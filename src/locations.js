@@ -3651,7 +3651,7 @@ function get_location_type_penalty(type, stage, stat) {
         types: [],
         is_unlocked: false, 
         is_challenge: true,
-        name: "Pure White Glacial Plain - Frost Portal",
+        name: "Pure White Arctic Tundra - Frost Portal",
         bgm:16,
         parent_location: locations["纯白冰原"],
         repeatable_reward: {
@@ -3668,7 +3668,7 @@ function get_location_type_penalty(type, stage, stat) {
         enemy_stat_halo:0.24,
         is_unlocked: false, 
         is_challenge: true,
-        name: "Pure White Glacial Plain - X",
+        name: "Pure White Arctic Tundra - X",
         bgm:16,
         parent_location: locations["纯白冰原"],
         repeatable_reward: {
@@ -3685,7 +3685,7 @@ function get_location_type_penalty(type, stage, stat) {
         enemy_stat_halo:0.24,
         is_unlocked: false, 
         is_challenge: true,
-        name: "Pure White Glacial Plain - XS",
+        name: "Pure White Arctic Tundra - XS",
         bgm:16,
         parent_location: locations["纯白冰原"],
         repeatable_reward: {
