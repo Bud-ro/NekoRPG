@@ -494,7 +494,8 @@ function create_item_tooltip_content({item, options={}}) {
  * @param {Object} item_effect from item effects[]
  */
 function create_effect_tooltip(effect_name, duration) {
-    const effect = effect_templates[effect_name];
+    //effect_name is a template key; fall back to the active effect itself for dynamically-created effects
+    const effect = effect_templates[effect_name] || active_effects[effect_name];
     const tooltip = document.createElement("div");
     tooltip.classList.add("active_effect_tooltip");
 
@@ -2895,9 +2896,9 @@ function update_displayed_effects() {
     if(effect_count > 0) {
         active_effects_tooltip.innerHTML = '';
         effect_divs = {};
-        Object.values(active_effects).forEach(effect => {
-            effect_divs[effect.name] = create_effect_tooltip(effect.name, effect.duration);
-            active_effects_tooltip.appendChild(effect_divs[effect.name]);
+        Object.entries(active_effects).forEach(([key, effect]) => {
+            effect_divs[key] = create_effect_tooltip(key, effect.duration);
+            active_effects_tooltip.appendChild(effect_divs[key]);
         });
     } else {
         active_effects_tooltip.innerHTML = 'No effects';

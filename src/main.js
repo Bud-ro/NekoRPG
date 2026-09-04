@@ -1227,8 +1227,8 @@ function textline_special(t_key){
         }
         else if(t_key == 'C1-dog'){
             let S_cnt = 0;
-            if(character.inventory["{\"id\":\""+"Intermediate Evolution Crystal Shard"+"\"}"] != undefined){
-                S_cnt = character.inventory["{\"id\":\""+"Intermediate Evolution Crystal Shard"+"\"}"].count;
+            if(character.inventory["{\"id\":\""+"中等进化结晶碎片"+"\"}"] != undefined){
+                S_cnt = character.inventory["{\"id\":\""+"中等进化结晶碎片"+"\"}"].count;
             }
             if(locations["古墓战 - II"].is_unlocked && !locations["古墓战 - II"].is_finished ){
                 
@@ -1237,7 +1237,7 @@ function textline_special(t_key){
             else{
                 if(S_cnt >= 10){
                     remove_from_character_inventory([{ 
-                        item_key: ("{\"id\":\""+"Intermediate Evolution Crystal Shard"+"\"}"),           
+                        item_key: ("{\"id\":\""+"中等进化结晶碎片"+"\"}"),           
                         item_count: 10,
                     }]);
                     displayed_text += `The \"bait\" has been laid... (Ancient Tomb Battle - II unlocked)`;
@@ -1253,10 +1253,10 @@ function textline_special(t_key){
         }
         else if(t_key.includes("pz")){
             let T_S = t_key;
-            let pz_map = {"pz-Bq":"Purple Blade Coin","pz-my":"Mithril Ingot","pz-bs":"Epic Yellow Gem"};//凭证
+            let pz_map = {"pz-Bq":"紫色刀币","pz-my":"秘银锭","pz-bs":"史诗黄宝石"};//凭证
             let cs_map = {"pz-Bq":250,"pz-my":30,"pz-bs":80};//cost
             //检查物品是否足够，扣除物品，如果不够就返回
-            let pz_key = "{\"id\":\""+"Wild Beast Voucher"+"\"}";//凭证
+            let pz_key = "{\"id\":\""+"荒兽凭证"+"\"}";//凭证
             let C_pz = cs_map[T_S];//Cost_凭证
             if(character.inventory[pz_key] != undefined)
             {
@@ -1277,7 +1277,7 @@ function textline_special(t_key){
             if(t_key == 'gacha-10') cnt = 10;
             if(t_key == 'gacha-50') cnt = 50;
             let cur_cost = cnt==1?10:(cnt*9);
-            let fj_key = "{\"id\":\""+"Inheritance Crystal: Pink"+"\"}";//粉
+            let fj_key = "{\"id\":\""+"传承水晶·粉"+"\"}";//粉
             if(character.inventory[fj_key] != undefined)
             {
 
@@ -5053,7 +5053,7 @@ let fish_v = 0,fish_x = 100;
 let rod_v = 0,rod_x = 100;
 let bar_health = 25;
 let rod_length = 40;
-let fishs = {1:{name:"Lake Carp",str:40},2:{name:"Blue Flower Fish",str:100},3:{name:"Ice Pillar Fish",str:180}}
+let fishs = {1:{name:"湖鲤鱼",str:40},2:{name:"青花鱼",str:100},3:{name:"冰柱鱼",str:180}}
 function update_displayed_fish()
 {
     fish_progress_bar.style.height = bar_health.toFixed(0) + "%";
@@ -5117,7 +5117,7 @@ function start_fishing_minigame()
 
         update_displayed_fish();
         if (bar_health >= 100) {
-            log_message(cur_fish.name + " is hooked!","enemy_defeated");
+            log_message(item_templates[cur_fish.name].getName() + " is hooked!","enemy_defeated");
             action_div.style.display = "inherit";
             fish_div.style.display = "none";
             add_xp_to_skill({skill: skills["Fishing"], xp_to_add: cur_fish.str / 20});
@@ -5125,7 +5125,7 @@ function start_fishing_minigame()
             clearInterval(fishId);
         }
         if (bar_health <= 0) {
-            log_message(cur_fish.name + " got away!","enemy_enhanced");
+            log_message(item_templates[cur_fish.name].getName() + " got away!","enemy_enhanced");
             action_div.style.display = "inherit";
             fish_div.style.display = "none";
             clearInterval(fishId);
@@ -5150,7 +5150,7 @@ let fish_vy = 0,fish_xy = 100;
 let rod_vy = 0,rod_xy = 100;
 let center_x,center_y,offset_x,offset_y;
 let rod_diff = 0.750;//操控力度
-let fishs_changed = {1:{name:"Ice Pillar Fish",str:80},2:{name:"Blood Lotus Fish",str:120},3:{name:"Ice Pillar Fish King",str:160}}
+let fishs_changed = {1:{name:"冰柱鱼",str:80},2:{name:"血莲鱼",str:120},3:{name:"冰柱鱼王",str:160}}
 //bar_health rod_length保留
 function update_displayed_fish_changed()
 {
@@ -5253,7 +5253,7 @@ function start_fishing_minigame_changed()
 
         update_displayed_fish_changed();
         if (bar_health >= 100) {
-            log_message(cur_fish.name + " is hooked!","enemy_defeated");
+            log_message(item_templates[cur_fish.name].getName() + " is hooked!","enemy_defeated");
             action_div.style.display = "inherit";
             fish_changed_div.style.display = "none";
             add_xp_to_skill({skill: skills["Fishing"], xp_to_add: cur_fish.str / 5});//四倍经验
@@ -5261,7 +5261,7 @@ function start_fishing_minigame_changed()
             clearInterval(fishId);
         }
         if (bar_health <= 0) {
-            log_message(cur_fish.name + " got away!","enemy_enhanced");
+            log_message(item_templates[cur_fish.name].getName() + " got away!","enemy_enhanced");
             action_div.style.display = "inherit";
             fish_changed_div.style.display = "none";
             clearInterval(fishId);
@@ -6076,7 +6076,7 @@ function engine_r(item_id,count){
 }
 function engine_f(oper){
     if(oper==1 && inf_combat.FE.fruit == -1){
-        let fr_key = "{\"id\":\""+"Mystic Ice Fruit"+"\"}";//应为玄冰果实
+        let fr_key = "{\"id\":\""+"玄冰果实"+"\"}";
         if(character.inventory[fr_key] != undefined){
             remove_from_character_inventory([{ 
                 item_key: fr_key,           
