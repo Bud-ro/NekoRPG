@@ -3,7 +3,9 @@
 import { current_game_time } from "./game_time.js";
 import { InventoryHaver } from "./inventory.js";
 import { item_templates, getItem} from "./items.js";
+import { inf_combat , family_data } from "./main.js";
 import { skills } from "./skills.js";
+import { locations } from "./locations.js";
 
 var traders = {};
 var inventory_templates = {};
@@ -18,6 +20,7 @@ class Trader extends InventoryHaver {
                  inventory_template,
                  profit_margin = 2,
                  is_unlocked = true,
+                 act = 1,
                 }) 
     {
         super();
@@ -41,6 +44,7 @@ class Trader extends InventoryHaver {
         //how much more expensive are the trader's items than their actual value, with default being 2 (so 2x more)
         //don't make it too low to prevent easy xp grinding for the haggling skill
         this.is_unlocked = is_unlocked;
+        this.act = act;
     }
     
     /**
@@ -49,11 +53,19 @@ class Trader extends InventoryHaver {
      */
     refresh() {
         if (this.can_refresh()) {
-            //refresh inventory
-            this.inventory = this.get_inventory_from_template();
+            if(this.have_closed()){
+                this.inventory = {};//物品栏清空
+                this.last_refresh = 9e15;//永不刷新
+                return false;
+            }
+            else{
 
-            this.last_refresh = (current_game_time.day_count);
-            return true;
+                //refresh inventory
+                this.inventory = this.get_inventory_from_template();
+
+                this.last_refresh = (current_game_time.day_count);
+                return true;
+            }
         }
         //otherwise do nothing
         return false;
@@ -63,6 +75,11 @@ class Trader extends InventoryHaver {
      * checks if enough time passed since last refresh
      * @returns {Boolean}
      */
+    have_closed(){
+        if(this.act <= 2 && (locations["幻境核心·出口"].is_unlocked )) return true;
+        if(this.act <= 1 && (locations["赫尔沼泽入口"].is_unlocked )) return true;
+        return false;
+    }
     can_refresh() {
         return (this.last_refresh < 0 || current_game_time.day_count - (this.last_refresh) >= this.refresh_time);
     }
@@ -74,28 +91,50 @@ class Trader extends InventoryHaver {
     get_inventory_from_template() {
         const inventory = {};
         const inventory_template = inventory_templates[this.inventory_template];
-
+        let quality_fix = 0;
+        let item_mul = 1;//全局乘数
+        if(this.inventory_template == "Sky II"){
+            let eff_N = inf_combat.B6 || 1;
+            if(eff_N >= 9999) eff_N = 9999;
+            quality_fix = 9 * Math.log(eff_N);
+            item_mul = eff_N ** 0.8;
+        }
+        let object_mul = 1;//局部乘数
         for (let i = 0; i < inventory_template.length; i++) {
             if (inventory_template[i].chance >= Math.random()) {
+                object_mul = 1;
+                if(inventory_template[i].influ.min >= 5){
+                    if(family_data.influ >= inventory_template[i].influ.min){
+                        object_mul *= Math.min(inventory_template[i].influ.cap,(family_data.influ / inventory_template[i].influ.min) ** inventory_template[i].influ.exp);//影响力充足，计算倍数
+                    }
+                    else continue;//影响力不足，直接跳过
+                }
                 let item_count = inventory_template[i].count.length == 1 ?
                 inventory_template[i].count[0] : Math.round(Math.random() *
                     (inventory_template[i].count[1] - inventory_template[i].count[0]) + inventory_template[i].count[0]);
-                
-                if(inventory_template[i].quality) {
+                let item_count_q = item_count;
+                item_count *= item_mul;
+                item_count *= object_mul;
+                item_count = Math.ceil(item_count);
+
+                if(inventory_template[i].quality[0] >= 10) {
                     let quality = Math.round(Math.random() *
-                        (inventory_template[i].quality[1] - inventory_template[i].quality[0]) + inventory_template[i].quality[0]);
+                        (inventory_template[i].quality[1] - inventory_template[i].quality[0]) + inventory_template[i].quality[0] + quality_fix);
 
                     const item = getItem({...item_templates[inventory_template[i].item_name], quality});
-                    inventory[item.getInventoryKey()] = { item: item, count: item_count };
+                    inventory[item.getInventoryKey()] = { item: item, count: item_count_q };
                 } else {
                     inventory[item_templates[inventory_template[i].item_name].getInventoryKey()] = { item: getItem(item_templates[inventory_template[i].item_name]), count: item_count };
 
                 }
             }
-            //console.log(inventory_template[i]);
 
 
-        }
+        }//family_data.influ = 纳家影响力
+        
+        //influ.min:最低多少影响力解锁(1代表禁用)
+        //influ.exp:超过min的影响力对物品获取倍数
+        //influ.cap:倍数上限(冰宫商人惨案警钟长鸣)
 
         //just add items based on their chances and counts in inventory_template
         return inventory;
@@ -125,7 +164,8 @@ class TradeItem {
     constructor({ item_name,
                   chance = 1,
                   count = [1],
-                  quality = [0.2, 0.8]
+                  quality = [0.2, 0.8],
+                  influ = {min:1,exp:0.0,cap:1},
                 }) 
     {
         this.item_name = item_name;
@@ -134,6 +174,12 @@ class TradeItem {
         //how many can appear, will randomly choose something between min and max if specificed, otherwise will go with specific ammount
         
         this.quality = quality; //min and max quality of item
+
+        this.influ = influ;
+        //influ.min:最低多少影响力解锁(1代表禁用)
+        //influ.exp:超过min的影响力对物品获取倍数
+        //influ.cap:倍数上限(冰宫商人惨案警钟长鸣)
+
     }
 }
 
@@ -144,6 +190,7 @@ class TradeItem {
         inventory_template: "Basic",
         is_unlocked: false,
         location_name: "Village",
+        act:1,
     });
     traders["suspicious trader"] = new Trader({
         name: "suspicious trader",
@@ -151,12 +198,14 @@ class TradeItem {
         is_unlocked: true,
         location_name: "Slums",
         profit_margin: 3,
+        act:1,
     });
     traders["Vending Machine"] = new Trader({
         name: "Vending Machine",
         inventory_template: "Basic I",
         is_unlocked: true,
         location_name: "纳家大厅",
+        act:1,
     });
     traders["Yangang General Store"] = new Trader({
         name: "Yangang General Store",
@@ -164,6 +213,7 @@ class TradeItem {
         is_unlocked: false,
         location_name: "燕岗城",
         profit_margin: 3,
+        act:1,
     });
     traders["Mine Market"] = new Trader({
         name: "Mine Market",
@@ -171,6 +221,7 @@ class TradeItem {
         is_unlocked: true,
         location_name: "燕岗矿井",
         profit_margin: 3.2,
+        act:1,
     });
     traders["Metal Wholesaler"] = new Trader({
         name: "Metal Wholesaler",
@@ -178,6 +229,7 @@ class TradeItem {
         is_unlocked: false,
         location_name: "地宫浅层",
         profit_margin: 1.5,
+        act:1,
     });
     traders["Camp Shop"] = new Trader({
         name: "Camp Shop",
@@ -185,6 +237,7 @@ class TradeItem {
         is_unlocked: true,
         location_name: "荒兽森林营地",
         profit_margin: 3.6,
+        act:2,
     });
     traders["Traveling Merchant"] = new Trader({
         name: "Traveling Merchant",
@@ -192,6 +245,7 @@ class TradeItem {
         is_unlocked: false,
         location_name: "清野江畔",
         profit_margin: 4.2,
+        act:2,
     });
     traders["Ruins Merchant"] = new Trader({
         name: "Ruins Merchant",
@@ -199,6 +253,7 @@ class TradeItem {
         is_unlocked: false,
         location_name: "声律城废墟",
         profit_margin: 4.8,
+        act:2,
     });
     traders["Airship Market"] = new Trader({
         name: "Airship Market",
@@ -206,6 +261,7 @@ class TradeItem {
         is_unlocked: false,
         location_name: "天外飞船",
         profit_margin: 5.4,
+        act:2,
     });
     traders["Treasure Pavilion"] = new Trader({
         name: "Treasure Pavilion",
@@ -213,6 +269,44 @@ class TradeItem {
         is_unlocked: true,
         location_name: "飞云阁",
         profit_margin: 4.2,
+        refresh_time: 2,
+        act:3,
+    });
+    traders["冰宫商人"] = new Trader({
+        name: "冰宫商人",
+        inventory_template: "Sky II",
+        is_unlocked: false,
+        location_name: "极寒冰宫",
+        profit_margin: 4.8,
+        refresh_time: 2,
+        act:3,
+    });
+    traders["窥秘商人"] = new Trader({
+        name: "窥秘商人",
+        inventory_template: "Sky III",
+        is_unlocked: false,
+        location_name: "传承幻境",
+        profit_margin: 6.4,
+        refresh_time: 2,
+        act:3,
+    });
+    traders["声望商人"] = new Trader({
+        name: "声望商人",
+        inventory_template: "Cloudy I",
+        is_unlocked: false,
+        location_name: "狩猎大赛·城门战",
+        profit_margin: 5.6,
+        refresh_time: 5,
+        act:4,
+    });
+    traders["声望商人·二代"] = new Trader({
+        name: "声望商人·二代",
+        inventory_template: "Cloudy II",
+        is_unlocked: false,
+        location_name: "狩猎大赛·古墓战",
+        profit_margin: 7.2,
+        refresh_time: 5,
+        act:4,
     });
     traders["Storage Chest"] = new Trader({
         name: "Storage Chest",
@@ -222,6 +316,7 @@ class TradeItem {
         location_name: "纳家秘境",
         profit_margin: 1.0,
         refresh_time: 9e15,
+        act:16,
     });
 })();
 
@@ -516,6 +611,122 @@ class TradeItem {
             new TradeItem({item_name: "黑白枝丫", count: [5,25]}),
             new TradeItem({item_name: "黑森叶片", count: [5,25]}),
             new TradeItem({item_name: "黑森织料", count: [5,10],chance:0.5}),
+
+
+    ];
+    inventory_templates["Sky II"] = 
+    [
+            new TradeItem({item_name: "B4·能量核心", count: [50,250]}),
+            new TradeItem({item_name: "旋律合金锭", count: [50,250]}),
+            new TradeItem({item_name: "能量冰沙", count: [10,50]}),
+
+            new TradeItem({item_name: "冰原超流体", count: [50,125]}),
+            new TradeItem({item_name: "多孔冰晶", count: [50,125]}),
+
+            new TradeItem({item_name: "晶化剑", count: [1], quality: [141, 180]}),
+            new TradeItem({item_name: "晶化戟", count: [1], quality: [141, 180]}),
+            new TradeItem({item_name: "晶化月轮", count: [1], quality: [141, 180]}),
+
+            
+            new TradeItem({item_name: "冰髓头盔", count: [1], quality: [151, 190]}),
+            new TradeItem({item_name: "冰髓胸甲", count: [1], quality: [151, 190]}),
+            new TradeItem({item_name: "冰髓腿甲", count: [1], quality: [151, 190]}),
+            new TradeItem({item_name: "冰髓战靴", count: [1], quality: [151, 190]}),
+            new TradeItem({item_name: "极寒帽子", count: [1], quality: [141, 180]}),
+            new TradeItem({item_name: "极寒背心", count: [1], quality: [141, 180]}),
+            new TradeItem({item_name: "极寒裤子", count: [1], quality: [141, 180]}),
+            new TradeItem({item_name: "极寒袜子", count: [1], quality: [141, 180]}),
+
+            
+            new TradeItem({item_name: "冰宫鳞片", count: [5,10]}),
+            new TradeItem({item_name: "光环杖芯", count: [5,10]}),
+            new TradeItem({item_name: "镶晶盾牌", count: [5,10]}),
+            new TradeItem({item_name: "万载冰髓锭", count: [1,3]}),
+            new TradeItem({item_name: "玄冰果实", count: [1,1],chance:0.2}),
+
+
+    ];
+    inventory_templates["Sky III"] = 
+    [
+            new TradeItem({item_name: "B7·能量核心", count: [50,250]}),
+            new TradeItem({item_name: "晶化合金锭", count: [50,250]}),
+            new TradeItem({item_name: "B9·??药剂", count: [10,50]}),
+
+            new TradeItem({item_name: "冰宫鳞片", count: [50,125]}),
+            new TradeItem({item_name: "光环杖芯", count: [50,125]}),
+
+            new TradeItem({item_name: "水素月轮", count: [1], quality: [151, 190]}),
+            new TradeItem({item_name: "宝石月轮", count: [1], quality: [141, 180]}),
+
+            
+            new TradeItem({item_name: "水素头盔", count: [1], quality: [151, 190]}),
+            new TradeItem({item_name: "水素胸甲", count: [1], quality: [151, 190]}),
+            new TradeItem({item_name: "水素腿甲", count: [1], quality: [151, 190]}),
+            new TradeItem({item_name: "水素战靴", count: [1], quality: [151, 190]}),
+
+            
+            new TradeItem({item_name: "传承水晶·橙", count: [5,10]}),
+            new TradeItem({item_name: "传承水晶·蓝", count: [5,10]}),
+            new TradeItem({item_name: "传承水晶·白", count: [5,10]}),
+            new TradeItem({item_name: "传承水晶·绿", count: [5,10]}),
+            new TradeItem({item_name: "牵制-从入门到入土", count: [50,100]}),
+
+
+    ];
+    inventory_templates["Cloudy I"] = 
+    [
+            new TradeItem({item_name: "破空紫蕨", count: [30,150]}),
+            new TradeItem({item_name: "魂晶锭", count: [30,150]}),
+            new TradeItem({item_name: "传承水晶·粉", count: [100,500]}),
+
+
+            new TradeItem({item_name: "魂晶月轮", count: [1], quality: [161, 200]}),
+            new TradeItem({item_name: "盖亚月轮", count: [1], quality: [121, 160]}),
+
+            
+            new TradeItem({item_name: "魂晶头盔", count: [1], quality: [151, 190]}),
+            new TradeItem({item_name: "魂晶胸甲", count: [1], quality: [151, 190]}),
+            new TradeItem({item_name: "魂晶腿甲", count: [1], quality: [151, 190]}),
+            new TradeItem({item_name: "魂晶战靴", count: [1], quality: [151, 190]}),
+
+            
+            new TradeItem({item_name: "C1·能量核心", count: [3,8],influ:{min:10,exp:0.4,cap:1000}}),
+            new TradeItem({item_name: "城门之星", count: [3,8],influ:{min:10,exp:0.4,cap:1000}}),
+            new TradeItem({item_name: "力场发生器", count: [2,4],influ:{min:30,exp:0.4,cap:1000}}),
+
+
+
+            new TradeItem({item_name: "盖亚合金锭", count: [1,3],influ:{min:50,exp:0.4,cap:1000}}),
+
+
+    ];
+    inventory_templates["Cloudy II"] = 
+    [
+            new TradeItem({item_name: "血灵液", count: [30,150]}),
+            new TradeItem({item_name: "远古碎片", count: [30,150]}),
+            new TradeItem({item_name: "C1·能量核心", count: [100,500]}),
+            new TradeItem({item_name: "远古合金锭", count: [5,20],influ:{min:100,exp:0.4,cap:1000}}),
+
+
+
+            new TradeItem({item_name: "远古月轮", count: [1], quality: [181, 220]}),
+            new TradeItem({item_name: "源金月轮", count: [1], quality: [141, 180]}),
+            
+            new TradeItem({item_name: "远古头盔", count: [1], quality: [161, 200]}),
+            new TradeItem({item_name: "远古胸甲", count: [1], quality: [161, 200]}),
+            new TradeItem({item_name: "远古腿甲", count: [1], quality: [161, 200]}),
+            new TradeItem({item_name: "远古战靴", count: [1], quality: [161, 200]}),
+
+            
+            new TradeItem({item_name: "云霄级魂魄", count: [5,12],influ:{min:150,exp:0.4,cap:1000}}),
+            new TradeItem({item_name: "爆燃粉末", count: [5,12],influ:{min:200,exp:0.4,cap:1000}}),
+            new TradeItem({item_name: "琥珀金骨", count: [3,10],influ:{min:250,exp:0.4,cap:1000}}),
+
+
+
+            new TradeItem({item_name: "古源金锭", count: [3,8],influ:{min:1000,exp:0.4,cap:1000}}),
+            new TradeItem({item_name: "血灵骨棉", count: [3,8],influ:{min:1000,exp:0.4,cap:1000}}),
+
 
 
     ];

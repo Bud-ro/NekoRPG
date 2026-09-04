@@ -6,11 +6,12 @@ import { skills } from "./skills.js";
 import { current_game_time } from "./game_time.js";
 import { activities } from "./activities.js";
 import { inf_combat } from "./main.js";
+import { format_numberL } from "./display.js";
 
 import { book_stats, item_templates, Weapon, Armor, Shield } from "./items.js";
 import { get_total_skill_level,add_to_character_inventory, remove_from_character_inventory } from "./character.js";
 import { character } from "./character.js";
-import { log_message , format_number} from "./display.js";
+import { log_message , format_number, update_displayed_equipment, update_displayed_stats, create_new_bestiary_entry, add_bestiary_zones} from "./display.js";
 import { enemy_killcount } from "./enemies.js";
 const locations = {};
 const location_types = {};
@@ -214,7 +215,13 @@ class Combat_zone {
             {
                 newEnemy.stats.attack += character.stats.full.attack_power * 0.1;
                 newEnemy.stats.defense += character.stats.full.defense * 0.1;
-                log_message(`${f_enemy.name} absorbed ${format_number(character.stats.full.attack_power * 0.1)} attack and ${format_number(character.stats.full.defense * 0.1)} defense [Synchronize]`,"enemy_enhanced");
+                newEnemy.stats.agility += character.stats.full.agility * 0.1;
+                log_message(`${f_enemy.name} 吸取了 ${format_number(character.stats.full.attack_power * 0.1)} 攻击，${format_number(character.stats.full.defense * 0.1)}防御 ，${format_number(character.stats.full.agility * 0.1)} 敏捷 [同调]`,"enemy_enhanced");
+            }//同调
+            if(newEnemy.spec.includes(53))
+            {
+                newEnemy.stats.attack += character.stats.full.attack_power * 2.0;
+                log_message(`${f_enemy.name} 吸取了 ${format_number(character.stats.full.attack_power * 2.0)} 攻击 [同调·魔]`,"enemy_enhanced");
             }//同调
             if(newEnemy.spec.includes(24)){
                 log_message(`${f_enemy.name} absorbed ${format_number(character.stats.full.attack_power * 0.5)} health [Sword Drain]`,"enemy_enhanced");
@@ -236,7 +243,17 @@ class Combat_zone {
                 log_message(`${f_enemy.name} absorbed ${format_number(character.stats.full.agility * newEnemy.spec_value[30])} attack [Purify]`,"enemy_enhanced");
                 newEnemy.stats.attack += character.stats.full.agility * newEnemy.spec_value[30];//净化
             }
-            if(newEnemy.id == "地宫养殖者[BOSS]")//特判地宫养殖者
+            if(newEnemy.spec.includes(69)){ 
+                log_message(`${f_enemy.name} 吸取了 ${format_number(character.stats.full.attack_power)} 攻击 [反击]`,"enemy_enhanced");
+                newEnemy.stats.attack += character.stats.full.attack_power;//反击
+            }
+            if(newEnemy.spec.includes(58)){
+                let M58 = ((8-inf_combat.S3.b2)*3-inf_combat.S3.b3)*0.05 + 1;
+                newEnemy.stats.health *= M58;
+                newEnemy.stats.attack *= M58;
+                log_message(`${f_enemy.name} 的攻击/血量 变为 ${format_number(M58*100)}% ! [暴走]`,"enemy_enhanced");
+            }//暴走-实现
+            if(newEnemy.name == "地宫养殖者[BOSS]")//特判地宫养殖者
             {
                 if(enemy_killcount["地宫养殖者[BOSS]"]) console.log("试图再次击杀");
                 else{
@@ -273,6 +290,17 @@ class Combat_zone {
                 }
             }
             newEnemy.is_alive = true;
+
+            
+            if(newEnemy.add_to_bestiary) {
+                if(enemy_killcount[newEnemy.name] >= 0) {
+                    //摆烂
+                } else {
+                    enemy_killcount[newEnemy.name] = 0;
+                    create_new_bestiary_entry(newEnemy.name);
+                    add_bestiary_zones(newEnemy.name);
+                }
+            }
         return newEnemy;
     }
 
@@ -328,14 +356,15 @@ class Combat_zone {
 
             // } else {
             let halo_fix = 0;
-            if(enemy.id == "秘境心火精灵[BOSS]")//特判秘境心火
+            let halo_mul = 1;
+            if(enemy.name == "秘境心火精灵[BOSS]")//特判秘境心火
             {
                 const key_id = item_templates["微花残片"].getInventoryKey();
                 let key_cnt = character.inventory[key_id]?character.inventory[key_id].count:0;
                 key_cnt = Math.min(key_cnt,5);
                 if(key_cnt != 0)
                 {
-                    log_message(`Due to holding ${key_cnt} Micro-Petal Fragments, the halo is weakened: 140% -> ${140-key_cnt*8}%!`,"enemy_enhanced");
+                    log_message(`由于持有 ${key_cnt} 个微花残片，光环削弱：140% -> ${140-key_cnt*8}%！`,"hero_regened");
                     halo_fix -= 0.08*key_cnt;
                 }
             }
@@ -345,7 +374,7 @@ class Combat_zone {
                 key_cnt = Math.min(key_cnt,4);
                 if(key_cnt != 0)
                 {
-                    log_message(`Due to holding ${key_cnt} Micro-Petal Fragments, the halo is weakened: 132% -> ${132-key_cnt*8}%!`,"enemy_enhanced");
+                    log_message(`由于持有 ${key_cnt} 个微花残片，光环削弱：132% -> ${132-key_cnt*8}%！`,"hero_regened");
                     halo_fix -= 0.08*key_cnt;
                 }
             }
@@ -359,11 +388,54 @@ class Combat_zone {
             }
             else if(this.name.includes("Pure White Arctic Tundra") && character.is_in_inventory_nanami("{\"id\":\"峰\"}")){
                 remove_from_character_inventory([{item_key:"{\"id\":\"峰\"}"}]);
-                log_message("[Feng] We finally made it. Worth every step I spent tailing her.","enemy_enhanced");
-                log_message("[Feng] Well then, I suppose it's time for me to take my leave...","enemy_enhanced");
+                log_message("[峰]终于到地方了，不枉我盯了她一路。","hero_regened");
+                log_message("[峰]那么，我也差不多该走了……","hero_regened");
+            }
+            else if(this.name.includes("鲜血峰 - ")){
+                const key_id1 = item_templates["血峰限制器"].getInventoryKey();
+                let key_cnt1 = character.inventory[key_id1]?character.inventory[key_id1].count:0;
+                key_cnt1 = Math.min(key_cnt1,5);
+                if(key_cnt1 != 0){
+                    halo_mul *= 1 - 0.2 * key_cnt1;
+                }
+                const key_id2 = item_templates["血峰增幅器"].getInventoryKey();
+                let key_cnt2 = character.inventory[key_id2]?character.inventory[key_id2].count:0;
+                key_cnt2 = Math.min(key_cnt2,999025);
+                if(key_cnt2 != 0){
+                    halo_mul *= 1 + 0.2 * (key_cnt2 ** 0.5);
+                }
+            }
+            if(character.equipment.props?.name == "光环法杖"){
+                if(enemy.rank >= 4000){
+                    log_message("光环法杖大放光彩，随即暗淡下来……","hero_regened");
+                    log_message("它的材料不足以增幅如此强大的敌人！","hero_regened");
+                }
+                else if(enemy.rank % 100 >= 50){
+                    log_message("[光环法杖]BOSS级敌人无法被增幅!","hero_regened");
+                }
+                else{
+                    halo_fix += 0.25;
+                    log_message(`[光环法杖]光环:${format_number(100*(this.enemy_stat_halo + halo_fix - 0.25))}% -> ${format_number(100*(this.enemy_stat_halo + halo_fix))}%`,"enemy_enhanced");
+                }
+            }//不是云霄级以上目标(4幕以后目标)
+            
+            if(character.equipment.props?.name == "荒兽傀儡"){
+                
+                if((character.xp.current_level>=29)){
+                    
+                    log_message("随着一声气球漏气一样的声音，","hero_regened");
+                    log_message("荒兽傀儡被纳可的云霄级威压压扁了。","hero_regened");
+                    log_message("用沼泽材料搓的东西能撑到现在已经不错了啦……","hero_regened");
+                    
+                    character.equipment.props = null;
+                    
+                    update_displayed_equipment(); 
+                    character.stats.add_all_equipment_bonus();
+                    update_displayed_stats();
+                }
             }
                 
-            const halo = this.enemy_stat_halo + 1 + halo_fix;
+            const halo = this.enemy_stat_halo * halo_mul + 1 + halo_fix;
 
             enemies.push(this.get_enemy(halo,enemy)); 
             if(enemy.spec.includes(41)) {
@@ -378,6 +450,13 @@ class Combat_zone {
                 enemies.push(this.get_enemy(halo,enemy_templates["舰船除草机B1"])); 
                 enemies.push(this.get_enemy(halo,enemy_templates["舰船除草机B1"])); 
             }//召唤
+            
+            if(enemy.spec.includes(60)) {
+                let E_name = this.enemies_list[Math.floor(Math.random() * this.enemies_list.length)];
+                enemies.push(this.get_enemy(halo,enemy_templates[E_name]));
+                log_message(`[败移] ${E_name} 被 ${enemy.name} 护在身前！`,"enemy_enhanced");
+
+            }//败移
         }
         return enemies;
     }
@@ -386,7 +465,7 @@ class Combat_zone {
     //launches on every combat action
     get_total_effect() {
         const effects = {multipliers: {}};
-        const hero_effects = {multipliers: {}};
+        const hero_effects = {multipliers: {},flat:{}};
         
         //iterate over types of location
         for(let i = 0; i < this.types.length; i++) {
@@ -404,9 +483,10 @@ class Combat_zone {
                 
                 hero_effects.multipliers[effect] = (hero_effects.multipliers[effect] || 1) * get_location_type_penalty(this.types[i].type, this.types[i].stage, effect);
             })
+
+
         }
 
-        
 
         return {base_penalty: effects, hero_penalty: hero_effects};
     }
@@ -791,6 +871,20 @@ function get_location_type_penalty(type, stage, stat) {
                     }
                 }
             }
+        }
+    });
+    location_types["toxic"] = new LocationType({
+        name: "toxic",
+        stages: {
+            1: {
+                description: "密林的毒虫叮咬使你疲于应对……",
+                related_skill: "Toxic resistance",
+                effects: {
+                    multipliers: {
+                        defense: 0.7,
+                    }
+                }
+            },
         }
     });
 })();
@@ -2208,7 +2302,7 @@ function get_location_type_penalty(type, stage, stat) {
 
         traders: ["Storage Chest"],
         sleeping: {
-            text: "Meditate and restore energy [+100XP/s]",
+            text: "调息，冥想[+10XP/s]",
             xp: 10
         },
         crafting: {
@@ -2686,8 +2780,8 @@ function get_location_type_penalty(type, stage, stat) {
         bgm: 10,
         traders: ["Storage Chest"],
         sleeping: {
-            text: "Cultivate in the Rune House [+10,000XP/s]",
-            xp: 100
+            text: "在符文之屋修炼[+40XP/s]",
+            xp: 40
         },
             crafting: {
                 is_unlocked: true,
@@ -3145,8 +3239,8 @@ function get_location_type_penalty(type, stage, stat) {
         bgm: 13,
         traders: ["Storage Chest"],
         sleeping: {
-            text: "Use the outer-space energy-gathering array [+250,000XP/s]",
-            xp: 500
+            text: "使用天外聚能阵[+120XP/s]",
+            xp: 120
         },
             crafting: {
                 is_unlocked: true,
@@ -3444,8 +3538,8 @@ function get_location_type_penalty(type, stage, stat) {
         traders: ["Storage Chest","Treasure Pavilion"],
         dialogues: ["峰(飞云)"],
         sleeping: {
-            text: "Rest at Feiyun Pavilion [+360,000XP/s]",
-            xp: 600
+            text: "在飞云阁休息[+360XP/s]",
+            xp: 360
         },
             crafting: {
                 is_unlocked: true,
@@ -3464,10 +3558,10 @@ function get_location_type_penalty(type, stage, stat) {
 
 
     locations["纯白冰原"] = new Location({ 
-        connected_locations: [{location: locations["飞云阁"], custom_text: "Return to Feiyun Pavilion"}],
-        description: "A bitterly cold world of ice and snow. The temperature stays around 240K (-33°C), and the ice element permeating the air can spell doom for Earth Rank cultivators. [End point for versions before V2.30]",
-        name: "Pure White Arctic Tundra",
-        dialogues: ["纳娜米(冰原)"],
+        connected_locations: [{location: locations["飞云阁"], custom_text: "回到飞云阁"}], 
+        description: "相当寒冷的冰雪天地。温度长期停留在240K(-33°C)附近，空气中弥漫的冰元素更是能让大地级修者遭遇不测",
+        name: "纯白冰原", 
+        dialogues: ["纳娜米(冰原)","极寒相变引擎","冰霜门户"],
         is_unlocked: false,
         bgm: 16,
         unlock_text : "In a silver-white world wrapped in thick snow, two girls stand on the peak of a snow mountain, overlooking the vast white expanse below."
@@ -3528,7 +3622,7 @@ function get_location_type_penalty(type, stage, stat) {
         },
         repeatable_reward: {
             xp: 30e8,
-            locations: [{location: "纯白冰原 - 4"}],
+            locations: [{location: "纯白冰原 - 4"},{location: "纯白冰原 - 冰霜门户"}],
         },
     });
     locations["纯白冰原 - 4"] = new Combat_zone({
@@ -3546,36 +3640,1675 @@ function get_location_type_penalty(type, stage, stat) {
         },
         repeatable_reward: {
             xp: 40e8,
-            //locations: [{location: "纯白冰原 - X"}],
+            locations: [{location: "纯白冰原 - XS"}],
         },
+    });
+    locations["纯白冰原 - 冰霜门户"] = new Challenge_zone({
+        description: "前面有一座两侧覆盖着冰雪的石制大门。越过这只怨气魔物才能触碰到它。", 
+        enemy_count: 1, 
+        enemies_list : [["探险者的怨恨[BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "纯白冰原 - 冰霜门户",
+        bgm:16,
+        parent_location: locations["纯白冰原"],
+        repeatable_reward: {
+            textlines: [{dialogue: "冰霜门户", lines: ["bs1"]}],
+        },
+        unlock_text : "系统提示：触碰冰霜门户，或许会有意外收获。",
+    });
+    locations["纯白冰原 - X"] = new Challenge_zone({
+        description: "前面有一座两侧覆盖着冰雪的石制大门。越过这只怨气魔物才能触碰到它。", 
+        enemy_count: 1, 
+        enemy_groups_list : [["敌意女巫[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]"]],
+        enemy_group_size: [7,7],
+        types: [],
+        enemy_stat_halo:0.24,
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "纯白冰原 - X",
+        bgm:16,
+        parent_location: locations["纯白冰原"],
+        repeatable_reward: {
+            locations: [{location: "极寒冰宫"}],
+        },
+        unlock_text : "[猎兵]没什么好说的，真要道歉，那就留在这里吧！杀！",
+    });
+    locations["纯白冰原 - XS"] = new Challenge_zone({
+        description: "前面有一座两侧覆盖着冰雪的石制大门。越过这只怨气魔物才能触碰到它。", 
+        enemy_count: 1, 
+        enemy_groups_list : [["敌意女巫[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]"]],
+        enemy_group_size: [7,7],
+        types: [],
+        enemy_stat_halo:0.24,
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "纯白冰原 - XS",
+        bgm:16,
+        parent_location: locations["纯白冰原"],
+        repeatable_reward: {
+            locations: [{location: "极寒冰宫"}],
+        },
+        unlock_text : "[猎兵]没什么好说的，真要道歉，那就留在这里吧！杀！",
     });
 
     locations["纯白冰原"].connected_locations.push({location: locations["纯白冰原 - 1"]});
     locations["纯白冰原"].connected_locations.push({location: locations["纯白冰原 - 2"]});
     locations["纯白冰原"].connected_locations.push({location: locations["纯白冰原 - 3"]});
     locations["纯白冰原"].connected_locations.push({location: locations["纯白冰原 - 4"]});
+    locations["纯白冰原"].connected_locations.push({location: locations["纯白冰原 - 冰霜门户"]});
+    locations["纯白冰原"].connected_locations.push({location: locations["纯白冰原 - X"], custom_text: "前往挑战冰宫守卫[旧]"});
+    locations["纯白冰原"].connected_locations.push({location: locations["纯白冰原 - XS"], custom_text: "前往挑战冰宫守卫"});
+    
+    locations["极寒冰城"] = new Location({ 
+        connected_locations: [{location: locations["极寒冰宫"], custom_text: "前往【极寒冰宫】"}], 
+        description: "非常抱歉，这里的名字最后一个字已经改掉了的说……为了防止有猫掉进虚空，做了这个地点！",
+        name: "极寒冰城", 
+        is_unlocked: true,
+        bgm: 17,
+    });//3-4(D)
+    
+    locations["极寒冰宫"] = new Location({ 
+        connected_locations: [{location: locations["纯白冰原"], custom_text: "回到纯白冰原"}], 
+        description: "坐落于纯白冰原的中心地带，完全由冰块组成的城市。女巫似乎希望留下纳可和纳娜米，却没有意识到攻守已悄然逆转。",
+        name: "极寒冰宫", 
+        traders: ["冰宫商人"],
+        dialogues: ["溪月"],
+        is_unlocked: false,
+        bgm: 17,
+        unlock_text : "[女巫]外来的小东西，本以为你们会知难而退，想不到竟然闯入这冰城里来。",
+    });//3-4
+    locations["纯白冰原"].connected_locations.push({location: locations["极寒冰宫"]});
+    locations["极寒冰宫 - 1"] = new Combat_zone({
+        description: "充斥着敌意的冰块城市，女巫指引着狂暴的荒兽", 
+        enemy_count: 20, 
+        enemies_list: ["探险者的怨恨","出芽橙茸战士","敌意猎兵","大眼霜冻鱼","敌意女巫"],
+        enemy_group_size: [3,3],
+        enemy_stat_halo:0.12,
+        is_unlocked: true, 
+        name: "极寒冰宫 - 1",
+        rank:231, 
+        bgm:17,
+        parent_location: locations["极寒冰宫"],
+        first_reward: {
+            xp: 150e8,
+        },
+        repeatable_reward: {
+            xp: 50e8,
+            locations: [{location: "极寒冰宫 - 2"}],
+        },
+    });locations["极寒冰宫 - 2"] = new Combat_zone({
+        description: "充斥着敌意的冰块城市，更多的女巫对荒兽不断释放着光环", 
+        enemy_count: 20, 
+        enemies_list: ["敌意女巫","出芽黄茸战士","绝对低温能源","敌意骑士","出芽绿茸战士"],
+        enemy_group_size: [3,3],
+        enemy_stat_halo:0.12,
+        is_unlocked: false, 
+        name: "极寒冰宫 - 2",
+        rank:232,
+        bgm:17,
+        parent_location: locations["极寒冰宫"],
+        first_reward: {
+            xp: 225e8,
+        },
+        repeatable_reward: {
+            xp: 75e8,
+            locations: [{location: "极寒冰宫 - 3"}],
+        },
+    });locations["极寒冰宫 - 3"] = new Combat_zone({
+        description: "充斥着敌意的冰块城市，女巫离开了……毕竟它们也无法掌控冰血除草者的力量。", 
+        enemy_count: 20, 
+        enemies_list: ["冰血除草者","夹击卫戍","敌意傀儡","雪茸茸战士","大教内门弟子","敌意美杜莎"],
+        enemy_group_size: [3,3],
+        is_unlocked: false, 
+        name: "极寒冰宫 - 3",
+        rank:233,
+        bgm:17,
+        parent_location: locations["极寒冰宫"],
+        first_reward: {
+            xp: 300e8,
+        },
+        repeatable_reward: {
+            xp: 100e8,
+            locations: [{location: "极寒冰宫 - 4"}],
+        },
+    });locations["极寒冰宫 - 4"] = new Combat_zone({
+        description: "充斥着敌意的冰块城市，这里是一片较核心的区域……奇怪的粉发少女似乎在附近！要不要跟上呢？", 
+        enemy_count: 20, 
+        enemies_list: ["冰兽龙龙","敌意巫师","出芽青茸战士","自爆步兵","敌意老人"],
+        enemy_group_size: [3,3],
+        is_unlocked: false, 
+        name: "极寒冰宫 - 4",
+        rank:234,
+        bgm:17,
+        parent_location: locations["极寒冰宫"],
+        first_reward: {
+            xp: 450e8,
+        },
+        repeatable_reward: {
+            xp: 150e8,
+            locations: [{location: "极寒冰宫 - X"}],
+        },
+    });
+    locations["极寒冰宫 - X"] = new Challenge_zone({
+        description: "在光环的庇护之下，我等将誓死冲锋！谔谔啊啊啊啊啊啊！", 
+        enemy_count: 1, 
+        enemies_list : [["敌意老人[BOSS]"]],
+        enemy_group_size: [4,4],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        enemy_stat_halo:0.50,
+        name: "极寒冰宫 - X",
+        bgm:17,
+        parent_location: locations["极寒冰宫"],
+        repeatable_reward: {
+            textlines: [{dialogue: "溪月", lines: ["xy1"]}],
+        },
+        unlock_text : "[敌意老人]狂妄自大的外来者，杀我族人，罪该当诛！"
+    });
+    locations["极寒冰宫"].connected_locations.push({location: locations["极寒冰宫 - 1"]});
+    locations["极寒冰宫"].connected_locations.push({location: locations["极寒冰宫 - 2"]});
+    locations["极寒冰宫"].connected_locations.push({location: locations["极寒冰宫 - 3"]});
+    locations["极寒冰宫"].connected_locations.push({location: locations["极寒冰宫 - 4"]});
+    locations["极寒冰宫"].connected_locations.push({location: locations["极寒冰宫 - X"]});
+    locations["时封水牢"] = new Location({ 
+        connected_locations: [{location: locations["极寒冰宫"], custom_text: "回到极寒冰宫"}], 
+        description: "充盈着水元素的奇怪领域。被奇怪的粉色头发女孩子打晕之后就进来了！",
+        name: "时封水牢", 
+        dialogues: ["竺虎","莫尔"],
+        is_unlocked: false,
+        bgm: 18,
+        unlock_text : "[老人]你们……完了……主人会……替我们……报仇……",
+    });//3-5
+    
+    locations["极寒冰宫"].connected_locations.push({location: locations["时封水牢"]});
+
+    locations["时封水牢 - I"] = new Challenge_zone({
+        description: "这一区的小boss着实很多。将会从I~IV区分！", 
+        enemy_count: 1, 
+        enemies_list : [["竺虎[BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "时封水牢 - I",
+        bgm:18,
+        parent_location: locations["时封水牢"],
+        repeatable_reward: {
+            textlines: [{dialogue: "竺虎", lines: ["zh5"]}],
+        },
+    });
+    locations["时封水牢 - II"] = new Challenge_zone({
+        description: "莫尔的脾气很好，人也很好……不会有杀害按钮了啦。", 
+        enemy_count: 1, 
+        enemies_list : [["莫尔[BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "时封水牢 - II",
+        bgm:18,
+        parent_location: locations["时封水牢"],
+        repeatable_reward: {
+            textlines: [{dialogue: "莫尔", lines: ["mr6"]}],
+        },
+    });
+
+    
+    locations["时封水牢 - 1"] = new Combat_zone({
+        description: "囚禁着大量天空级强者的水牢。也孕育着许多用于积攒经验的【灵】。", 
+        enemy_count: 20, 
+        enemies_list: ["大门派先锋","水牢雪怪","水牢花妖","成熟期蛟龙","出芽蓝茸战士"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        name: "时封水牢 - 1",
+        rank:241, 
+        bgm:18,
+        parent_location: locations["时封水牢"],
+        first_reward: {
+            xp: 900e8,
+        },
+        repeatable_reward: {
+            xp: 300e8,
+            locations: [{location: "时封水牢 - 2"}],
+        },
+    });
+    locations["时封水牢 - 2"] = new Combat_zone({
+        description: "囚禁着大量天空级强者的水牢。也孕育着许多用于积攒经验的【灵】。", 
+        enemy_count: 20, 
+        enemies_list: ["出芽蓝茸战士","燕岗迷途强者","水牢嗜血哥布林","识灵水藻","徘徊的紫乌"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        name: "时封水牢 - 2",
+        rank:242, 
+        bgm:18,
+        parent_location: locations["时封水牢"],
+        first_reward: {
+            xp: 1200e8,
+        },
+        repeatable_reward: {
+            xp: 400e8,
+            locations: [{location: "时封水牢 - 3"}],
+        },
+    });
+    locations["时封水牢 - 3"] = new Combat_zone({
+        description: "囚禁着大量天空级强者的水牢。也孕育着许多用于积攒经验的【灵】。", 
+        enemy_count: 20, 
+        enemies_list: ["徘徊的紫乌","夜巡傀儡","水猫茸茸","徘徊的骸骨","水牢骨角茸茸"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        name: "时封水牢 - 3",
+        enemy_stat_halo: 0.06,
+        rank:243, 
+        bgm:18,
+        parent_location: locations["时封水牢"],
+        first_reward: {
+            xp: 1500e8,
+        },
+        repeatable_reward: {
+            xp: 500e8,
+            textlines: [{dialogue: "莫尔", lines: ["mr1"]}],
+            locations: [{location: "水牢深处"},{location: "水牢洞府"}],
+        },
+    });
+    locations["时封水牢"].connected_locations.push({location: locations["时封水牢 - I"]});
+    locations["时封水牢"].connected_locations.push({location: locations["时封水牢 - II"]});
+    locations["时封水牢"].connected_locations.push({location: locations["时封水牢 - 1"]});
+    locations["时封水牢"].connected_locations.push({location: locations["时封水牢 - 2"]});
+    locations["时封水牢"].connected_locations.push({location: locations["时封水牢 - 3"]});
+
+    
+    locations["水牢洞府"] = new Location({
+        connected_locations: [{location: locations["时封水牢"], custom_text: "回到水牢中战斗"}],
+        description: "强榜强者在听闻纳可姐妹的战绩后，“主动”腾出的一间洞府。",
+        name: "水牢洞府",
+        is_unlocked: false,
+        bgm: 18,
+        traders: ["物品存储箱"],
+        sleeping: {
+            text: "在水牢洞府修炼[+1440XP/s]",
+            xp: 1440
+        },
+            crafting: {
+                is_unlocked: true, 
+                use_text: "使用熔炼阵法[Tier+14]", 
+                tiers: {
+                    crafting: 14,
+                    forging: 14,
+                    smelting: 14,
+                    cooking: 14,
+                    alchemy: 14,
+                }
+            },
+        
+    })
+    
+    locations["时封水牢"].connected_locations.push({location: locations["水牢洞府"]});
+
+    
+    
+    locations["水牢深处"] = new Location({ 
+        connected_locations: [{location: locations["时封水牢"], custom_text: "回到时封水牢"}], 
+        description: "充盈着水元素的奇怪领域。从此出发去挑战强榜强者！",
+        name: "水牢深处", 
+        dialogues: ["秋兴","蓝柒"],
+        is_unlocked: false,
+        bgm: 18,
+    });//3-5II
+    locations["时封水牢"].connected_locations.push({location: locations["水牢深处"]});
+
+    locations["时封水牢 - 4"] = new Combat_zone({
+        description: "囚禁着大量天空级强者的水牢。从此出发可以前往强榜强者的住处。", 
+        enemy_count: 20, 
+        enemies_list: ["水牢石灵","仙旅城强战士","城主府骨干","火箭卫戍","小门派长老"],
+        enemy_group_size: [4,4],
+        is_unlocked: true, 
+        name: "时封水牢 - 4",
+        rank:244, 
+        bgm:18,
+        parent_location: locations["水牢深处"],
+        first_reward: {
+            xp: 1800e8,
+        },
+        repeatable_reward: {
+            xp: 600e8,
+            textlines: [{dialogue: "秋兴", lines: ["qx1"]}],
+        },
+    });
+    locations["时封水牢 - 5"] = new Combat_zone({
+        description: "囚禁着大量天空级强者的水牢。从此出发可以前往强榜强者的住处。", 
+        enemy_count: 20, 
+        enemies_list: ["小门派长老","水牢幽暗人形","出芽紫茸战士","星月幻术师","绿皮怪物"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        name: "时封水牢 - 5",
+        rank:245, 
+        enemy_stat_halo: 0.10,
+        bgm:18,
+        parent_location: locations["水牢深处"],
+        first_reward: {
+            xp: 2400e8,
+        },
+        repeatable_reward: {
+            xp: 800e8,
+            textlines: [{dialogue: "蓝柒", lines: ["lq1"]}],
+            locations: [{location: "时封水牢 - 6"}],
+        },
+    });
+    locations["时封水牢 - 6"] = new Combat_zone({
+        description: "囚禁着大量天空级强者的水牢。距离出水的岸边已经越来越近了。", 
+        enemy_count: 20, 
+        enemies_list: ["星月幻术师","魔化枭蝎","古龙幼崽","血杀殿余孽","城主府骨干"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        name: "时封水牢 - 6",
+        rank:246, 
+        enemy_stat_halo: 0.10,
+        bgm:18,
+        parent_location: locations["水牢深处"],
+        first_reward: {
+            xp: 3000e8,
+        },
+        repeatable_reward: {
+            xp: 1000e8,
+            locations: [{location: "时封水牢 - X"}],
+        },
+    });
+    
+    locations["时封水牢 - III"] = new Challenge_zone({
+        description: "击败她以解锁时封水牢 - 5！", 
+        enemy_count: 1, 
+        enemies_list : [["秋兴[BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "时封水牢 - III",
+        bgm:18,
+        parent_location: locations["水牢深处"],
+        repeatable_reward: {
+            locations: [{location: "时封水牢 - 5"}],
+            textlines: [{dialogue: "秋兴", lines: ["qx5"]}],
+        },
+    });
+    locations["时封水牢 - IV"] = new Challenge_zone({
+        description: "击败她以……拿到三颗传奇红宝石？", 
+        enemy_count: 1, 
+        enemies_list : [["蓝柒[放水 ver.][BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "时封水牢 - IV",
+        bgm:18,
+        parent_location: locations["水牢深处"],
+        repeatable_reward: {
+            textlines: [{dialogue: "蓝柒", lines: ["lq5"]}],
+        },
+    });
+    locations["时封水牢 - X"] = new Challenge_zone({
+        description: "击败她以离开水牢！", 
+        enemy_count: 1, 
+        enemies_list : [["蓝柒[BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "时封水牢 - X",
+        bgm:18,
+        parent_location: locations["水牢深处"],
+        repeatable_reward: {
+            textlines: [{dialogue: "蓝柒", lines: ["lq7"]}],
+        },
+    });
+
+
+    locations["水牢深处"].connected_locations.push({location: locations["时封水牢 - 4"]});    
+    locations["水牢深处"].connected_locations.push({location: locations["时封水牢 - 5"]});    
+    locations["水牢深处"].connected_locations.push({location: locations["时封水牢 - 6"]});
+    locations["水牢深处"].connected_locations.push({location: locations["时封水牢 - III"]});  
+    locations["水牢深处"].connected_locations.push({location: locations["时封水牢 - IV"]});  
+    locations["水牢深处"].connected_locations.push({location: locations["时封水牢 - X"]});  
+
+
+    
+    locations["水牢走廊"] = new Location({ 
+        connected_locations: [{location: locations["时封水牢"], custom_text: "回到时封水牢"}], 
+        description: "已经离开了时封水牢的范围……等会！那个粉色头发的女孩子！",
+        name: "水牢走廊", 
+        dialogues: ["溪月 II"],
+        is_unlocked: false,
+        bgm: 19,
+    });//3-5III
+    locations["水牢深处"].connected_locations.push({location: locations["水牢走廊"]});  
+
+    locations["传承幻境"] = new Location({ 
+        connected_locations: [{location: locations["时封水牢"], custom_text: "回到时封水牢"}], 
+        description: "散发着五彩光华的空间，周围有许多实力相近(?)的荒兽。苏醒了，猎杀时刻！",
+        dialogues: ["传承水晶"],
+        traders: ["窥秘商人"],
+        name: "传承幻境", 
+        is_unlocked: false,
+        bgm: 19,
+    });//3-6
+    locations["水牢走廊"].connected_locations.push({location: locations["传承幻境"]});  
+
+
+    locations["传承幻境 - 1"] = new Combat_zone({
+        description: "散发着五彩光华的空间。无论左阿到底想要什么，至少这里真的有很多突破机缘。", 
+        enemy_count: 20, 
+        enemies_list: ["奇异菇菇","幻境掌灯人","蓝皮怪物","幻境通识者","幻境翠绿行者"],
+        enemy_group_size: [2.5,3.5],
+        is_unlocked: true, 
+        name: "传承幻境 - 1",
+        rank:251, 
+        bgm:19,
+        parent_location: locations["传承幻境"],
+        first_reward: {
+            xp: 3600e8,
+        },
+        repeatable_reward: {
+            xp: 1200e8,
+            locations: [{location: "传承幻境 - 2"}],
+        },
+    });
+    locations["传承幻境 - 2"] = new Combat_zone({
+        description: "散发着五彩光华的空间。无论左阿到底想要什么，至少这里真的有很多突破机缘。", 
+        enemy_count: 20, 
+        enemies_list: ["幻境翠绿行者","幻境飞蛾","风尘的窃贼","深邃级魔法师","荒野守尸人"],
+        enemy_group_size: [3,3],
+        is_unlocked: false, 
+        name: "传承幻境 - 2",
+        rank:252, 
+        bgm:19,
+        parent_location: locations["传承幻境"],
+        first_reward: {
+            xp: 4200e8,
+        },
+        repeatable_reward: {
+            xp: 1400e8,
+            locations: [{location: "传承幻境 - 3"},{location: "传承幻境 - 水晶空间"}],
+        },
+    });
+    locations["传承幻境 - 3"] = new Combat_zone({
+        description: "散发着五彩光华的空间。无论左阿到底想要什么，至少这里真的有很多突破机缘。", 
+        enemy_count: 20, 
+        enemies_list: ["火烈茸茸","幻境火蝶","出芽粉茸战士","凶恶的金乌","幻境血魔"],
+        enemy_group_size: [3.5,4.5],
+        is_unlocked: false, 
+        name: "传承幻境 - 3",
+        rank:253, 
+        bgm:19,
+        parent_location: locations["传承幻境"],
+        first_reward: {
+            xp: 4800e8,
+        },
+        repeatable_reward: {
+            xp: 1600e8,
+            locations: [{location: "传承幻境 - 4"}],
+            traders: [{traders:"窥秘商人"}],
+        },
+    });
+    locations["传承幻境 - 4"] = new Combat_zone({
+        description: "散发着五彩光华的空间。无论左阿到底想要什么，至少这里真的有很多突破机缘。", 
+        enemy_count: 20, 
+        enemies_list: ["幻境血魔","窥秘商人","燕岗领独行侠","幻境石灵","磐石蜘蛛"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        name: "传承幻境 - 4",
+        rank:254, 
+        bgm:19,
+        parent_location: locations["传承幻境"],
+        first_reward: {
+            xp: 5400e8,
+        },
+        repeatable_reward: {
+            xp: 1800e8,
+            locations: [{location: "传承幻境 - ?"},{location: "传承幻境 - X"}],
+        },
+    });
+
+    locations["传承幻境"].connected_locations.push({location: locations["传承幻境 - 1"]});
+    locations["传承幻境"].connected_locations.push({location: locations["传承幻境 - 2"]});
+    locations["传承幻境"].connected_locations.push({location: locations["传承幻境 - 3"]});
+    locations["传承幻境"].connected_locations.push({location: locations["传承幻境 - 4"]});    
+
+    locations["传承幻境 - 水晶空间"] = new Challenge_zone({
+        description: "击败成精的怪物手册来获取五色水晶——当然还有映星紫华。", 
+        enemy_count: 1, 
+        enemies_list : [["怪物手册[BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "传承幻境 - 水晶空间",
+        bgm:19,
+        parent_location: locations["传承幻境"],
+        repeatable_reward: {
+            textlines: [{dialogue: "传承水晶", lines: ["sj1"]}],
+        },
+    });
+    locations["传承幻境"].connected_locations.push({location: locations["传承幻境 - 水晶空间"]});   
+    
+    
+    locations["传承幻境 - ?"] = new Challenge_zone({
+        description: "测试一下伤害是否正常！(才不是因为纱雪的存档还在3-5没办法测，才放这个地图在这里的。)", 
+        enemy_count: 1, 
+        enemies_list : [["心魔木偶[SP]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "传承幻境 - ?",
+        bgm:19,
+        parent_location: locations["传承幻境"],
+        repeatable_reward: {
+        },
+    });
+    locations["传承幻境"].connected_locations.push({location: locations["传承幻境 - ?"]});   
+    locations["传承幻境 - X"] = new Challenge_zone({
+        description: "如果打不过的话，回去吃两本牵制书！说不定还有其他的邪道呢？", 
+        enemy_count: 1, 
+        enemies_list : [["心魔[BOSS]"]],
+        enemy_group_size: [4,4],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "传承幻境 - X",
+        bgm:19,
+        parent_location: locations["传承幻境"],
+        repeatable_reward: {
+            locations: [{location: "幻境核心·地宫"}],
+        },
+    });
+    locations["传承幻境"].connected_locations.push({location: locations["传承幻境 - X"]});   
+
+
+    locations["幻境核心·地宫"] = new Location({ 
+        connected_locations: [{location: locations["传承幻境"], custom_text: "回到传承幻境"}], 
+        description: "幻境之行，应该就到此为止……等等，骗人的吧，这，这里是——地宫？有姐姐的声音！",
+        name: "幻境核心·地宫", 
+        dialogues: ["纳娜米?"],
+        is_unlocked: false,
+        bgm: 20,
+    });//3-7(1区)
+    locations["传承幻境"].connected_locations.push({location: locations["幻境核心·地宫"]});   
+
+    locations["幻境核心 - 1"] = new Combat_zone({
+        description: "隐约听到姐姐的声音？！姐姐不会——就在那里——", 
+        enemy_count: 30, 
+        enemies_list: ["心魔","燕岗辉煌佣兵","地宫虫将","地宫不眠者","地下焚天火","燕岗城卫队长"],
+        enemy_group_size: [4,4],
+        is_unlocked: true, 
+        name: "幻境核心 - 1",
+        rank:261, 
+        bgm:20,
+        parent_location: locations["幻境核心·地宫"],
+        first_reward: {
+            xp: 6000e8,
+        },
+        repeatable_reward: {
+            xp: 2000e8,
+            textlines: [{dialogue: "纳娜米?", lines: ["hx1"]}],
+        },
+    });
+    locations["幻境核心 - I"] = new Challenge_zone({
+        description: "大胆茸茸！我一眼就看出你不是姐姐！姐姐虽然会灵体，但哪有你这么强哇。", 
+        enemy_count: 1, 
+        enemies_list : [["喵咕啦[BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "幻境核心 - I",
+        bgm:20,
+        parent_location: locations["幻境核心·地宫"],
+        repeatable_reward: {
+            locations: [{location: "幻境核心·结界湖"}],
+        },
+    });
+    locations["幻境核心·地宫"].connected_locations.push({location: locations["幻境核心 - 1"]});   
+    locations["幻境核心·地宫"].connected_locations.push({location: locations["幻境核心 - I"]});  
+
+
+
+    locations["幻境核心·结界湖"] = new Location({ 
+        connected_locations: [{location: locations["幻境核心·地宫"], custom_text: "回到一重幻境"}], 
+        description: "所以这一次是——家族秘境，结界湖吗，不知道这里有没有冰柱鱼。这里也算是……对我影响很深的地方呢。",
+        name: "幻境核心·结界湖", 
+        dialogues: ["纳鹰?"],
+        is_unlocked: false,
+        bgm: 20,
+    });//3-7(2区)
+
+    locations["幻境核心·地宫"].connected_locations.push({location: locations["幻境核心·结界湖"]});  
+
+    locations["幻境核心 - 2"] = new Combat_zone({
+        description: "就是在这里，纳鹰前辈传授了我很多修炼心得，令我一步步成长到现在。", 
+        enemy_count: 30, 
+        enemies_list: ["心魔","残雪灵阵","秘境荧光帕芙","秘境闪耀精灵","喵咕啦","晓雪魅蝠","威武星骑士"],
+        enemy_group_size: [4,4],
+        is_unlocked: true, 
+        name: "幻境核心 - 2",
+        enemy_stat_halo:0.1,
+        rank:262, 
+        bgm:20,
+        parent_location: locations["幻境核心·结界湖"],
+        first_reward: {
+            xp: 7500e8,
+        },
+        repeatable_reward: {
+            xp: 2500e8,
+            textlines: [{dialogue: "纳鹰?", lines: ["hx5"]}],
+        },
+    });
+    locations["幻境核心·结界湖"].connected_locations.push({location: locations["幻境核心 - 2"]});  
+
+
+
+    locations["幻境核心·战场"] = new Location({ 
+        connected_locations: [{location: locations["幻境核心·结界湖"], custom_text: "回到二重幻境"}], 
+        description: "幻境，已经被打破了两重。那一场生灵涂炭的劫难……身临其境，不自觉就会变得暴戾起来。",
+        name: "幻境核心·战场", 
+        dialogues: ["烈日神像"],
+        is_unlocked: false,
+        bgm: 20,
+    });//3-7(3区)
+
+    locations["幻境核心·结界湖"].connected_locations.push({location: locations["幻境核心·战场"]});  
+
+    locations["幻境核心 - 3"] = new Combat_zone({
+        description: "要坚信，这一切的劫难……都是假象……假象！", 
+        enemy_count: 30, 
+        enemies_list: ["心魔","威武星骑士","兰陵城头目","圣荒城头目","战场不朽骸骨","血腥追风者"],
+        enemy_group_size: [4,4],
+        is_unlocked: true, 
+        name: "幻境核心 - 3",
+        enemy_stat_halo:0.18,
+        rank:263, 
+        bgm:20,
+        parent_location: locations["幻境核心·战场"],
+        first_reward: {
+            xp: 9000e8,
+        },
+        repeatable_reward: {
+            xp: 3000e8,
+            locations: [{location: "幻境核心 - II"}],
+        },
+    });
+    locations["幻境核心 - II"] = new Challenge_zone({
+        description: "说起来，彭罗斯三角什么的在攻防中会有怎样的妙用呢？感觉是一个不错的巧思主题。", 
+        enemy_count: 1, 
+        enemies_list : [["不可能三角B9[BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "幻境核心 - II",
+        bgm:20,
+        parent_location: locations["幻境核心·战场"],
+        repeatable_reward: {
+            locations: [{location: "幻境核心·飞船"}],
+        },
+    });
+    locations["幻境核心·战场"].connected_locations.push({location: locations["幻境核心 - 3"]});  
+    locations["幻境核心·战场"].connected_locations.push({location: locations["幻境核心 - II"]});  
+
+    locations["幻境核心·飞船"] = new Location({ 
+        connected_locations: [{location: locations["幻境核心·战场"], custom_text: "回到三重幻境"}], 
+        description: "那么，第四重幻境……天外来客的飞船核心？说起来，附近的区域，似乎有一种莫名的怨念在聚集。",
+        name: "幻境核心·飞船", 
+        dialogues: ["末世天骄","十连扭蛋机"],
+        is_unlocked: false,
+        bgm: 20,
+    });//3-7(4区)
+
+    locations["幻境核心·战场"].connected_locations.push({location: locations["幻境核心·飞船"]});  
+
+
+    locations["幻境核心 - 4"] = new Combat_zone({
+        description: "这种怨念……这是之前三重幻境，都没有感应到过的。这一次，又是什么呢？", 
+        enemy_count: 30, 
+        enemies_list: ["心魔","黄桃重工B9","不可能三角B9","极寒之锋B9","金色血眼B9","恐怖机人B9"],
+        enemy_group_size: [4,4],
+        is_unlocked: true, 
+        name: "幻境核心 - 4",
+        rank:264, 
+        bgm:20,
+        parent_location: locations["幻境核心·飞船"],
+        first_reward: {
+            xp: 12000e8,
+        },
+        repeatable_reward: {
+            xp: 4000e8,
+            locations: [{location: "幻境核心 - III"}],
+        },
+    });
+    locations["幻境核心 - 歧路"] = new Challenge_zone({
+        description: "看来讲话是讲不通了！Plan B~物·理·超·度！", 
+        enemy_count: 1, 
+        enemies_list : [["末世天骄[BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "幻境核心 - 歧路",
+        bgm:20,
+        parent_location: locations["幻境核心·飞船"],
+        repeatable_reward: {
+            textlines: [{dialogue: "十连扭蛋机", lines: ["nd1"]}],
+        },
+    });
+    locations["幻境核心 - III"] = new Challenge_zone({
+        description: "真的非常狠！蛮咕兽，狠咕兽，特咕兽——征集下一个名字！暴咕兽怎么样？", 
+        enemy_count: 1, 
+        enemies_list : [["狠咕兽[BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "幻境核心 - III",
+        bgm:20,
+        parent_location: locations["幻境核心·飞船"],
+        repeatable_reward: {
+            locations: [{location: "幻境核心·森林"}],
+        },
+    });
+    locations["幻境核心·飞船"].connected_locations.push({location: locations["幻境核心 - 4"]});  
+    locations["幻境核心·飞船"].connected_locations.push({location: locations["幻境核心 - III"]});  
+    locations["幻境核心·飞船"].connected_locations.push({location: locations["幻境核心 - 歧路"]});  
+
+
+    locations["幻境核心·森林"] = new Location({ 
+        connected_locations: [{location: locations["幻境核心·飞船"], custom_text: "回到四重幻境"}], 
+        description: "好浓的雾气……不过辨认眼前的事物还是没问题的。这是，遇到峰大哥的那片森林吧。",
+        name: "幻境核心·森林", 
+        dialogues: ["心魔之主","草场"],
+        is_unlocked: false,
+        bgm: 20,
+    });//3-7(5区)
+
+    locations["幻境核心·飞船"].connected_locations.push({location: locations["幻境核心·森林"]});  
+
+
+
+    locations["幻境核心 - 5"] = new Combat_zone({
+        description: "说起来，如果不是百家联合许多势力设计，我也就不会遇到峰大哥，就不会有后来的这些事情。", 
+        enemy_count: 30, 
+        enemies_list: ["心魔","冈崎喵妖","血洛大陆骨干","扭曲毒虫","狠咕兽","超量凶悍树妖"],
+        enemy_group_size: [4,4],
+        is_unlocked: true, 
+        name: "幻境核心 - 5",
+        rank:265, 
+        bgm:20,
+        parent_location: locations["幻境核心·森林"],
+        first_reward: {
+            xp: 15000e8,
+        },
+        repeatable_reward: {
+            xp: 5000e8,
+            textlines: [{dialogue: "心魔之主", lines: ["xm1"]}],
+        },
+    });
+    locations["幻境核心 - IV"] = new Challenge_zone({
+        description: "这家伙的信心取决于被牵制毒害的有多深！说到底不就差了两倍吗……魔不行别怪到牵制头上哇。", 
+        enemy_count: 1, 
+        enemies_list : [["心魔之主[BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "幻境核心 - IV",
+        bgm:20,
+        parent_location: locations["幻境核心·森林"],
+        repeatable_reward: {
+            locations: [{location: "幻境核心·现世"}],
+        },
+    });
+    locations["幻境核心·森林"].connected_locations.push({location: locations["幻境核心 - 5"]});  
+    locations["幻境核心·森林"].connected_locations.push({location: locations["幻境核心 - IV"]});  
+
+
+    locations["幻境核心·现世"] = new Location({ 
+        connected_locations: [{location: locations["幻境核心·森林"], custom_text: "回到五重幻境"}], 
+        description: "挣脱开心魔的侵袭后，彩色光芒浮现。五层幻境全部破碎，此地即是幻境的真正核心。另外，左阿忙着抹除印记，这里的阵法可以偷用一下！",
+        dialogues: ["溪月(核心)"],
+        name: "幻境核心·现世", 
+        
+        traders: ["物品存储箱"],
+        sleeping: {
+            text: "“借用”幻境阵法修炼[+5760XP/s]",
+            xp: 5760
+        },
+            crafting: {
+                is_unlocked: true, 
+                use_text: "“借用”熔炼阵法[Tier+16]", 
+                tiers: {
+                    crafting: 16,
+                    forging: 16,
+                    smelting: 16,
+                    cooking: 16,
+                    alchemy: 16,
+                }
+            },
+        is_unlocked: false,
+        bgm: 20,
+    });//3-7(6区)
+
+    locations["幻境核心·森林"].connected_locations.push({location: locations["幻境核心·现世"]});  
+    
+    locations["幻境核心 - 6"] = new Combat_zone({
+        description: "请登上最后的决战之地，击败左阿！", 
+        enemy_count: 30, 
+        enemies_list: ["暗杀飞蛾","巨人强豪","古龙小兽","血洛流浪剑客","大门派精英"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        name: "幻境核心 - 6",
+        rank:266, 
+        bgm:20,
+        parent_location: locations["幻境核心·现世"],
+        first_reward: {
+            xp: 18000e8,
+        },
+        repeatable_reward: {
+            xp: 6000e8,
+            textlines: [{dialogue: "溪月(核心)", lines: ["hx35"]}],
+        },
+    });
+    locations["幻境核心·现世"].connected_locations.push({location: locations["幻境核心 - 6"]});  
 
 
 
 
+    locations["幻境核心·决战"] = new Location({ 
+        connected_locations: [],//没有退路可言！
+        description: "这里就是第三幕的终极尽头！对了，你回不去了。复活也是就地复活哦。",
+        name: "幻境核心·决战", 
+        dialogues: ["左阿(决战)","决战木牌"],
+        is_unlocked: false,
+        bgm: 20,
+    });//3-7(最终)
+    locations["幻境核心·现世"].connected_locations.push({location: locations["幻境核心·决战"],custom_text:"进入决战[⚠️胜利前无法返回]"});  
+
+
+    locations["幻境核心 - B1"] = new Challenge_zone({
+        description: "心之灵·禁锢 自选敌人区域！", 
+        enemy_count: 1, 
+        enemies_list : [["心之灵·禁锢[BOSS]"]],
+        enemy_group_size: [1,1],
+        enemy_stat_halo: 0.25,
+        types: [],
+        is_unlocked: true, 
+        is_challenge: true,
+        name: "幻境核心 - B1",
+        bgm:20,
+        parent_location: locations["幻境核心·决战"],
+        repeatable_reward: {},
+    });
+    locations["幻境核心 - B2"] = new Challenge_zone({
+        description: "心之灵·滋生 自选敌人区域！", 
+        enemy_count: 1, 
+        enemies_list : [["心之灵·滋生[BOSS]"]],
+        enemy_group_size: [1,1],
+        enemy_stat_halo: 0.25,
+        types: [],
+        is_unlocked: true, 
+        is_challenge: true,
+        name: "幻境核心 - B2",
+        bgm:20,
+        parent_location: locations["幻境核心·决战"],
+        repeatable_reward: {},
+    });
+    locations["幻境核心 - B3"] = new Challenge_zone({
+        description: "心之灵·暴走 自选敌人区域！", 
+        enemy_count: 1, 
+        enemies_list : [["心之灵·暴走[BOSS]"]],
+        enemy_group_size: [1,1],
+        enemy_stat_halo: 0.25,
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "幻境核心 - B3",
+        bgm:20,
+        parent_location: locations["幻境核心·决战"],
+        repeatable_reward: {},
+    });
+    locations["幻境核心 - X"] = new Challenge_zone({
+        description: "左阿的最终战斗！", 
+        enemy_count: 1, 
+        enemies_list : [["左阿(垂死)[BOSS]"]],
+        enemy_stat_halo: 0.1,
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "幻境核心 - X",
+        bgm:20,
+        parent_location: locations["幻境核心·决战"],
+        repeatable_reward: {
+            locations: [{location: "幻境核心·出口"}],
+        },
+    });
+    
+    locations["幻境核心·决战"].connected_locations.push({location: locations["幻境核心 - B1"],custom_text:"挑战心之灵·禁锢"});
+    locations["幻境核心·决战"].connected_locations.push({location: locations["幻境核心 - B2"],custom_text:"挑战心之灵·滋生"});
+    locations["幻境核心·决战"].connected_locations.push({location: locations["幻境核心 - B3"],custom_text:"挑战心之灵·暴走"});
+    locations["幻境核心·决战"].connected_locations.push({location: locations["幻境核心 - X"],custom_text:"挑战左阿！！！"});
+
+    
+
+    locations["幻境核心·出口"] = new Location({ 
+        connected_locations: [{location: locations["幻境核心·现世"], custom_text: "回到六重幻境"}], 
+        description: "左阿的战斗……结束了！",
+        name: "幻境核心·出口", 
+        dialogues: ["冰溪月"],//出口剧情！
+        is_unlocked: false,
+        bgm: 20,
+    });//3-7(5区)
+    locations["幻境核心·现世"].connected_locations.push({location: locations["幻境核心·出口"]});
+    locations["幻境核心·决战"].connected_locations.push({location: locations["幻境核心·出口"],custom_text:"离开决战之地"});
+
+    locations["纳家宝库"] = new Location({ 
+        connected_locations: [{location: locations["幻境核心·出口"], custom_text: "回到幻境核心"},{location: locations["赫尔沼泽入口"], custom_text: "快速旅行 - 第三幕"}], 
+        description: "终于回到家族了！是时候夺走这家主大位……",
+        name: "纳家宝库", 
+        dialogues: ["纳布(宝库)"],//老登剧情！
+        is_unlocked: false,
+        bgm: 21,
+    });//4-1(初始区)
+    locations["纳家宝库 - X"] = new Challenge_zone({
+        description: "老爹突破了。想要拿走奇宝可没有原作那么简单了！", 
+        enemy_count: 1, 
+        enemies_list : [["纳布[BOSS]"]],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "纳家宝库 - X",
+        bgm:21,
+        parent_location: locations["纳家宝库"],
+        repeatable_reward: {
+            textlines: [{dialogue: "纳布(宝库)", lines: ["bk6"]}],
+        },
+    });
+    locations["幻境核心·出口"].connected_locations.push({location: locations["纳家宝库"]});
+    locations["纳家宝库"].connected_locations.push({location: locations["纳家宝库 - X"]});
+    locations["赫尔沼泽入口"].connected_locations.push({location: locations["纳家宝库"],custom_text:"快速旅行 - 第四幕"});
+    locations["狩猎大赛·城门战"] = new Location({ 
+        connected_locations: [{location: locations["纳家宝库"], custom_text: "回到纳家宝库"}], 
+        description: "激动人心的燕岗领狩猎大赛。这里是第一阶段！",
+        name: "狩猎大赛·城门战", 
+        traders: ["声望商人"],
+        dialogues: [],
+        is_unlocked: false,
+        bgm: 21,
+    });//4-1
+    locations["纳家宝库"].connected_locations.push({location: locations["狩猎大赛·城门战"]});
+
+    locations["城门战 - 1"] = new Combat_zone({
+        description: "紧张刺激的燕岗领狩猎大赛~全是云霄级战力哦~", 
+        enemy_count: 20, 
+        enemies_list: ["魔草绿球","刺穿的菇灵","奸猾绝凶兽","暴风野蝠","城门战傀儡"],
+        enemy_group_size: [4,4],
+        is_unlocked: true, 
+        name: "城门战 - 1",
+        rank:301, 
+        bgm:21,
+        parent_location: locations["狩猎大赛·城门战"],
+        first_reward: {
+            xp: 3e12,
+        },
+        repeatable_reward: {
+            xp: 1e12,
+            locations: [{location: "城门战 - 2"}],
+            activities: [{location:"狩猎大赛·城门战", activity:"Running"}],
+        },
+    });
+    locations["城门战 - 2"] = new Combat_zone({
+        description: "听说这附近许多强者都选择抱团取暖。如果缺乏足够的影响力，或许买到补给都成问题？", 
+        enemy_count: 20, 
+        enemies_list: ["毒牙噬蝠","深邃法师小队","燕岗狂剑小队","古树蜘蛛","燕城看门人"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        name: "城门战 - 2",
+        rank:302, 
+        bgm:21,
+        parent_location: locations["狩猎大赛·城门战"],
+        first_reward: {
+            xp: 4.5e12,
+        },
+        repeatable_reward: {
+            xp: 1.5e12,
+            locations: [{location: "城门战 - 3"}],
+            traders: [{traders:"声望商人"}],
+        },
+    });
+    locations["城门战 - 3"] = new Combat_zone({
+        description: "单靠一人奋勇杀敌是无法扩大整个势力的影响力的。真正重要的是大量中流砥柱……", 
+        enemy_count: 20, 
+        enemies_list: ["炽烈茸茸","城门战淘汰者","哥布林头目","燕岗知识分子","古古怪树"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        name: "城门战 - 3",
+        rank:303, 
+        bgm:21,
+        parent_location: locations["狩猎大赛·城门战"],
+        first_reward: {
+            xp: 6e12,
+        },
+        repeatable_reward: {
+            xp: 2e12,
+            locations: [{location: "城门战 - X"}],
+        },
+        unlock_text : "[纳可]诶，那边那个人看起来没了气息。是已经死亡被淘汰了吗……等会！怎么它变绿了也变强了！一定要避开它。",
+    });
+    locations["城门战 - 歧路"] = new Challenge_zone({
+        description: "我从地狱回来了！你知道我这几十年怎么过的吗！！！", 
+        enemy_count: 1, 
+        enemies_list: ["百方[复仇 ver.][BOSS]"],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "城门战 - 歧路",
+        bgm:21,
+        parent_location: locations["狩猎大赛·城门战"],
+        repeatable_reward: {
+        },
+    });
+
+    locations["城门战 - X"] = new Challenge_zone({
+        description: "结界湖BOSS战强势回归！依旧是法师-战士-坦克的阵容~", 
+        enemy_count: 1, 
+        enemy_groups_list : [["薛奇[BOSS]","燕岗骑砍小队[BOSS]","燕岗骑砍小队[BOSS]","燕岗威武小队[BOSS]","燕岗威武小队[BOSS]","燕岗卫戍小队[BOSS]","燕岗卫戍小队[BOSS]"]],
+        enemy_group_size: [7,7],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "城门战 - X",
+        bgm:21,
+        parent_location: locations["狩猎大赛·城门战"],
+        repeatable_reward: {
+            locations: [{location: "狩猎大赛·密林战"}],
+        },
+    });
+
+    locations["狩猎大赛·城门战"].connected_locations.push({location: locations["城门战 - 1"]}); 
+    locations["狩猎大赛·城门战"].connected_locations.push({location: locations["城门战 - 2"]}); 
+    locations["狩猎大赛·城门战"].connected_locations.push({location: locations["城门战 - 3"]});  
+    locations["狩猎大赛·城门战"].connected_locations.push({location: locations["城门战 - 歧路"]});  
+    locations["狩猎大赛·城门战"].connected_locations.push({location: locations["城门战 - X"]});  
+
+
+    locations["狩猎大赛·密林战"] = new Location({ 
+        connected_locations: [{location: locations["狩猎大赛·城门战"], custom_text: "回到城门前"}], 
+        description: "似乎是上纪元被废弃的古战场区域。人造物痕迹仍然存在，植被却已极度繁盛。",
+        name: "狩猎大赛·密林战", 
+        traders: [],
+        dialogues: [],
+        is_unlocked: false,
+        bgm: 22,
+        unlock_text : "[纳可]怪事，战前似乎没有下发狩猎大赛的路线图。不过，既然是比狩猎，那跟着强者和荒兽多的路线走就对了！",
+    });//4-2
+    locations["狩猎大赛·城门战"].connected_locations.push({location: locations["狩猎大赛·密林战"]});
+
+    locations["狩猎大赛·补给点"] = new Location({ 
+        connected_locations: [{location: locations["狩猎大赛·密林战"], custom_text: "回到战斗区"}], 
+        description: "一个野生的补给区域。似乎上古炼器炉的气息驱散了这里的毒虫，使这里变成了密林中难得的清净之地。这里甚至有些许水体，可以练习高难度游泳动作！",
+        name: "狩猎大赛·补给点", 
+        traders: ["物品存储箱"],
+        dialogues: [],
+        sleeping: {
+            text: "使用补给点修炼资源[+23040XP/s]",
+            xp: 23040,
+        },
+        crafting: {
+            is_unlocked: true, 
+            use_text: "使用前人留下的上古炼器炉[Tier+18]", 
+            tiers: {
+                crafting: 18,
+                forging: 18,
+                smelting: 18,
+                cooking: 18,
+                alchemy: 18,
+            }
+        },
+        is_unlocked: false,
+        bgm: 22,
+    });//4-2休息区
+    locations["狩猎大赛·密林战"].connected_locations.push({location: locations["狩猎大赛·补给点"]});
+
+
+    locations["密林战 - 1"] = new Combat_zone({
+        description: "由于古战场上存在大量强者尸体，蚊子们逐步产生了适应进化，破防能力大大加强了！", 
+        enemy_count: 20, 
+        enemies_list: ["水晶骷髅","壮硕走地兽","燕岗威武小队","燕岗骑砍小队","燕岗卫戍小队"],
+        enemy_group_size: [4,4],
+        is_unlocked: true, 
+        types: [{type: "toxic", stage: 1, xp_gain: 1}],
+        name: "密林战 - 1",
+        rank:311, 
+        bgm:22,
+        parent_location: locations["狩猎大赛·密林战"],
+        first_reward: {
+            xp: 9e12,
+        },
+        repeatable_reward: {
+            xp: 3e12,
+            money:20e12,
+            locations: [{location: "密林战 - 2"}],
+            activities: [{location:"狩猎大赛·密林战", activity:"Swimming"}],
+        },
+        unlock_text : "[???]嗡嗡嗡嗡嗡……[纳可]看来这条路线上蚊子众多。在拥有强力恢复效果前，还是尽可能速战速决吧。",
+    });
+    locations["密林战 - 2"] = new Combat_zone({
+        description: "古古怪树真是天下第一雄关啊。告诉你们一个好消息：4-3没有这货。", 
+        enemy_count: 20, 
+        enemies_list: ["古古怪树","腐毒仙子","绿原圣触","燕岗暮年强者","燕岗精英铁卫"],
+        enemy_group_size: [4,4],
+        is_unlocked: false,
+        types: [{type: "toxic", stage: 1, xp_gain: 2}],
+        name: "密林战 - 2",
+        rank:312, 
+        bgm:22,
+        parent_location: locations["狩猎大赛·密林战"],
+        first_reward: {
+            xp: 12e12,
+        },
+        repeatable_reward: {
+            xp: 4e12,
+            money:44e12,
+            locations: [{location: "密林战 - 3"},{location: "狩猎大赛·补给点"}],
+        },
+        unlock_text : "[纳可]随着逐步深入密林，敌人愈发强大，指示天地能量浓度的蚊虫量却几乎恒定。前方必有大机缘的入口！",
+    });
+    locations["密林战 - 3"] = new Combat_zone({
+        description: "对策卡并不只有纳可的道具：诺，那个【硬化】就是C1镭射枪·残的对策卡。", 
+        enemy_count: 20, 
+        enemies_list: ["古古怪树","燕岗金甲战士","奥术大师","燕岗射手小队","燕岗钢铁战士"],
+        enemy_group_size: [4,4],
+        is_unlocked: false,
+        types: [{type: "toxic", stage: 1, xp_gain: 3}],
+        name: "密林战 - 3",
+        rank:313, 
+        bgm:22,
+        parent_location: locations["狩猎大赛·密林战"],
+        first_reward: {
+            xp: 15e12,
+        },
+        repeatable_reward: {
+            xp: 5e12,
+            money:72e12,
+            locations: [{location: "密林战 - 4"}],
+        },
+    });
+    locations["密林战 - 4"] = new Combat_zone({
+        description: "这里没有古古怪树了。但代价是……极致的数值和机制！", 
+        enemy_count: 20, 
+        enemies_list: ["燕岗金甲战士","绿原守灵人","绿原蜂后","燕岗名流商人","燕岗江洋大盗"],
+        enemy_group_size: [4,4],
+        is_unlocked: false,
+        types: [{type: "toxic", stage: 1, xp_gain: 4}],
+        name: "密林战 - 4",
+        rank:314, 
+        bgm:22,
+        parent_location: locations["狩猎大赛·密林战"],
+        first_reward: {
+            xp: 18e12,
+        },
+        repeatable_reward: {
+            xp: 6e12,
+            money:100e12,
+            locations: [{location: "密林战 - X"}],
+        },
+        unlock_text : "[纳可]强者们似乎都聚集在一处固若金汤的主门前。绕过它只需要迅速击败3个警戒哨！好机会！",
+    });
+    
+    locations["密林战 - X"] = new Challenge_zone({
+        description: "快点把它们全部干掉！虽然看起来血不多，但这些全是时封……", 
+        enemy_count: 1, 
+        enemy_groups_list : [["燕岗城警戒哨[BOSS]","燕岗城警戒哨[BOSS]","燕岗城警戒哨[BOSS]"]],
+        enemy_group_size: [3,3],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "密林战 - X",
+        bgm:22,
+        parent_location: locations["狩猎大赛·密林战"],
+        repeatable_reward: {
+            locations: [{location: "狩猎大赛·古墓战"}],
+        },
+    });
+    locations["狩猎大赛·密林战"].connected_locations.push({location: locations["密林战 - 1"]}); 
+    locations["狩猎大赛·密林战"].connected_locations.push({location: locations["密林战 - 2"]}); 
+    locations["狩猎大赛·密林战"].connected_locations.push({location: locations["密林战 - 3"]}); 
+    locations["狩猎大赛·密林战"].connected_locations.push({location: locations["密林战 - 4"]}); 
+    locations["狩猎大赛·密林战"].connected_locations.push({location: locations["密林战 - X"]}); 
 
 
 
 
+    locations["狩猎大赛·古墓战"] = new Location({ 
+        connected_locations: [{location: locations["狩猎大赛·密林战"], custom_text: "回到密林中"}], 
+        description: "就知道哨所前面指定有好东西~虽然古墓中弥漫着阴冷的气息，但可以隐约感应到，突破云霄，就在此地！[V4.20前版本终点]",
+        name: "狩猎大赛·古墓战", 
+        traders: ["声望商人·二代"],
+        dialogues: ["枫杏红","石风雄"],
+        is_unlocked: false,
+        bgm: 23,
+    });//4-3
+    locations["狩猎大赛·密林战"].connected_locations.push({location: locations["狩猎大赛·古墓战"]});
+
+    locations["古墓战 - 1"] = new Combat_zone({
+        description: "附近似乎有人正在寻找纳家后人的下落！[提示:影响力达到50且通过此区域]", 
+        enemy_count: 20, 
+        enemies_list: ["燕岗战法小队","毛茸茸绅士","驯兽地龙","驯兽养殖者","燕岗巨斧斗士"],
+        enemy_group_size: [4,4],
+        is_unlocked: true, 
+        types: [],
+        name: "古墓战 - 1",
+        rank:321, 
+        bgm:23,
+        parent_location: locations["狩猎大赛·古墓战"],
+        first_reward: {
+            xp: 300e12,
+        },
+        repeatable_reward: {
+            xp: 100e12,
+            money:11039,
+            locations: [{location: "古墓战 - 2"}],
+        },
+    });
+    locations["古墓战 - 2"] = new Combat_zone({
+        description: "警戒哨怎么监守自盗，跑进古墓里来了啊！这就是狩猎大赛带来的破格吗……", 
+        enemy_count: 20, 
+        enemies_list: ["燕岗大剑战士","燕岗城警戒哨","独行双剑侠","诡计披甲人","自守的斗士"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        types: [],
+        name: "古墓战 - 2",
+        rank:322, 
+        bgm:23,
+        parent_location: locations["狩猎大赛·古墓战"],
+        first_reward: {
+            xp: 450e12,
+        },
+        repeatable_reward: {
+            xp: 150e12,
+            money:11039,
+            locations: [{location: "古墓战 - 3"}],
+            traders: [{traders:"声望商人·二代"}],
+        },
+    });
+    locations["古墓战 - 3"] = new Combat_zone({
+        description: "凡是名为【声望商人】的，进货量都和影响力有关。务必切记！", 
+        enemy_count: 20, 
+        enemies_list: ["燕岗杖剑大队","茸茸魔导师","燕岗城巡逻哨","燕岗魔力大队","燕岗全职大队"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        types: [],
+        name: "古墓战 - 3",
+        rank:323, 
+        bgm:23,
+        parent_location: locations["狩猎大赛·古墓战"],
+        first_reward: {
+            xp: 600e12,
+        },
+        repeatable_reward: {
+            xp: 200e12,
+            money:11039,
+            locations: [{location: "古墓战 - 4"}],
+        },
+    });
+    locations["古墓战 - 4"] = new Combat_zone({
+        description: "前方就是古墓的底层，【终点线】了！传说那里有一份神秘大奖。希望没有被人捷足先登……", 
+        enemy_count: 20, 
+        enemies_list: ["燕岗双剑小队","燕岗壁垒大队","奸诈的恶棍","隐秘行刺者","青年天才","公正的袍师"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        types: [],
+        name: "古墓战 - 4",
+        rank:324, 
+        bgm:23,
+        parent_location: locations["狩猎大赛·古墓战"],
+        first_reward: {
+            xp: 750e12,
+        },
+        repeatable_reward: {
+            xp: 250e12,
+            money:11039,
+            locations: [{location: "古墓战 - X"}],
+        },
+    });
+    locations["古墓战 - I"] = new Challenge_zone({
+        description: "和枫杏红切磋以获取中等进化结晶的制作法！", 
+        enemy_count: 1, 
+        enemies_list: ["枫杏红[BOSS]"],
+        enemy_group_size: [1,1],
+        enemy_stat_halo: -0.40,
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "古墓战 - I",
+        bgm:23,
+        parent_location: locations["狩猎大赛·古墓战"],
+        repeatable_reward: {
+            textlines: [{dialogue: "枫杏红", lines: ["fxh1"]}],
+        },
+    });
+    locations["古墓战 - II"] = new Challenge_zone({
+        description: "就是现在！抓住那只正在突破的狗王~", 
+        enemy_count: 1, 
+        enemies_list: ["变异尸狗王[BOSS]"],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "古墓战 - II",
+        bgm:23,
+        parent_location: locations["狩猎大赛·古墓战"],
+        repeatable_reward: {
+        },
+    });
+    locations["古墓战 - X"] = new Challenge_zone({
+        description: "击败枫杏红，获取城主接见！", 
+        enemy_count: 1, 
+        enemies_list: ["枫杏红[BOSS]"],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "古墓战 - X",
+        bgm:23,
+        parent_location: locations["狩猎大赛·古墓战"],
+        repeatable_reward: {
+            textlines: [{dialogue: "石风雄", lines: ["sfx1"]}],
+        },
+    });
+    locations["狩猎大赛·古墓战"].connected_locations.push({location: locations["古墓战 - 1"]}); 
+    locations["狩猎大赛·古墓战"].connected_locations.push({location: locations["古墓战 - 2"]}); 
+    locations["狩猎大赛·古墓战"].connected_locations.push({location: locations["古墓战 - 3"]}); 
+    locations["狩猎大赛·古墓战"].connected_locations.push({location: locations["古墓战 - 4"]}); 
+    locations["狩猎大赛·古墓战"].connected_locations.push({location: locations["古墓战 - I"]}); 
+    locations["狩猎大赛·古墓战"].connected_locations.push({location: locations["古墓战 - II"]}); 
+    locations["狩猎大赛·古墓战"].connected_locations.push({location: locations["古墓战 - X"]}); 
 
 
+    locations["毬毬山谷"] = new Location({ 
+        connected_locations: [{location: locations["狩猎大赛·古墓战"], custom_text: "回到古墓中"}], 
+        description: "【燕岗领】与【清波领】的交界地带，活跃着云霄级中期的探险强者！",
+        name: "毬毬山谷", 
+        traders: [],
+        dialogues: ["玄铁方尖碑"],
+        is_unlocked: false,
+        bgm: 24,
+    });//4-4
+    locations["狩猎大赛·古墓战"].connected_locations.push({location: locations["毬毬山谷"]});
 
+    locations["山谷秘境"] = new Location({ 
+        connected_locations: [{location: locations["毬毬山谷"], custom_text: "回到战斗区"}], 
+        description: "原本被一批青茸茸将军和红仆小恶魔占据的秘境。在听闻纳可的事迹之后，它们都灰溜溜地逃跑了……",
+        name: "山谷秘境", 
+        traders: ["物品存储箱"],
+        dialogues: ["地层钻探"],
+        sleeping: {
+            text: "使用山谷秘境修炼资源[+92160XP/s]",
+            xp: 92160,
+        },
+        crafting: {
+            is_unlocked: true, 
+            use_text: "使用山谷中的C4级合成台[Tier+20]", 
+            tiers: {
+                crafting: 20,
+                forging: 20,
+                smelting: 20,
+                cooking: 20,
+                alchemy: 20,
+            }
+        },
+        is_unlocked: false,
+        bgm: 24,
+    });//4-4休息区
+    locations["毬毬山谷"].connected_locations.push({location: locations["山谷秘境"]});
+    locations["毬毬山谷 - 1"] = new Combat_zone({
+        description: "死线回归了真是一场恐怖事件啊……那如果这一区死线回归只是最小的问题呢？", 
+        enemy_count: 20, 
+        enemies_list: ["青茸茸将军","红仆小恶魔","红角茸茸","飞飞茸茸","公正的袍师"],
+        enemy_group_size: [4,4],
+        is_unlocked: true, 
+        types: [],
+        name: "毬毬山谷 - 1",
+        rank:331, 
+        bgm:24,
+        parent_location: locations["毬毬山谷"],
+        first_reward: {
+            xp: 900e12,
+        },
+        repeatable_reward: {
+            xp: 300e12,
+            locations: [{location: "毬毬山谷 - 2"},{location: "山谷秘境"}],
+        },
+    });
+    locations["毬毬山谷 - 2"] = new Combat_zone({
+        description: "该区【冰凌剑】斩杀线位于3600亿敏捷处。不要有侥幸心理——死线增伤会粉碎一切幻想。", 
+        enemy_count: 20, 
+        enemies_list: ["青鬼八爪鱼","青衣卫巫小队","红邪鬼随从商","天青驯兽","红仆小恶魔"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        types: [],
+        name: "毬毬山谷 - 2",
+        rank:332, 
+        bgm:24,
+        parent_location: locations["毬毬山谷"],
+        first_reward: {
+            xp: 1200e12,
+        },
+        repeatable_reward: {
+            xp: 400e12,
+            locations: [{location: "毬毬山谷 - 3"},{location: "毬毬山谷 - 歧路"}],
+        },
+        unlock_text : "[纳可]击败了之前的20波敌人，也空出了一个可用秘境……前方的敌人更加强大。先在此处稍作休整吧。",
+    });
+    locations["毬毬山谷 - 3"] = new Combat_zone({
+        description: "该区【冻伤】斩杀线位于8100亿攻防和处。没有那些败移和死线了，是时候喘口气了……", 
+        enemy_count: 20, 
+        enemies_list: ["飞飞茸茸","绯红剑侍","深红毒蛇刺剑","青面大侠","冰霜骸骨"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        types: [],
+        name: "毬毬山谷 - 3",
+        rank:333, 
+        bgm:24,
+        parent_location: locations["毬毬山谷"],
+        first_reward: {
+            xp: 1500e12,
+        },
+        repeatable_reward: {
+            xp: 500e12,
+            locations: [{location: "毬毬山谷 - 4"}],
+            textlines: [{dialogue: "地层钻探", lines: ["dczt"]}],
+        },
+        unlock_text : "[纳可]一块玄铁方尖碑？！这里一定蕴含着超规格的感悟升级契机！",
+    });
+    locations["毬毬山谷 - 4"] = new Combat_zone({
+        description: "该区【冰封术】斩杀线位于54兆剩余生命处，【追光】斩杀线位于7200亿防御处，还有【死线】增伤，【散华】【生命限制】收割残余生命。", 
+        enemy_count: 20, 
+        enemies_list: ["青面大侠","青衣魔法使","难缠的红蝙蝠","蛮血枭蝎","蓝泽追光者"],
+        enemy_group_size: [4,4],
+        is_unlocked: false, 
+        types: [],
+        name: "毬毬山谷 - 4",
+        rank:334, 
+        bgm:24,
+        parent_location: locations["毬毬山谷"],
+        first_reward: {
+            xp: 1800e12,
+        },
+        repeatable_reward: {
+            xp: 600e12,
+            locations: [{location: "毬毬山谷 - X"}],
+        },
+        unlock_text : "[纳可]山谷秘境的地下似乎埋着不得了的东西……翻个底朝天肯定是做不到的。但用念力感受一下呢？",
+    });
+    locations["毬毬山谷 - 歧路"] = new Challenge_zone({
+        description: "一座玄铁母制成的方尖碑！参拜它或许可以让【映星花】领悟产生质变。至于这些家伙……唯一有效的应对方法就是闪避更多的【吹火掌】。", 
+        enemy_count: 1, 
+        enemy_groups_list : [["红邪鬼[BOSS]","飞飞茸茸[BOSS]","飞飞茸茸[BOSS]","飞飞茸茸[BOSS]","飞飞茸茸[BOSS]"]],
+        enemy_group_size: [5,5],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "毬毬山谷 - 歧路",
+        bgm:24,
+        parent_location: locations["毬毬山谷"],
+        repeatable_reward: {
+            textlines: [{dialogue: "玄铁方尖碑", lines: ["yxtc"]}],
+        },
+    });
 
+    locations["毬毬山谷"].connected_locations.push({location: locations["毬毬山谷 - 1"]}); 
+    locations["毬毬山谷"].connected_locations.push({location: locations["毬毬山谷 - 2"]}); 
+    locations["毬毬山谷"].connected_locations.push({location: locations["毬毬山谷 - 3"]}); 
+    locations["毬毬山谷"].connected_locations.push({location: locations["毬毬山谷 - 4"]}); 
+    locations["毬毬山谷"].connected_locations.push({location: locations["毬毬山谷 - 歧路"]}); 
+    locations["毬毬山谷 - X"] = new Challenge_zone({
+        description: "完全是被拉过来凑数的家伙。这区的资源都用来供养地底的宝藏了……", 
+        enemy_count: 1, 
+        enemies_list: ["心火红茸茸[BOSS]"],
+        enemy_group_size: [1,1],
+        types: [],
+        is_unlocked: false, 
+        is_challenge: true,
+        name: "毬毬山谷 - X",
+        bgm:24,
+        parent_location: locations["毬毬山谷"],
+        repeatable_reward: {
+            locations: [{location: "鲜血峰"}],
+        },
+    });
+    locations["毬毬山谷"].connected_locations.push({location: locations["毬毬山谷 - X"]}); 
 
+    locations["鲜血峰"] = new Location({ 
+        connected_locations: [{location: locations["毬毬山谷"], custom_text: "回到毬毬山谷"}], 
+        description: "圣荒领与兰陵领的交界地带，争斗不断，血流漂杵。这座主峰是【大青王】的领地。[V3.50前版本终点]",
+        name: "鲜血峰", 
+        traders: [],
+        dialogues: [],
+        is_unlocked: false,
+        bgm: 25,
+    });//4-5
+    locations["毬毬山谷"].connected_locations.push({location: locations["鲜血峰"]});
 
-
-
-
-
-
-
-
-
+    locations["鲜血峰 - 1"] = new Combat_zone({
+        description: "【大青王尤斯纳】的领地。鲜血系的修炼法屡见不鲜……让人感到阴森呢。", 
+        enemy_count: 20, 
+        enemies_list: ["亮青水晶","难缠的红蝙蝠","翩然蝶仙","红宝石近卫","心火红茸茸"],
+        enemy_group_size: [4,4],
+        enemy_stat_halo:0.05,
+        is_unlocked: true, 
+        types: [],
+        name: "鲜血峰 - 1",
+        rank:341, 
+        bgm:25,
+        parent_location: locations["鲜血峰"],
+        first_reward: {
+            xp: 2400e12,
+        },
+        repeatable_reward: {
+            xp: 800e12,
+            locations: [{location: "鲜血峰 - 2"}],
+        },
+    });
+    locations["鲜血峰 - 2"] = new Combat_zone({
+        description: "经过一番调查，附近并没有人类养殖场。血都是养殖高等血统的荒兽，那个长的快，而且血质量高。", 
+        enemy_count: 20, 
+        enemies_list: ["亮青水晶","报春红食人花","报春红食人花","红角邪恶触触","蓝泽追光者"],
+        enemy_group_size: [4,4],
+        enemy_stat_halo:0.10,
+        is_unlocked: false, 
+        types: [],
+        name: "鲜血峰 - 2",
+        rank:342, 
+        bgm:25,
+        parent_location: locations["鲜血峰"],
+        first_reward: {
+            xp: 3000e12,
+        },
+        repeatable_reward: {
+            xp: 1000e12,
+            locations: [{location: "鲜血峰 - 3"}],
+        },
+    });
+    locations["鲜血峰 - 3"] = new Combat_zone({
+        description: "所谓“吸收精血过于驳杂导致被残留意识入侵”至少在云霄境还不存在。无论人类还是动物类荒兽，大脑没了就死透了。", 
+        enemy_count: 20, 
+        enemies_list: ["亮青水晶","炽热幽闻藤","红甲射箭小队","灰暗双剑小队","红野人战士"],
+        enemy_group_size: [4,4],
+        enemy_stat_halo:0.15,
+        is_unlocked: false, 
+        types: [],
+        name: "鲜血峰 - 3",
+        rank:343, 
+        bgm:25,
+        parent_location: locations["鲜血峰"],
+        first_reward: {
+            xp: 3600e12,
+        },
+        repeatable_reward: {
+            xp: 1200e12,
+            locations: [{location: "鲜血峰 - 4"}],
+        },
+    });
+    locations["鲜血峰 - 4"] = new Combat_zone({
+        description: "对了，毕竟实在是有很多荒兽养殖场……所以这片区域有不少强大而逃出来的荒兽也不奇怪。野人和巨人某种意义上也算荒兽——它们连血洛通用语都不会。", 
+        enemy_count: 20, 
+        enemies_list: ["鲜红水晶","品红野人战士","树莓龙勇士","树莓龙勇士","红巨人番队"],
+        enemy_group_size: [4,4],
+        enemy_stat_halo:0.20,
+        is_unlocked: false, 
+        types: [],
+        name: "鲜血峰 - 4",
+        rank:344, 
+        bgm:25,
+        parent_location: locations["鲜血峰"],
+        first_reward: {
+            xp: 4200e12,
+        },
+        repeatable_reward: {
+            xp: 1400e12,
+            locations: [{location: "鲜血峰 - 5"}],
+        },
+    });
+    locations["鲜血峰 - 5"] = new Combat_zone({
+        description: "刻意保留，用于防止鲜血峰上发生争斗的山腰混乱之地正中央。大量彼此决一死战的强者汇聚于此，但都干掉就可以得到两边的财产了……", 
+        enemy_count: 20, 
+        enemies_list: ["鲜红水晶","撼瀚野熊","鲑红腐殖质","大红蜕钳蝎","红白闪"],
+        enemy_group_size: [4,4],
+        enemy_stat_halo:0.20,
+        is_unlocked: false, 
+        types: [],
+        name: "鲜血峰 - 5",
+        rank:345, 
+        bgm:25,
+        parent_location: locations["鲜血峰"],
+        first_reward: {
+            xp: 4800e12,
+        },
+        repeatable_reward: {
+            xp: 1600e12,
+            //locations: [{location: "鲜血峰 - X"}],
+        },
+    });
+    locations["鲜血峰"].connected_locations.push({location: locations["鲜血峰 - 1"]}); 
+    locations["鲜血峰"].connected_locations.push({location: locations["鲜血峰 - 2"]}); 
+    locations["鲜血峰"].connected_locations.push({location: locations["鲜血峰 - 3"]}); 
+    locations["鲜血峰"].connected_locations.push({location: locations["鲜血峰 - 4"]}); 
+    locations["鲜血峰"].connected_locations.push({location: locations["鲜血峰 - 5"]}); 
+/* 
+*/
 
     locations["Nearby cave"] = new Location({ 
         connected_locations: [{location: locations["Village"], custom_text: "Go outside and to the village"}], 
@@ -4243,13 +5976,102 @@ function get_location_type_penalty(type, stage, stat) {
             },
         }),
     }
+    locations["极寒冰宫"].activities = {
+        "miningIce": new LocationActivity({
+            activity_name: "mining",
+            infinite: true,
+            starting_text: "挖开冰块，拯救被困住的商人",
+            skill_xp_per_tick: 200,
+            is_unlocked: true,
+            gained_resources: {
+                resources: [{name: "冰块", ammount: [[1,1], [9,10]], chance: [0.96, 1.0]},{name: "万载冰髓锭", ammount: [[1,1], [1,1]], chance: [0.03, 0.3]},{name: "冰宫商人", ammount: [[1,1], [1,1]], chance: [0.01, 0.1]},], 
+                time_period: [24, 1],
+                skill_required: [40, 60],
+                scales_with_skill: true,
+            },
+        }),
+    }
+    
+    locations["时封水牢"].activities = {
+        
+        "AquaElement": new LocationActivity({
+            activity_name: "AquaElement",
+            infinite: true,
+            starting_text: "感应时封水牢中充盈的水元素",
+            skill_xp_per_tick: 1,
+            is_unlocked: true,
+        }),
+    }
+    
+    locations["幻境核心·地宫"].activities = {
+        "mining100MGem": new LocationActivity({
+            activity_name: "mining",
+            infinite: true,
+            starting_text: "偷偷用镐子挖出……血杀剑？",
+            skill_xp_per_tick: 1000,
+            is_unlocked: true,
+            exp_scaling: true,
+            scaling_id: "100M",
+            exp_o:1.8,//每完成一次需要的时间指数提升
+            gained_resources: {
+                resources: [{name: "血杀剑", ammount: [[1,1], [1,1]], chance: [1.0, 1.0]}], 
+                time_period: [40, 2],
+                skill_required: [50, 70],
+                scales_with_skill: true,
+            },
+        }),
+    }
+    locations["幻境核心·结界湖"].activities = {
+        "fishing2": new LocationActivity({
+            activity_name: "fishing",
+            infinite: true,
+            starting_text: "在幻境·结界湖中垂钓(2D)",
+            skill_xp_per_tick: 4,
+            is_unlocked: true,
+            gained_resources: {
+                resources: [{name: "冰柱鱼", ammount: [[1,1], [1,1]], chance: [0.00000001, 0.00000001]},{name: "血莲鱼", ammount: [[1,1], [1,1]], chance: [0.00000001, 0.00000001]},{name: "冰柱鱼王", ammount: [[1,1], [1,1]], chance: [0.00000001, 0.00000001]}],
+                time_period: [15, 3],
+                skill_required: [15, 35],
+                scales_with_skill: true,
+            },
+        }),
+    }
+    locations["狩猎大赛·城门战"].activities = {
+        
+        "Running": new LocationActivity({
+            activity_name: "Running",
+            infinite: true,
+            starting_text: "在敌群中练习神行术[EXPx192]",
+            skill_xp_per_tick: 192,
+            is_unlocked: false,
+        }),
+    }
+    locations["狩猎大赛·密林战"].activities = {
+        
+        "Swimming": new LocationActivity({
+            activity_name: "Swimming",
+            infinite: true,
+            starting_text: "在密林的溪流中躲开追兵[EXPx192]",
+            skill_xp_per_tick: 192,
+            is_unlocked: false,
+        }),
+        "woodcuttingC1": new LocationActivity({
+            activity_name: "woodcutting",
+            infinite: true,
+            starting_text: "砍伐密林的云霄一阶树妖",
+            skill_xp_per_tick: 50,
+            is_unlocked: true,
+            gained_resources: {
+                resources: [{name: "草木之芯", ammount: [[1,1], [2,5]], chance: [0.2, 1]},{name: "C1·能量核心", ammount: [[1,2], [7,16]], chance: [0.3, 1]},{name: "中等进化结晶碎片", ammount: [[1,1], [1,1]], chance: [0.01, 0.1]},],
+                time_period: [20, 2],
+                skill_required: [30, 60],
+                scales_with_skill: true,
+            },
+        }),
+    }
+
 })();
 
 //add actions
 
 export {locations, location_types, get_location_type_penalty};
-
-/*
-TODO:
-    some "quick travel" location that would connect all important ones? (e.g. some towns?)
-*/

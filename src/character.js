@@ -49,6 +49,7 @@ character.base_stats = {
         intuition: 10,
         attack_mul: 1,
         luck:1,
+        SCGV:30,
 };
 
 
@@ -78,6 +79,7 @@ character.stats.flat = {
         light_level: {},
         environment: {},
         gems: {},
+        coins: {},
 };
 
 character.stats.multiplier = {
@@ -138,7 +140,8 @@ character.get_xp_bonus = function(){
         return (character.xp_bonuses.total_multiplier.hero || 1) * (character.xp_bonuses.total_multiplier.all || 1) * (character.stats.full.luck || 1);
 }
 character.get_hero_realm = function(){
-        if(character.xp.current_level >= 18) return character.xp.current_level - 1;//大地级破限记为巅峰。
+        if(character.xp.current_level >= 28) return character.xp.current_level - 2;//天空级破限[28]记为天空巅峰[26]。
+        if(character.xp.current_level >= 18) return character.xp.current_level - 1;//大地级破限[18]记为大地巅峰[17]。
         return character.xp.current_level;
 }
 character.upgrade_effects = function(lvl){
@@ -172,6 +175,22 @@ character.upgrade_effects = function(lvl){
                 const E_body = document.body;
                 E_body.classList.add('sky_root');
         }//天空1
+        if(lvl == 29){
+                const effect = document.getElementById('cloudy_effect');
+                effect.classList.add('cloudy-break');
+                const main = document.getElementById('global_content');
+                main.classList.add('cloudy-break');
+                effect.addEventListener('animationend', () => {
+                       effect.classList.remove('cloudy-break');
+                       main.classList.remove('cloudy-break');
+                        E_body.classList.add('cloudy_root');
+                }, { once: true });
+                
+                const E_body = document.body;
+                E_body.classList.remove('sky_root');
+                E_body.classList.add('cloudy_root_proto');
+
+        }//云霄1
 }
 
 character.add_xp = function ({xp_to_add, use_bonus = true},ignore_cap) {
@@ -204,6 +223,14 @@ character.add_xp = function ({xp_to_add, use_bonus = true},ignore_cap) {
                         }
                         else character.upgrade_effects(19);
                 }
+                if(character.xp.current_level == 28){
+                        //character.xp.total_xp -= character.xp.current_xp - 99999999 ;
+                        if(ignore_cap <= 2){
+                                character.xp.current_xp = 99.9999e16;
+                                return `<b>被<span class="realm_cloudy">云霄级瓶颈</span>限制 - 经验已锁定</b>`
+                        }
+                        else character.upgrade_effects(29);
+                }
                 character.xp.current_level += 1;
                 if(character.xp.current_level>9) character.upgrade_effects(character.xp.current_level);
                 let this_realm = window.REALMS[character.xp.current_level];
@@ -226,14 +253,15 @@ character.add_xp = function ({xp_to_add, use_bonus = true},ignore_cap) {
                 //升级之后技能领悟力变强，境界越高越明显
                 if(this_realm[0]>=9) total_skill_xp_multiplier += 0.05;
                 if(this_realm[0]>=19) total_skill_xp_multiplier += 0.15;
-                //微尘10% 万物15% 潮汐20% 大地25% 天空40%
+                if(this_realm[0]>=29) total_skill_xp_multiplier += 0.20;
+                //微尘10% 万物15% 潮汐20% 大地25% 天空40% 云霄60%
                 character.xp_bonuses.multiplier.levels.all_skill = (character.xp_bonuses.multiplier.levels.all_skill || 1) * total_skill_xp_multiplier;
 
                 //显示-提高属性
-                gains += `Attack increased by ${this_realm[2] * 2}<br>`;
-                gains += `Defense, Agility increased by ${this_realm[2]}<br>`;
-                gains += `Max HP increased by ${this_realm[3]}<br>`;
-                if(realm_spd_gain != 0) gains += `Minor stage breakthrough, Attack Speed additionally increased by ${realm_spd_gain}<br>`;
+                gains += `攻击提高了${format_number(this_realm[2] * 2)}<br>`;
+                gains += `防御,敏捷提高了${format_number(this_realm[2])}<br>`;
+                gains += `生命上限提高了${format_number(this_realm[3])}<br>`;
+                if(realm_spd_gain != 0) gains += `小阶段突破，攻击速度额外增加${realm_spd_gain}<br>`;
                 if(this_realm[0]==9)
                 {
                         //add_to_character_inventory([{item: item_templates["微火"], count: 1}]);
@@ -258,12 +286,33 @@ character.add_xp = function ({xp_to_add, use_bonus = true},ignore_cap) {
                                 gains += `Major Realm Breakthrough, [Fire Spirit Illusion Sea] gained 9999T XP...?<br>`;
                                 gains += `You've already broken through this threshold. Way too much grinding.<br>`;
                         }
-                        add_xp_to_skill({skill: skills["Neko_Realm"], xp_to_add: 9999e12,should_info:true,use_bonus:false,add_to_parent:false},);
-                        gains += `Character stat <span style="color:#ffee11">[Luck]</span> is now unlocked!<br>`;
-                        gains += `Also, [Crit] stats have been concentrated!<br>[Crit Rate] reduced to one-quarter, [Crit Damage] quadrupled!<br>`;
+                        add_xp_to_skill({skill: skills["Neko_Realm"], xp_to_add: 9999e12,should_info:true,use_bonus:false},);
+                        gains += `角色属性<span style="color:#ffee11">【幸运】</span>现已解锁！<br>`;
+                        gains += `同时，【暴击】属性被浓缩了！<br>【暴击概率】降低为四分之一，【暴击伤害】提高了四倍！<br>`;
                         character.stats.multiplier.level.crit_rate = 0.25;
                         character.stats.multiplier.level.crit_multiplier = 4;
-                        gains += `Heart-Realm Stage 2 - God of Greed is now unlocked!<br>`;
+                        gains += `心之境界二重 - 贪婪之神 现已解锁！<br>`;
+                        gains += `基础时间流速: 6min -> 48min!<br>`;
+                }
+                if(this_realm[0]==29)
+                {
+                        if(skills["Neko_Realm"].current_level <= 44){
+                                gains += `大境界突破，【出云落月[领域四重]】获取了9999秭经验！<br>`;
+                        }
+                        else{
+                                gains += `大境界突破，【出云落月[领域五重]】获取了9999秭经验...?<br>`;
+                                gains += `怎么领悟已经突破了哇。也太能刷了叭。<br>`;
+                        }
+                        add_xp_to_skill({skill: skills["Neko_Realm"], xp_to_add: 9999e24,should_info:true,use_bonus:false},);
+                        gains += `所有状态效果已清除！<br>`;
+
+                        Object.keys(active_effects).forEach(key => {
+                        delete active_effects[key];
+                        });
+
+                        gains += `角色属性<span style="color:#ff11dd">【宝石软上限起始倍率(SCGV)】</span>现已解锁！<br>`;
+                        gains += `心之境界三重 - 信仰祭坛 现已解锁！ <br>`;
+                        gains += `基础时间流速: 48min -> 288min!<br>`;
                 }
 
 
@@ -274,6 +323,13 @@ character.add_xp = function ({xp_to_add, use_bonus = true},ignore_cap) {
                         gains += `<span style="color:#ffee11">Luck</span> increased by ${Luck_gain.toFixed(2)}<br>`;
                 }
 
+                if(this_realm[0]>=29 && this_realm[0]<=37)
+                {
+                        let SCGV_gain = (this_realm[0]==29?4:2);
+                        character.stats.flat.level.SCGV = ( character.stats.flat.level.SCGV || 0) + SCGV_gain;
+                        gains += `<span style="color:#ff11dd"> SCGV </span>增加了${SCGV_gain.toFixed(2)}<br>`;
+                }
+
 
                 gains += `Skill XP multiplier increased by ${Math.round(total_skill_xp_multiplier*100-100)}%<br>`;
                 gains += `HP fully restored<br>`;
@@ -281,6 +337,7 @@ character.add_xp = function ({xp_to_add, use_bonus = true},ignore_cap) {
                 if(this_realm[0]<=8) lvl_display=`<span class="realm_basic">${this_realm[1]}</span>`;
                 if(this_realm[0]>=9) lvl_display=`<span class="realm_terra">${this_realm[1]}</span>`;
                 if(this_realm[0]>=19) lvl_display=`<span class="realm_sky">${this_realm[1]}</span>`;
+                if(this_realm[0]>=29) lvl_display=`<span class="realm_cloudy">${this_realm[1]}</span>`;
                 
                 levelupresult += `${character.name} Realm Breakthrough, reached ${lvl_display} <br>${gains}`;
                 update_quests();
@@ -376,9 +433,13 @@ character.stats.add_active_effect_bonus = function() {
 
 character.stats.add_gem_bonus = function(){
         inf_combat.VP =inf_combat.VP || {num:0};
+        inf_combat.MP = inf_combat.MP || 0;
+        inf_combat.InP = inf_combat.InP || 0;
         character.xp_bonuses.multiplier.gems.all_skill = Math.pow(inf_combat.VP.num+1,0.07) || 1;
         character.stats.multiplier.coins.luck = Math.pow(inf_combat.MP+1,0.10);
+        character.stats.flat.coins.SCGV = 0.5*(Math.log10(inf_combat.InP+1) ** 1.5);
         //luck bonus
+        //函数:心境1-3重载
 }
 
 /**
@@ -476,8 +537,11 @@ character.stats.add_realm_bonus = function(){
         if(R_level<10) R_value = 1000 * R_level;
         else if(R_level<20) R_value = 1.5e4 * (R_level - 8);
         else if(R_level<30) R_value = 15e4 * (R_level - 18);
-        else if(R_level<40) R_value = 121.5e4 * (R_level - 24);
-        else if(R_level<50) R_value = 486e4 * (R_level - 34);
+        else if(R_level<35) R_value = 121.5e4 * (R_level - 24);
+        else if(R_level<40) R_value = 486e4 * (R_level - 29);
+        else if(R_level<45) R_value = 2.048e8 * (R_level - 38);
+        else if(R_level<55) R_value = 20.28e8 * (R_level - 42);
+        else if(R_level<69) R_value = 324e8 * (R_level - 51);
         return R_value;
 }
 
@@ -491,7 +555,7 @@ character.stats.add_all_skill_level_bonus = function() {
         
         character.stats.multiplier.skills.max_health = skills["Swimming"].get_coefficient("multiplicative");
         
-        character.stats.flat.skills.attack_power = character.stats.flat.skills.defense = character.stats.add_realm_bonus();
+        character.stats.flat.skills.attack_power = character.stats.flat.skills.defense = character.stats.flat.skills.agility = character.stats.add_realm_bonus();
 
         character.stats.add_weapon_type_bonuses();
 }
@@ -533,12 +597,21 @@ character.stats.add_location_penalties = function() {
                         character.stats.multiplier.light_level.agility = 1;
                         character.stats.multiplier.light_level.attack_speed = 1;
                 }
+                character.stats.flat.environment.health_regeneration_flat = 0;
+                for(let i = 0; i < current_location.types.length; i++) {
+                        if(current_location.types[i].type =='toxic'){
+                                character.stats.flat.environment.health_regeneration_flat = -800e8*(1-skills["Toxic resistance"].current_level*0.05)*(0.99**skills["Iron skin"].current_level);
+                        }
+                        //toxic提供flat而不是multiplier，并且公式特殊，所以需要特殊判定
+                }
         }
+        
 
         character.stats.multiplier.environment = {};
         Object.keys(effects).forEach(effect => {
                 character.stats.multiplier.environment[effect] = effects[effect];
         });
+
 }
 
 /**
@@ -656,11 +729,30 @@ character.take_damage = function (enemy_spec = [0],{damage_value, can_faint = tr
                 
         }
 
-        if(active_effects["Fortify A9"]!=undefined && damage_taken > character.stats.full.max_health * 0.05)
+        
+        if(active_effects["坚固 A9"]!=undefined && damage_taken > character.stats.full.max_health * 0.05)
         {
                 log_message(`Fortify potion blocked ${format_number(damage_taken - character.stats.full.max_health * 0.05)} overflow damage!`,"enemy_enhanced")
                 damage_taken = character.stats.full.max_health * 0.0500001;
         }
+        if(active_effects["烈日祝福·坤"]!=undefined && damage_taken > character.stats.full.max_health * 0.08)
+        {
+                log_message(`烈日祝福·坤 抵挡了溢出的 ${format_number(damage_taken - character.stats.full.max_health * 0.08)} 伤害！`,"enemy_enhanced")
+                damage_taken = character.stats.full.max_health * 0.0800001;
+        }
+
+
+        if(active_effects["死线"]!=undefined && damage_taken != 0){
+                
+                if(character.equipment.props?.name == "凝滞力场"){
+                        damage_taken *= 2;
+                        log_message(`[死线·凝滞]受到的伤害x2！`,"enemy_enhanced");
+                }
+                else{
+                        damage_taken *= 5;
+                        log_message(`[死线]受到的伤害x5！`,"enemy_enhanced");
+                }
+        }//死线(2/3)
 
         character.stats.full.health -= damage_taken;
 
@@ -674,6 +766,7 @@ character.take_damage = function (enemy_spec = [0],{damage_value, can_faint = tr
         if(give_skill_xp) {
                 //TODO give xp to resistance skills when taking damge
         }
+
 
         return {damage_taken, fainted};
 }

@@ -5,7 +5,7 @@ import { item_templates, getItem, book_stats, setLootSoldCount, loot_sold_count,
 import { locations } from "./locations.js";
 import { skills, weapon_type_to_skill, which_skills_affect_skill } from "./skills.js";
 import { dialogues } from "./dialogues.js";
-import { enemy_killcount } from "./enemies.js";
+import { enemy_killcount, enemy_templates } from "./enemies.js";
 import { traders } from "./traders.js";
 import { is_in_trade, start_trade, cancel_trade, accept_trade, exit_trade, add_to_trader_inventory,
          add_to_buying_list, remove_from_buying_list, add_to_selling_list, remove_from_selling_list} from "./trade.js";
@@ -57,6 +57,12 @@ import { end_activity_animation,
          update_other_save_load_button,
          format_number,add_bestiary_zones,
          unlock_moonwheel,
+         add_bestiary_tooltip,
+         clear_bestiary_tooltip,
+         add_levelary_tooltip,
+         clear_levelary_tooltip,
+         update_displayed_family,
+         update_displayed_family_members,
         } from "./display.js";
 import { compare_game_version, get_hit_chance } from "./misc.js";
 import { stances } from "./combat_stances.js";
@@ -64,42 +70,57 @@ import { get_recipe_xp_value, recipes } from "./crafting_recipes.js";
 import { game_version, get_game_version } from "./game_version.js";
 import { ActiveEffect, effect_templates } from "./active_effects.js";
 
+window.add_bestiary_tooltip = add_bestiary_tooltip;
+window.clear_bestiary_tooltip = clear_bestiary_tooltip;
+window.add_levelary_tooltip = add_levelary_tooltip;
+window.clear_levelary_tooltip = clear_levelary_tooltip;
+
 const save_key = "save data";
 const dev_save_key = "dev save data";
 const backup_key = "backup save";
 const dev_backup_key = "dev backup save";
 
 window.REALMS=[
-[0,"Dust Rank: Novice",0,0,0,"basic"],
-[1,"Dust Rank: Adept",1,50,5,"basic"],
-[2,"Dust Rank: Expert",3,200,100,"basic"],
-[3,"Myriad Rank: Novice",6,700,1200,"basic"],//0.1spd
-[4,"Myriad Rank: Expert",12,3000,4800,"basic"],
-[5,"Myriad Rank: Pinnacle",25,6000,16000,"basic"],
-[6,"Tidal Rank: Novice",40,10000,36000,"basic"],//0.1spd
-[7,"Tidal Rank: Expert",100,20000,120000,"basic"],
-[8,"Tidal Rank: Pinnacle",250,40000,2400000,"basic"],
+[0,"微尘级初级",0,0,0,"basic"],
+[1,"微尘级中级",1,50,5,"basic"],
+[2,"微尘级高级",3,200,100,"basic"],
+[3,"万物级初等",6,700,1200,"basic"],//0.1spd 
+[4,"万物级高等",15,3000,4800,"basic"],
+[5,"万物级巅峰",25,6000,16000,"basic"],
+[6,"潮汐级初等",50,10000,36000,"basic"],//0.1spd
+[7,"潮汐级高等",100,20000,120000,"basic"],
+[8,"潮汐级巅峰",250,40000,2400000,"basic"],
 
-[9,"Earth Rank: Stage 1",600,120000,60000000,"terra"],
-[10,"Earth Rank: Stage 2",1000,250000,80000000,"terra"],
-[11,"Earth Rank: Stage 3",2000,550000,1.6e8,"terra"],
-[12,"Earth Rank: Stage 4",3000,1000000,4.8e8,"terra"],//200w
-[13,"Earth Rank: Stage 5",5000,1500000,12e8,"terra"],//350w
-[14,"Earth Rank: Stage 6",9000,2500000,36e8,"terra"],//600w
-[15,"Earth Rank: Stage 7",16000,6500000,108e8,"terra"],//1250w
-[16,"Earth Rank: Stage 8",32000,12500000,216e8,"terra"],//2500w
-[17,"Earth Rank: Pinnacle",60000,22500000,432e8,"terra"],
-[18,"Earth Rank: Breakthrough",150000,32500000,1080e8,"terra"],
+[9,"大地级一阶",550,120000,60000000,"terra"],
+[10,"大地级二阶",1000,250000,80000000,"terra"],
+[11,"大地级三阶",2000,550000,1.6e8,"terra"],
+[12,"大地级四阶",3000,1000000,4.8e8,"terra"],//200w
+[13,"大地级五阶",5000,1500000,12e8,"terra"],//350w
+[14,"大地级六阶",9000,2500000,36e8,"terra"],//600w
+[15,"大地级七阶",15000,6500000,108e8,"terra"],//1250w
+[16,"大地级八阶",36000,12500000,216e8,"terra"],//2500w
+[17,"大地级巅峰",72000,22500000,432e8,"terra"],
+[18,"大地级破限",126000,32500000,1080e8,"terra"],
 
-[19,"Sky Rank: Stage 1",150000,1.2e8,10000e8,"sky"],//2e
-[20,"Sky Rank: Stage 2",500000,3e8,4e12,"sky"],//5e
-[21,"Sky Rank: Stage 3",1500000,10e8,16e12,"sky"],//15e
-[22,"Sky Rank: Stage 4",4000000,25e8,80e12,"sky"],//40e
-[23,"Sky Rank: Stage 5",16000000,60e8,320e12,"sky"],//100e 经验应为320e12.
-[24,"Sky Rank: Stage 6",40000000,150e8,170.1411e36,"sky"],//250e
-[25,"Sky Rank: Stage 7",70000000,350e8,6000e12,"sky"],//600e
-[26,"Sky Rank: Stage 8",3e8,900e8,2.4e16,"sky"],//1500e
-[27,"Sky Rank: Pinnacle",8e8,1500e8,9.6e16,"sky"],//3000e
+[19,"天空级一阶",180000,1.2e8,10000e8,"sky"],//2e
+[20,"天空级二阶",550000,3e8,4e12,"sky"],//5e
+[21,"天空级三阶",1500000,10e8,16e12,"sky"],//15e
+[22,"天空级四阶",4000000,25e8,80e12,"sky"],//40e 
+[23,"天空级五阶",16000000,60e8,320e12,"sky"],//100e
+[24,"天空级六阶",40000000,150e8,1120e12,"sky"],//250e 
+[25,"天空级七阶",72500000,350e8,6000e12,"sky"],//600e 
+[26,"天空级八阶",3e8,900e8,2.4e16,"sky"],//1500e
+[27,"天空级巅峰",8e8,1500e8,7.2e16,"sky"],//3000e 
+[28,"天空级破限",16e8,3000e8,21.6e16,"sky"],//6000e 
+[29,"云霄级一阶",40e8,6000e8,100e16,"cloudy"],//1.2z
+[30,"云霄级二阶",150e8,28000e8,1200e16,"cloudy"],//4z 
+[31,"云霄级三阶",600e8,5.5e12,7200e16,"cloudy"],//9.5z 应为4800e16?
+[32,"云霄级四阶",1200e8,10.5e12,170.1411e36,"cloudy"],//21.0z 
+[33,"云霄级五阶",1,1,1,"cloudy"],//下面没填数据
+[34,"云霄级六阶",1,1,1,"cloudy"],
+[35,"云霄级七阶",1,1,1,"cloudy"],
+[36,"云霄级八阶",1,1,1,"cloudy"],
+[37,"云霄级巅峰",1,1,1,"cloudy"],
 
 ];
 //境界，X级存储了该等级的数据
@@ -110,27 +131,48 @@ const global_flags = {
     is_crafting_unlocked: false,
     is_deep_forest_beaten: false,
     is_realm_enabled: false,
+    is_family_enabled: false,
     is_evolve_studied:false,
     is_moonwheel_unlocked: false,
+    qx_status: 0,
+    lq_status: 0,//0:离开 1:杀害 2:侵犯
+    qz_percent: 0,//牵制-从入门到精通 获取的百分比
+
+    
 };
 const flag_unlock_texts = {
-    is_gathering_unlocked: "You have gained the ability to gather materials!",
-    is_crafting_unlocked: "You have gained the ability to craft items and equipment!",
-    is_realm_enabled: "The path of evolution through [Tiny Flame] has been opened!",
-    is_evolve_studied: "You have mastered the method to condense [Basic Evolution Crystal]!",
-    is_moonwheel_unlocked: "You have mastered the crafting method for [Silver Frost Moonwheel]!",
+    is_gathering_unlocked: "你获得了收集材料的能力！",
+    is_crafting_unlocked: "你获得了合成物品和装备的能力！",
+    is_realm_enabled: "领悟【微火】的进化之路已经被打通！",
+    is_evolve_studied: "你掌握了【初等进化结晶】的凝聚方法！",
+    is_moonwheel_unlocked: "你掌握了【银霜月轮】的合成方法！",
+    is_family_enabled: "【家族系统】已激活！(右下角第三栏)",
 }
 
 // special stats
+
 //infinity combat
-let inf_combat = {"A6":{cur:6,cap:8},"A7":{cur:0}, "VP":{num:0}, "RM":0,"MP":0,"B3":0};
+let inf_combat = {"A6":{cur:6,cap:8},"A7":{cur:0}, "VP":{num:0}, "RM":0,"MP":0,"B3":0,"ST":0,"S3":{live:false,sp:0,b1:8,b2:8,b3:0},"InP":0};
 //A6:秘境
 //A7:赶往声律城
-//VP:心境一重价值点
 //RM:不是现实机器。是Realm(领域)层数
+//VP:心境一重价值点
 //MP:心境二重宝钱数
+//InP:心境三重献祭影响力
 //B3:辐射扩散程度(赫尔沼泽)
+//B6:拯救商人数
+//ST:SaveTime(上次保存时间)
+//S3:第三幕最终战，live表示开战与否，sp灵魂之力,b1b2b3是怪物数。
 
+//vis可见性，num数量,break/die0代表无记录 正值代表数目 负值代表经过天数，ali1~5代表五种家族态度
+let family_data = {
+    unlocked:false,
+    baby:0,
+    mem:[],
+    re_gain:0,
+    influ:0,
+    re_influ:0,
+}
 
 //in seconds
 let total_playtime = 0;
@@ -271,6 +313,8 @@ const options = {
     remember_message_log_filters: false,
     remember_sorting_options: false,
     combat_disable_autoswitch: true,
+    option_combat_filter: false,
+    option_format_change: false,
 };
 
 let message_log_filters = {
@@ -369,6 +413,32 @@ function option_remember_filters(option) {
     }
 }
 
+function option_combat_filter(option) {
+    const checkbox = document.getElementById("options_combat_filter");
+
+    if(checkbox.checked || option) {
+        options.option_combat_filter = true;
+    } else {
+        options.option_combat_filter = false;
+    }
+
+    if(option) {
+        checkbox.checked = option;
+    }
+}
+function option_format_change(option) {
+    const checkbox = document.getElementById("options_format_change");
+
+    if(checkbox.checked || option) {
+        options.option_format_change = true;
+    } else {
+        options.option_format_change = false;
+    }
+
+    if(option) {
+        checkbox.checked = option;
+    }
+}
 function option_combat_autoswitch(option) {
     const checkbox = document.getElementById("options_dont_autoswitch_to_combat");
 
@@ -384,24 +454,7 @@ function option_combat_autoswitch(option) {
 }
 const bgm = document.getElementById('bgm');
 
-const musicList = {
-  1: 'bgms/1.mp3',
-  2: 'bgms/2.mp3',
-  3: 'bgms/3.mp3',
-  4: 'bgms/4.mp3',
-  5: 'bgms/5.mp3',
-  6: 'bgms/6.mp3',
-  7: 'bgms/7.mp3',
-  8: 'bgms/8.mp3',
-  9: 'bgms/9.mp3',
-  10: 'bgms/10.mp3',
-  11: 'bgms/11.mp3',
-  12: 'bgms/12.mp3',
-  13: 'bgms/13.mp3',
-  14: 'bgms/14.mp3',
-  15: 'bgms/15.mp3',
-  16: 'bgms/16.mp3',
-};
+function musicList(index){ return `bgms/${index}.mp3`}
 
 let hasPlayed = false;  // 确保只触发一次
 let enableBGM = true;
@@ -446,6 +499,12 @@ function switchBGM(key) {
             hasPlayed = false;
         });
     }
+  if (bgm.src.includes(musicList(key)) && bgm.src.length >= 5 && musicList(key).length >= 5) return;  // 已是当前音乐
+  bgm.pause();
+  bgm.src = musicList(key);
+  bgm.load();             // 重新加载新资源
+  bgm.volume = 0.5;
+  bgm.play();
 }
 
 
@@ -492,8 +551,9 @@ function change_location(location_name) {
 
     if(typeof current_location !== "undefined" && current_location.name !== location.name ) { 
         //so it's not called when initializing the location on page load or on reloading current location (due to new unlocks)
-        log_message(`[ Entering ${location.name} ]`, "message_travel");
-    }
+        log_message(`[ 进入 ${location.name} ]`, "message_travel");
+        //character.upgrade_effects(29);
+            }
 
     if(location.crafting) {
         update_displayed_crafting_recipes();
@@ -507,15 +567,16 @@ function change_location(location_name) {
         // basically means it's a normal location and not a combat zone (as combat zone has only "parent")
         update_displayed_normal_location(current_location);
     } else { //so if entering combat zone
+        chara_cd = 0;
         update_displayed_combat_location(current_location);
-        start_combat();
-
         if(!current_location.is_challenge) {
             last_combat_location = current_location.name;
         }
+        start_combat();
     }
 }
 
+window.change_location = change_location;
 
 /**
  * 
@@ -639,8 +700,8 @@ function start_activity(selected_activity) {
 }
 
 function end_activity() {
-    let ActivityEndMap = {"Running":"Running","Swimming":"Swimming","mining":"Mining","woodcutting":"Woodcutting","fishing":"Fishing"}
-    log_message(`${character.name} finished ${ActivityEndMap[current_activity.activity_name]}`, "activity_finished");
+    let ActivityEndMap = {"Running":"跑步","Swimming":"游泳","mining":"挖矿","woodcutting":"砍伐","fishing":"钓鱼","AquaElement":"水元素感应"}
+    log_message(`${character.name} 结束了 ${ActivityEndMap[current_activity.activity_name]}`, "activity_finished");
     if(current_activity.exp_scaling)
     {
         character.C_scaling[current_activity.scaling_id] = current_activity.done_actions;
@@ -866,16 +927,10 @@ function reload_normal_location() {
     update_displayed_normal_location(current_location);
 }
 function get_enemy_killcount(){
-    let bestiary_div =document.getElementById("bestiary_list");
-    let bestiary_childs = bestiary_div.querySelectorAll('.bestiary_entry_div');
+    
     let K_sum = 0;
-    let K_num;
-    bestiary_childs.forEach((div, index) => {
-        K_num = div.children[1].innerHTML;
-        if(K_num[0] != '<')
-        {
-            K_sum += Number(K_num);
-        }
+    Object.keys(enemy_killcount).forEach(key => {
+        K_sum += enemy_killcount[key];
     });
     return K_sum;
 }
@@ -985,6 +1040,30 @@ function textline_special(t_key){
                 
             }
         }
+        else if(t_key == "LR-check"){
+            let C_HP = character.stats.full.max_health;
+            let C_realm = character.xp.current_level;
+            if(C_realm >= 32){
+                displayed_text += `这个神像仅能给 ${character.name} 这样的强者清空效果...`;
+                displayed_text += `基于 ${format_number(C_HP)} 的生命力，<br>赐福一次的耗费为 ${format_money(Math.round(C_HP ** 1.4))}<br>`;
+            }
+            else{
+                displayed_text += `基于 ${format_number(C_HP)} 的生命力，<br>赐福一次的耗费为 ${format_money(Math.round(C_HP ** 1.4))}<br>`;
+                let C_time = current_game_time.hour + current_game_time.minute / 60;
+                C_time = Math.floor(C_time / 22.5)
+                let MM1 = ["0-23点","23-45点","45-67点","67-90点","90-113点","113-135点","135-157点","157-180点"];
+                let MM2 = ["生命上限 x 1.8","生命恢复 1.5%","攻击伤害 x 1.2","攻击速度 x 1.15","牵制 [80% 效力]","魔攻 [20% 占比]","回风 [80% 倍率]","坚固 [8% 吸收线]"];
+                displayed_text += `<br>目前的时段为 ${MM1[C_time]}，<br>赐福内容为 ${MM2[C_time]}.(1800s)`
+                displayed_text += `<br>⚠️接受烈阳祝福会清空原有状态效果⚠️`;
+                /*
+                
+<br>·乾:血量*1.8,兑:回血+1.5%,离:攻击*1.2,震:攻速*1.15.
+<br>·巽:牵制80%,坎:魔攻20%,艮:回风/普攻倍率*0.8,坤:坚固(受伤上限8%/无副作用)
+
+                */
+                
+            }
+        }
         else if(t_key == "JY-sacrifice"){
             let C_realm = character.xp.current_level;
             if(C_realm >= 22) displayed_text += `This idol is insufficient to bless a powerful cultivator like ${character.name}...`;
@@ -1019,8 +1098,69 @@ function textline_special(t_key){
                 }
             }
         }
+        else if(t_key == "LR-sacrifice"){
+            let C_realm = character.xp.current_level;
+            
+                let C_money = Math.round(character.stats.full.max_health ** 1.4);
+                if(character.money < C_money)
+                {
+                    displayed_text += `叮~余额不足！<br> ${format_money(character.money)} / ${format_money(C_money)}`;
+                }
+                else
+                {
+                    displayed_text += `钱包: ${format_money(character.money)} ->`;
+                    character.money -= C_money;
+                    displayed_text += `${format_money(character.money)}.<br>`;
+                    update_displayed_money();
+                    displayed_text += `原有的状态效果全部被烈日净化了！`;
+                    
+                    Object.keys(active_effects).forEach(key => {
+                        delete active_effects[key];
+                    });
+                    if(C_realm >= 32) displayed_text += `这个神像仅能给 ${character.name} 这样的强者清空效果...`;
+                    else{
+                        let MM3 = ["乾","兑","离","震","巽","坎","艮","坤"];
+                        let C_time = current_game_time.hour + current_game_time.minute / 60;
+                        C_time = Math.floor(C_time / 22.5)
+                        let moon_effect = "烈日祝福·"+MM3[C_time];
+                        active_effects[moon_effect] = new ActiveEffect({...effect_templates[moon_effect], duration:1800});
+                        
+                        character.stats.add_active_effect_bonus();
+                        update_character_stats();
+                        update_displayed_effect_durations();
+                        update_displayed_effects();
+                    }
+                }
+        }
         else if(t_key == "A7-reactor"){
             start_reactor_minigame();
+        }
+        else if(t_key == "freezing-engine"){
+            start_engine_minigame();
+        }
+        else if(t_key == "grass-field"){
+            start_grass_minigame();
+        }
+        else if(t_key == "ground-digging"){
+            start_digging_minigame();
+        }
+        else if(t_key == "realm-II"){
+            displayed_text += '在看到这冰蓝色六芒星阵时，我印证了很多东西……<br>';
+            displayed_text += '曾经领悟的水元素秘法，<br>';
+            displayed_text += '与火元素领域，彻底融合在了一起。<br>';
+            displayed_text += '竟然……会有这么神异的现象产生。<br>';
+            displayed_text += '互斥的两种元素，本该是极难相容。<br>';
+            displayed_text += '可一旦达到完美的临界点，<br>';
+            displayed_text += '便能迈入【冰火两重天】的玄妙之境，<br>';
+            displayed_text += '迸发出不可思议的力量！<br>';
+            if(skills["Neko_Realm"].current_level <= 29){
+                    displayed_text += `，【火灵幻海】获取了51.2垓经验！<br>`;
+            }
+            else{
+                    displayed_text += `【焰海霜天】获取了51.2垓经验...?<br>`;
+                    displayed_text += `怎么领悟又已经突破了哇！也太能刷了叭！！<br>`;
+            }
+            add_xp_to_skill({skill: skills["Neko_Realm"], xp_to_add: 51.2e20,should_info:true,use_bonus:false},);
         }
         else if(t_key == "jjhzx"){
 
@@ -1036,6 +1176,20 @@ function textline_special(t_key){
             }
             else displayed_text += `Please equip the [Boundary Lake Heart] and try again!`;
         }
+        else if(t_key == "byzx"){
+
+            if(character.equipment.special?.name == "冰原之心")
+            {
+                character.equipment.special = null;
+                add_to_character_inventory([{item: item_templates["冰原之心·材"], count: 1}]);
+                update_displayed_equipment(); 
+                character.stats.add_all_equipment_bonus();
+                update_displayed_stats();
+                displayed_text += `你的【冰原之心】已经被转化为【冰原之心·材】，<br>可以继续升级为【幻境之心】。`;
+                log_message("获取了 冰原之心·材","combat_loot");
+            }
+            else displayed_text += `请将【冰原之心】佩戴后再次尝试！`;
+        }
         else if(t_key == "3-1-nanami"){
             if(character.equipment.special?.name == "Nanami (Spaceship)") displayed_text += `(pat) Koko, Sky Rank usually means you won't get fevers anymore.<br>Hasn't she always been dragged by your side, refusing to let go?<br>`;
             else displayed_text += `Yes, she left without a moment's hesitation.<br>Nana, that child, has the heart of a true strong one.<br>`;
@@ -1049,6 +1203,32 @@ function textline_special(t_key){
 
             displayed_text += `[Nabu] Don't worry too much about your sister's matters.<br>Just focus on your cultivation until you've fully grown,<br>then you can go assist her.`;
         }
+        else if(t_key == 'C1-dog'){
+            let S_cnt = 0;
+            if(character.inventory["{\"id\":\""+"中等进化结晶碎片"+"\"}"] != undefined){
+                S_cnt = character.inventory["{\"id\":\""+"中等进化结晶碎片"+"\"}"].count;
+            }
+            if(locations["古墓战 - II"].is_unlocked && !locations["古墓战 - II"].is_finished ){
+                
+                displayed_text += `我说，“饵料”已经布下！！<br>就算你有多的碎片也必须先打完这一只哇！`;
+            }
+            else{
+                if(S_cnt >= 10){
+                    remove_from_character_inventory([{ 
+                        item_key: ("{\"id\":\""+"中等进化结晶碎片"+"\"}"),           
+                        item_count: 10,
+                    }]);
+                    displayed_text += `“饵料”已经布下……(古墓战 - II 已解锁)`;
+                    locations["古墓战 - II"].is_unlocked = true;
+                    locations["古墓战 - II"].is_finished = false;
+                    locations["古墓战 - II"].enemy_groups_killed = 0;
+
+                }
+                else{
+                    displayed_text += `<img src='image/item/evolve_1e16_shard.png'>中等进化结晶碎片 数量不足……`;
+                }
+            }
+        }
         else if(t_key.includes("pz")){
             let T_S = t_key;
             let pz_map = {"pz-Bq":"紫色刀币","pz-my":"秘银锭","pz-bs":"史诗黄宝石"};//凭证
@@ -1058,7 +1238,7 @@ function textline_special(t_key){
             let C_pz = cs_map[T_S];//Cost_凭证
             if(character.inventory[pz_key] != undefined)
             {
-                let T_cnt = Math.floor(character.inventory[pz_key].count/C_pz);//TODO - count
+                let T_cnt = Math.floor(character.inventory[pz_key].count/C_pz);
                 if(T_cnt != 0) remove_from_character_inventory([{ 
                     item_key: pz_key,           
                     item_count: C_pz * T_cnt,
@@ -1068,7 +1248,62 @@ function textline_special(t_key){
                 displayed_text += `Exchanged for ${T_cnt} x ${item_templates[pz_map[T_S]].getName()}.<br>`;
 
             }
-            else displayed_text += `[Wild Beast Voucher] not found!<br>You need it at the exchange point to trade for items...`;
+            else displayed_text += `未发现【<img src='image/item/B3_ear.png'>荒兽凭证】！<br>兑换点需要它才能兑换物品...`;
+        }
+        else if(t_key.includes("gacha")){
+            let cnt = 1;
+            if(t_key == 'gacha-10') cnt = 10;
+            if(t_key == 'gacha-50') cnt = 50;
+            let cur_cost = cnt==1?10:(cnt*9);
+            let fj_key = "{\"id\":\""+"传承水晶·粉"+"\"}";//粉
+            if(character.inventory[fj_key] != undefined)
+            {
+
+                let cur_cnt = character.inventory[fj_key].count;//目前的粉色数量
+                if(cur_cnt >= cur_cost)
+                    {
+                    remove_from_character_inventory([{ 
+                        item_key: fj_key,           
+                        item_count: cur_cost,
+                    }]);
+                    //宝石母锭 & 幻境符文 & 紫晶碎片 & 天空级魂魄 & 传说红宝石：安慰奖，各12.4%
+                    //魂晶锭 & 血莲鱼 & 传说绿宝石 & 宇宙币：罕见物品，各8% 还有8%
+                    //血杀剑 & 冰柱鱼王 &中等进化结晶碎片：稀有物品，各2%
+                    //【峰】：隐藏物品，兆分之一的概率
+                    displayed_text += `抽奖结果：<br>`;
+                    for(let c_num = 1;c_num <= cnt;c_num ++){
+                        let gacha_RNG = Math.random();
+                        let reward_list = {1:{1:"宝石母锭",2:"幻境符文",3:"紫晶碎片",4:"天空级魂魄",5:"绝音蕨",6:"绝音蕨"},2:{1:"魂晶锭",2:"血莲鱼",3:"传说绿宝石",4:"宇宙币"},3:{1:"血杀剑",2:"冰柱鱼王",3:"中等进化结晶碎片",4:"噬芒兰"},4:{1:"峰",2:"峰"}};
+                        let reward_lvl = 0;
+                        if(gacha_RNG<0.62) reward_lvl = 1;
+                        else if(gacha_RNG<0.94
+
+                        ) reward_lvl = 2;
+                        else if(gacha_RNG<0.9999) reward_lvl = 3;
+                        else{
+                            let RNG2 = Math.random(),RNG3 = Math.random();
+                            if(RNG2<0.0001 && RNG3<0.0001){
+                                reward_lvl = 4;
+                            }
+                            else reward_lvl = 3;
+                        }
+                        let reward_total = (reward_lvl<=2)?(8-2*reward_lvl):(10-2*reward_lvl);
+                        let reward_order = Math.floor(Math.random()*(reward_total))+1;
+                        if(reward_order > reward_total) reward_order = reward_total;
+                        let reward_name = reward_list[reward_lvl][reward_order];
+                        let reward_style = {1:"style='filter:drop-shadow(0 0 5px #0f0)'",2:"style='filter:drop-shadow(0 0 9px #0cf) drop-shadow(0 0 9px #0f0) '",3:"style='filter: drop-shadow(0 0 12px #c0f) drop-shadow(0 0 9px #00f) drop-shadow(0 0 6px #0cf)'",4:"style='filter:drop-shadow(0 0 20px #f00) drop-shadow(0 0 20px #f00) drop-shadow(0 0 20px #f00) drop-shadow(0 0 20px #f00) drop-shadow(0 0 20px #f00)"}
+                        add_to_character_inventory([{ "item": getItem(item_templates[reward_name]), "count": 1 }]);
+                        displayed_text += `<img src=${item_templates[reward_name].image} ${reward_style[reward_lvl]}>`;
+                        if(c_num%10 == 0) displayed_text += "<br><br>";
+                        else displayed_text += ` , `
+
+                        //<img src="https://picsum.photos/100" style="filter:drop-shadow(0 0 10px #0ff) drop-shadow(0 0 25px #0ff)">
+                    }
+                }
+                else displayed_text += `【<img src='image/item/inherit_pink.png'>传承水晶·粉】不足！ ${cur_cnt} / ${cur_cost}`;
+
+            }
+            else displayed_text += `未发现【<img src='image/item/inherit_pink.png'>传承水晶·粉】！<br>需要它才能扭蛋...`;
         }
         else if(t_key == "lf-1"){
             displayed_text +=  `Your mental force is impressive, and you possess ${inf_combat.RM==2?"first":"second"}-layer domain,<br>
@@ -1084,6 +1319,110 @@ function textline_special(t_key){
         }
         else if(t_key == "lf-leave"){
             remove_from_character_inventory([{item_key:"{\"id\":\"峰\"}"}]);
+        }
+        else if(t_key == "kill-zh"){
+            add_to_character_inventory([{item: getItem({...item_templates["晶化剑"], quality: 239}), count: 1}]);
+            add_to_character_inventory([{ "item": getItem(item_templates["沼泽·荒兽肉块"]), "count": 5 }]);
+            character.money += 259346107197056;
+            update_displayed_money();
+        }
+        else if(t_key == "moonwheel-lv40"){
+            add_xp_to_skill({skill: skills["Moonwheels"], xp_to_add: 2.99e20,should_info:true,use_bonus:false},);
+        }
+        else if(t_key == "realm-III"){
+            if(skills["Neko_Realm"].current_level <= 34){
+                    displayed_text += `【焰海霜天[领域二重]】获取了1.68秭经验！<br>`;
+            }
+            else{
+                    displayed_text += `【焰海霜天[领域三重]】获取了1.68秭经验！<br>`;
+                    displayed_text += `这次……能提前突破一点也不意外（笑！<br>`;
+            }
+            add_xp_to_skill({skill: skills["Neko_Realm"], xp_to_add: 1.68e24,should_info:true,use_bonus:false},);
+            add_xp_to_skill({skill: skills["AquaElement"], xp_to_add: 3997e4,should_info:true,use_bonus:false},);
+        }
+        else if(t_key == "realm-IV"){
+            if(skills["Neko_Realm"].current_level <= 39){
+                    displayed_text += `【焰海霜天[领域三重]】获取了64秭经验！<br>（到现在，<br>在直面领域级强者，<br>感受其来自领域的威压之后，<br>本就临近突破的四重领域，<br>终于迈出了最后一步。）`;
+                    
+            }
+            else{
+                    displayed_text += `【出云落月[领域四重]】获取了64秭经验！<br>`;
+                    displayed_text += `抱歉纱雪高考去了……别说突破了都有人48级了！喵啊啊啊！<br>`;
+            }
+            add_xp_to_skill({skill: skills["Neko_Realm"], xp_to_add: 64e24,should_info:true,use_bonus:false},);
+        }else if(t_key == "S3-start"){
+            inf_combat.S3 = {live:true,sp:0,b1:8,b2:8,b3:0};
+
+        }
+        else if(t_key == "qx-kill"){
+            character.money += 923124981247561;
+            global_flags['qx_status'] = 1;
+            update_displayed_money();
+        }else if(t_key == "qx-sox"){
+            global_flags['qx_status'] = 2;
+            current_game_time.go_up(10800);
+        }
+        else if(t_key == "lq-kill"){
+            character.money += 5810358643364656;
+            global_flags['lq_status'] = 1;
+            update_displayed_money();
+        }else if(t_key == "lq-sox"){
+            global_flags['lq_status'] = 2;
+            current_game_time.go_up(32400);
+        }
+        else if(t_key == "heartdemon-lord"){
+            displayed_text += `[心魔之主]哼，自爆！<br>恐怕云霄级强者来了，<br>都扛不住16兆伤害吧！<br>`;
+            let qz_perc = global_flags["qz_percent"];
+            displayed_text += `……哈？压制${100 - qz_perc}%,牵制${qz_perc}%?<br>`;
+            if(qz_perc < 30) displayed_text += `哈哈哈——恐惧牵制又如何？<br>你不会的技能，我又从何模仿起呢？<br>强行抹杀！汇集心魔的一切力量，<br>誓要令你……彻底沉眠！`;
+            else if(qz_perc < 70) displayed_text += `你还偷看燕岗领五大禁书之一的牵制书！<br>自己从来没用过，也不想用……<br>只是为了坑我吗！<br>……强行抹杀……汇集力量……<br>令你，彻底沉眠！`;
+            else displayed_text += `牵制书不愧是燕岗领五大禁书之一……<br>该死，我的力量已经十不存一。<br>你到底从哪里搞到的这个？<br>外面那帮黄不拉几的商人，<br>还是某个封闭许久的老坟？<br><br>唏，可以和解吗？`
+        }
+        else if(t_key == "save"){
+                var a = window.document.createElement('a');
+                a.href = window.URL.createObjectURL(new Blob([save_to_file()], {type: 'text/plain'}));
+                a.download = `Autosave_corrupt_prevention`;
+
+                document.body.appendChild(a);
+                a.click();
+
+                document.body.removeChild(a);
+        }
+        else if(t_key.includes("P3")){
+            if(t_key == "P3-1"){
+                displayed_text += global_flags['lq_status']==1?"原本的强榜第二，也不是蓝柒，而是<span style='color:aqua'>冰蓝</span>。<br>不过，她倒在了黎明前的黑暗中……":`喏，我旁边这位也不是蓝柒，而是<span style='color:aqua'>冰蓝</span><br><br>[冰蓝]……嗯嗯……`;
+            }if(t_key == "P3-2"){
+                displayed_text += global_flags['qx_status']==1?"例如秋兴就是一例……<br>不过倒也不用担心冰家追下追杀令。<br>作为死士，在危机四伏的水牢中遇难，<br>也在所难免。":`<br>[秋兴]哎啊啊，小姐。<br>这种说法有点太残忍了吧？<br>家主大人待我等不薄，<br>我等也不过是奉命行事。`;
+            }if(t_key == "P3-3"){
+                displayed_text += global_flags['lq_status']==1?"[纳可]那，之所以排出强榜是为了……<br><br>[冰溪月]哎呀呀，这你得去问冰蓝了……<br>最新一代的强榜还是她一手操办的呢。":`[纳可]那，蓝柒……冰蓝小姐，<br>之所以排出强榜是为了？<br><br>[冰蓝]……左阿是一个戒心很重的人。<br>我将实力控制在天空级六阶，<br>长此以往，他必然会有疑心。<br>【强榜】是一种掩饰，<br>这让左阿误以为我是那种享受者，<br>压制他人，高高在上的家伙。<br><br>[莫尔]是的，而且在那老贼的眼中，<br>这样一个榜单，反而看似对他的杀戮规则有益。<br>呵，他也以为自己能轻松掌控全局。`;
+            }
+            if(t_key == "P3-4"){
+                let kr = (global_flags['qx_status']==1?1:0) + (global_flags['lq_status']==1?1:0);
+                if(kr == 0){
+                    displayed_text += "[冰蓝]两位，大恩不言谢。<br>自此之后，凡我族血脉所及之处，<br>便敬二位为坐上宾，<br>即便献上性命，也定护你们周全。<br><br>[冰溪月]哦哦，气场很足的嘛。<br>话说小蓝你今天，<br>一次性说了这么多话？有点难得呀。<br>是时候了，回家了哦。<br>纳可小姐……谢谢你。<br>拿着这个，后会有期啦。<br><br>冰溪月玉手一挥，<br>一枚镌刻着<span style='color:aqua'>冰</span>字的玉简落入纳可手中。"
+                    add_to_character_inventory([{ "item": getItem(item_templates["冰家玉简"]), "count": 1}]);
+                    //获取冰家玉简(价值1000u)
+                }
+                if(kr == 1){
+                    displayed_text += "[冰溪月]两位，虽说有些许摩擦，<br>但冤家宜解不宜结，<br>毕竟小姐也是唯一成功破局之人。<br>纳可小姐……谢谢你。<br>拿着这个，后会有期啦。<br><br>冰溪月玉手一挥，<br>一叠369枚<span class='coin coin_moneyQa' >宇宙币</span>落入纳可手中。"
+                    character.money += 369e15;
+                    //获取888u
+                }
+                if(kr == 2){
+                    displayed_text += "[冰溪月]两位……<br>虽然破局之人是你们，<br>但你们的杀念属实太重。<br>在被你杀掉之前，<br>我还是先溜为妙。<br><br>冰溪月玉手一捏，<br>一枚镌刻着<span style='color:aqua'>冰</span>字的玉简被捏碎，<br>她的身影也消散在空气中。"
+                    //杀了俩还想要东西？
+                }
+            }
+
+        }//Past-3 第三幕boss战后多种判定
+        else if(t_key == "age-check"){
+            let age=Math.round(current_game_time.year - 1374 + (current_game_time.era-31698)*10081);
+            // 1374年 15岁 进入时封水牢(RPG标准世界线)
+            displayed_text += `${age}年了呐！！<br>`
+            if(age<10) displayed_text += `家族里的人都说你们很快就会回来。<br>看来我也是瞎操心一趟。`;
+            else if(age<100) displayed_text += `虽然那个历练地点是峰大哥建议的……<br>但以后还是不要离开那么久，好吗？<br>`;
+            else if(age<1000) displayed_text += `得亏你们还记得回来……<br>再不回来的话，<br>家族都不知道谁继承了。`
+            else displayed_text += `满燕岗城都在传，<br>曾经惊才绝艳的纳可姐妹，<br>双双陨落在了那座出不去的冰宫！<br>再晚回来几年，你们估计连纳家都看不到了。`
         }
         return displayed_text;
 }
@@ -1158,12 +1497,12 @@ function start_textline(textline_key){
             continue;
         }
         for(let j = 0; j < textline.unlocks.textlines[i].lines.length; j++) {
-            const line_key = textline.unlocks.textlines[i].lines[j];
-            if(!unlock_dialogue.textlines[line_key]) {
-                console.warn(`[Dialogue] Missing textline "${line_key}" while unlocking from dialogue "${dialogue_name}"`);
-                continue;
+            if(dialogues[dialogue_name].textlines[textline.unlocks.textlines[i].lines[j]] == undefined)
+            {
+                console.error(`未定义的对话: NPC[${dialogue_name}] - 对话[${textline.unlocks.textlines[i].lines[j]}]`);
+                console.log(textline.unlocks);
             }
-            unlock_dialogue.textlines[line_key].is_unlocked = true;
+            dialogues[dialogue_name].textlines[textline.unlocks.textlines[i].lines[j]].is_unlocked = true;
         }
     }
 
@@ -1261,6 +1600,10 @@ function set_new_combat({enemies} = {}) {
         return;
     }
     current_enemies = enemies || current_location.get_next_enemies();
+    for(let id = 0;id < current_enemies.length;id+=1){
+        current_enemies[id].pos = id;
+        //console.log("标记了第",id,"位敌人")
+    }
     clear_all_enemy_attack_loops();
 
     let character_attack_cooldown = 1/(character.stats.full.attack_speed);
@@ -1332,30 +1675,37 @@ function reset_combat_loops() {
  * @param {*} enemy_id 
  * @param {*} cooldown 
  */
+
+let cd_needed = [0,0,0,0,0,0,0,0];
+let cur_cd = [0,0,0,0,0,0,0,0];
 function do_enemy_attack_loop(enemy_id, count, E_round = 1,isnew = false) {//E_round:回合数
     count = count || 0;
-    update_enemy_attack_bar(enemy_id, count);
-    if(!current_enemies?.[enemy_id] || !Array.isArray(current_enemies[enemy_id].spec)) {
-        clearTimeout(enemy_attack_loops[enemy_id]);
+    if(!current_enemies[enemy_id].is_alive || !current_enemies[enemy_id]){
+        clear_enemy_attack_loop(current_enemies[enemy_id]);
         return;
     }
+    //update_enemy_attack_bar(enemy_id, 0);
     let Spec_S = "";
-    if(current_enemies[enemy_id].spec.includes(0)) Spec_S += "[Magic ATK]";
-    if(current_enemies[enemy_id].spec.includes(5)) Spec_S += "[Suppression]";
-    if(current_enemies[enemy_id].spec.includes(7)) Spec_S += "[Rend]";
-    if(current_enemies[enemy_id].spec.includes(8)) Spec_S += "[Weaken]";
-    if(current_enemies[enemy_id].spec.includes(9)) Spec_S += "[Reverse]";
-    if(current_enemies[enemy_id].spec.includes(10)) Spec_S += "[Whirlwind]";
-    if(current_enemies[enemy_id].spec.includes(17)) Spec_S += "[Tenacity]";
-    if(current_enemies[enemy_id].spec.includes(18)) Spec_S += "[Greed]";
-    if(current_enemies[enemy_id].spec.includes(26)) Spec_S += "[Split]";
-    if(current_enemies[enemy_id].spec.includes(27)) Spec_S += "[Soft Bone]";
-    if(current_enemies[enemy_id].spec.includes(39)) Spec_S += "[Greed·Gem]";
+    if(current_enemies[enemy_id].spec.includes(0)) Spec_S += "[魔攻]";
+    if(current_enemies[enemy_id].spec.includes(5)) Spec_S += "[牵制]";
+    if(current_enemies[enemy_id].spec.includes(7)) Spec_S += "[撕裂]";
+    if(current_enemies[enemy_id].spec.includes(8)) Spec_S += "[衰弱]";
+    if(current_enemies[enemy_id].spec.includes(9)) Spec_S += "[反转]";
+    if(current_enemies[enemy_id].spec.includes(10)) Spec_S += "[回风]";
+    if(current_enemies[enemy_id].spec.includes(17)) Spec_S += "[执着]";
+    if(current_enemies[enemy_id].spec.includes(18)) Spec_S += "[贪婪]";
+    if(current_enemies[enemy_id].spec.includes(26)) Spec_S += "[分裂]";
+    if(current_enemies[enemy_id].spec.includes(27)) Spec_S += "[柔骨]";
+    if(current_enemies[enemy_id].spec.includes(39)) Spec_S += "[贪婪·宝石]";
+    if(current_enemies[enemy_id].spec.includes(51)) Spec_S += "[压制]";
+    if(current_enemies[enemy_id].spec.includes(52)) Spec_S += "[压制..?]";
+    if(current_enemies[enemy_id].spec.includes(54)) Spec_S += "[生命限制]";
+    if(current_enemies[enemy_id].spec.includes(55)) Spec_S += "[贪婪·改]";
     
     if(isnew) {
-        enemy_timer_variance_accumulator[enemy_id] = 0;
-        enemy_timer_adjustment[enemy_id] = 0;
-        if(current_enemies[enemy_id].spec.includes(2)) do_enemy_combat_action(enemy_id,"[Swift]"+Spec_S);//迅捷(开局攻击)
+        cd_needed[enemy_id] = 1000 / current_enemies[enemy_id].stats.attack_speed;
+        cur_cd[enemy_id] = 0;
+        if(current_enemies[enemy_id].spec.includes(2)) do_enemy_combat_action(enemy_id,"[迅捷]"+Spec_S);//迅捷(开局攻击)
         if(current_enemies != null) if(current_enemies[enemy_id].spec.includes(4))
         {
             for(let cb=1;cb<=3;cb++) if(current_enemies != null){
@@ -1404,31 +1754,20 @@ function do_enemy_attack_loop(enemy_id, count, E_round = 1,isnew = false) {//E_r
         }//冻伤
     }
 
+    let frametime = 25;
     clearTimeout(enemy_attack_loops[enemy_id]);
     enemy_attack_loops[enemy_id] = setTimeout(() => {
-        if(current_enemies != null)
-        {
-            if(!current_enemies[enemy_id]) {
-                clearTimeout(enemy_attack_loops[enemy_id]);
-                return;
-            }
-            if(!Array.isArray(enemy_timers[enemy_id])) {
-                enemy_timers[enemy_id] = [Date.now(), Date.now()];
-            }
-            if(typeof enemy_timer_variance_accumulator[enemy_id] !== "number") {
-                enemy_timer_variance_accumulator[enemy_id] = 0;
-            }
-            if(typeof enemy_timer_adjustment[enemy_id] !== "number") {
-                enemy_timer_adjustment[enemy_id] = 0;
-            }
-            enemy_timers[enemy_id][0] = Date.now(); 
-            enemy_timer_variance_accumulator[enemy_id] += ((enemy_timers[enemy_id][0] - enemy_timers[enemy_id][1]) - enemy_attack_cooldowns[enemy_id]*1000/(40*tickrate));
-
-            enemy_timers[enemy_id][1] = Date.now();
-            update_enemy_attack_bar(enemy_id, count);
-            count++;
+        
+        if(!current_enemies[enemy_id].is_alive || !current_enemies[enemy_id]){
+            clear_enemy_attack_loop(current_enemies[enemy_id]);
+            return;
+        }
+            cur_cd[enemy_id] += frametime;
+            //console.log(enemy_id,(cur_cd[enemy_id] / cd_needed[enemy_id])*100 )
+            update_enemy_attack_bar(enemy_id, cur_cd[enemy_id] / cd_needed[enemy_id]);
             let atk_sign = 0;
-            if(count >= 40) {
+            if(cur_cd[enemy_id] >= cd_needed[enemy_id]) {
+                cur_cd[enemy_id] -= cd_needed[enemy_id];
                 count = 0;
                 if(current_enemies[enemy_id].spec.includes(10))
                 {
@@ -1517,26 +1856,12 @@ function do_enemy_attack_loop(enemy_id, count, E_round = 1,isnew = false) {//E_r
             }
             do_enemy_attack_loop(enemy_id, count,E_round + atk_sign,false);
 
-            if(enemy_timer_variance_accumulator[enemy_id] <= 5/tickrate && enemy_timer_variance_accumulator[enemy_id] >= -5/tickrate) {
-                enemy_timer_adjustment[enemy_id] = time_variance_accumulator;
-            }
-            else {
-                if(enemy_timer_variance_accumulator[enemy_id] > 5/tickrate) {
-                    enemy_timer_adjustment[enemy_id] = 5/tickrate;
-                }
-                else {
-                    if(enemy_timer_variance_accumulator[enemy_id] < -5/tickrate) {
-                        enemy_timer_adjustment[enemy_id] = -5/tickrate;
-                    }
-                }
-            } //limits the maximum correction to +/- 5ms, just to be safe
-        }
-        else clearTimeout(enemy_attack_loops[enemy_id]);
-    }, enemy_attack_cooldowns[enemy_id]*1000/(40*tickrate) - enemy_timer_adjustment[enemy_id]);
+    }, frametime);
 }
 
 function clear_enemy_attack_loop(enemy_id) {
     clearTimeout(enemy_attack_loops[enemy_id]);
+    enemy_attack_loops[enemy_id] = null;
 }
 
 /**
@@ -1588,25 +1913,34 @@ function set_character_attack_loop({base_cooldown}) {
  * @param {String} attack_power 
  * @param {String} attack_type 
  */
+let chara_cd = 0;
 function do_character_attack_loop({base_cooldown, actual_cooldown, attack_power, targets}) {
     let count = 0;
     clear_character_attack_loop();
+    let frametime = 20;
     character_attack_loop = setInterval(() => {
-        update_character_attack_bar(count);
-        count++;
-        if(count >= 40) {
-            count = 0;
+        update_character_attack_bar(chara_cd/(actual_cooldown * 1000));
+        chara_cd += frametime;
+        if(chara_cd >= actual_cooldown * 1000) {
+            chara_cd -= actual_cooldown * 1000;
             let leveled = false;
 
             for(let i = 0; i < targets.length; i++) {
                 let alive_targets = current_enemies.filter(enemy => enemy.is_alive);
-                if(active_effects["Whirlwind A9"]!=undefined)
+                let cur_pos = targets[i].pos;//目前攻击判定位
+                if(active_effects["回风 A9"]!=undefined || active_effects["烈日祝福·艮"]!=undefined)
                 {
-                    do_character_combat_action({target: targets[i], attack_power}, alive_targets.length - 1,0.8,"[Whirlwind-Weak]");
+                    do_character_combat_action({target: targets[i], attack_power}, cur_pos,0.8,"[回风-弱]");
                     alive_targets = current_enemies.filter(enemy => enemy.is_alive);
-                    if(current_enemies.filter(enemy => enemy.is_alive).length != 0) do_character_combat_action({target: targets[i], attack_power}, alive_targets.length - 1,1.2,"[Whirlwind-Strong]");
+                    if(targets[i].is_alive) do_character_combat_action({target: targets[i], attack_power}, cur_pos,1.2,"[回风-强]");
                 }
-                else do_character_combat_action({target: targets[i], attack_power}, alive_targets.length - 1,1,"");
+                else {
+                    do_character_combat_action({target: targets[i], attack_power}, cur_pos,1,"");
+                    if(current_stance == 'SR_Double'){
+                        alive_targets = current_enemies.filter(enemy => enemy.is_alive);
+                        if(targets[i].is_alive) do_character_combat_action({target: targets[i], attack_power}, cur_pos,1,"[映星天彩·双虹]");
+                    }//映星天彩·虹彩
+                }
             }
             if(stances[current_stance].related_skill) {
                 leveled = add_xp_to_skill({skill: skills[stances[current_stance].related_skill], xp_to_add: targets.reduce((sum,enemy)=>sum+enemy.xp_value,0)/targets.length});
@@ -1634,7 +1968,7 @@ function do_character_attack_loop({base_cooldown, actual_cooldown, attack_power,
                 set_new_combat();
             }
         }
-    }, actual_cooldown*1000/(40*tickrate));
+    }, frametime);
 }
 
 function clear_character_attack_loop() {
@@ -1666,6 +2000,12 @@ function faint(c_log)
     end_activity_animation(); //clears the "animation"
     current_activity = null;
      update_displayed_health();
+    if(inf_combat.S3?.live){
+        if(current_location.parent_location != undefined) change_location(current_location.parent_location.name);
+        log_message("心之灵的虚影摇曳着。现在还不能倒下！","combat_loot")
+        return;
+    }//BOSS战正在进行
+    
     if(options.auto_return_to_bed && last_location_with_bed) {
         change_location(last_location_with_bed);
         start_sleeping();
@@ -1717,6 +2057,19 @@ function do_enemy_combat_action(enemy_id,spec_hint,E_atk_mul = 1,E_dmg_mul = 1) 
         spec_mul *= attacker.stats.defense/character.stats.full.defense;
         if(spec_mul == Infinity) spec_mul = 9999.99;//防止除以0
     }
+    if(attacker.spec.includes(51))//压制
+    {
+        spec_mul *= (attacker.stats.defense+attacker.stats.attack)/(character.stats.full.defense+character.stats.full.attack_power);
+        if(spec_mul == Infinity) spec_mul = 9999.99;//防止除以0
+    }
+    if(attacker.spec.includes(52))//压制·伪
+    {
+        let QZ_P = global_flags['qz_percent'] || 0;
+        spec_mul *= ((attacker.stats.defense+attacker.stats.attack)/(character.stats.full.defense+character.stats.full.attack_power)) ** (1-0.01*QZ_P);
+        spec_mul *= (attacker.stats.defense/character.stats.full.defense) ** (0.01*QZ_P);
+
+        if(spec_mul == Infinity) spec_mul = 9999.99;//防止除以0
+    }
     if(attacker.spec.includes(18)){//贪婪
         spec_mul *= (1 - 0.01*(character.money/attacker.spec_value[18]));
         spec_mul = Math.max(spec_mul,0);
@@ -1726,8 +2079,23 @@ function do_enemy_combat_action(enemy_id,spec_hint,E_atk_mul = 1,E_dmg_mul = 1) 
         spec_mul *= (1 - 0.01*(inf_combat.VP.num/attacker.spec_value[39]));
         spec_mul = Math.max(spec_mul,0);
     }
+    if(attacker.spec.includes(55)){//贪婪·改
+        spec_mul *= (1 - 0.01*(character.money/attacker.spec_value[55]));
+        spec_mul = Math.max(spec_mul,0.2);
+    }
 
     if(attacker.spec.includes(7)) spec_mul *= 1.5;//撕裂
+    
+    if(attacker.spec.includes(67)){
+        if(character.stats.full.health >= attacker.stats.health){
+            spec_hint += "[血杀·正]";
+            spec_mul *= 1.5;
+        }
+        else{
+            spec_hint += "[血杀·逆]";
+            spec_mul *= 0.5;
+        }
+    }//血杀
     
 
     let E_atk_mul_f = E_atk_mul;
@@ -1796,27 +2164,47 @@ function do_enemy_combat_action(enemy_id,spec_hint,E_atk_mul = 1,E_dmg_mul = 1) 
     }//激光
     if(active_effects["Spirit Flash B9"]!=undefined){
         if(attacker.stats.attack < character.stats.full.attack_power * 2){
-            spec_mul *= (1 - 0.5 *character.stats.full.defense / attacker.stats.defense);
+            spec_mul *= (1 - 0.5 *character.stats.full.defense / Math.min(1,attacker.stats.defense));
             spec_mul = Math.max(spec_mul,0);
-            spec_hint += '[Spirit Flash·Positive]';
+            
+            spec_hint += '[灵闪·正]';
         } else {
-            spec_mul *= (1 + 3 *character.stats.full.defense / attacker.stats.defense);
-            spec_hint += '[Spirit Flash·Reverse]';
+            spec_mul *= Math.min(100,(1 + 3 *character.stats.full.defense / Math.min(1,attacker.stats.defense)));
+            spec_hint += '[灵闪·逆]';
         }
     }
     if(active_effects["Scatter B9"]!=undefined){
         E_atk_mul_f *= Math.max(( 1 - ((character.stats.full.health/attacker.stats.health) ** 0.5) * 0.1),0);
         spec_hint += '[Scatter^1/2]';
     }
+    if(attacker.spec.includes(54))
+    {
+        E_atk_mul_f *= Math.min(100,attacker.stats.health / character.stats.full.health);
+    }//生命限制
+
+    
+    if(active_effects["硬化 C6"]!=undefined){
+        if(attacker.stats.attack > attacker.stats.defense){
+            E_atk_mul_f *= 0.5 * attacker.stats.defense / attacker.stats.attack + 0.5;
+            spec_hint += '[硬化 C6]';
+        }
+        else Spec_E += "[硬化 C6·免疫]"
+    }
 
 
 //"如果敌人的攻击少于角色的2倍，角色受到的伤害减少(角色防御/敌人防御)的二分之一。反之，增加(角色防御/敌人防御)的两倍。该效果不会把伤害降低到0以下。", 
+
+
+    let enemy_agi_modifier = 1;
+    if(attacker.spec.includes(65)) enemy_agi_modifier = 1 + attacker.stats.health / attacker.stats.max_health * 99;
     
-    const hit_chance = get_hit_chance(attacker.stats.agility, character.stats.full.agility * evasion_agi_modifier);
+    if(active_effects["血遁 C6"]!=undefined) evasion_agi_modifier *= 1 + character.stats.full.health / character.stats.full.max_health * 2.5;
+
+    const hit_chance = get_hit_chance(attacker.stats.agility * enemy_agi_modifier, character.stats.full.agility * evasion_agi_modifier);
 
 
     if((hit_chance < Math.random()) && (spec_mul * E_atk_mul_f) < 25) { //EVADED ATTACK
-        log_message(character.name + " evaded an attack", "enemy_missed");
+        if(!options.option_combat_filter) log_message(character.name + " 闪避了一次攻击", "enemy_missed");
         return; //damage fully evaded, nothing more can happen
     }
     //目前25倍以上攻击是必中状态。
@@ -1858,11 +2246,11 @@ function do_enemy_combat_action(enemy_id,spec_hint,E_atk_mul = 1,E_dmg_mul = 1) 
     if(attacker.spec.includes(27)) sdef_mul *= character.stats.full.attack_power / character.stats.full.defense * 0.1 + 1;//柔骨
     
     if(attacker.spec.includes(34)){
-        if(attacker.defense < character.stats.full.defense){
-            spec_hint += "[Dominate Weak·Immune]";
+        if(attacker.stats.defense < character.stats.full.defense){
+            spec_hint += "[凌弱·免疫]";
         }
         else{
-            sdef_mul *= (2- attacker.defense/character.stats.full.defense);
+            sdef_mul *= (2- attacker.stats.defense/character.stats.full.defense);
             sdef_mul = sdef_mul || 0;
             spec_hint += "[Dominate Weak]";
         }
@@ -1873,69 +2261,72 @@ function do_enemy_combat_action(enemy_id,spec_hint,E_atk_mul = 1,E_dmg_mul = 1) 
 
     if(critted)
     {
-        log_message(character.name + " took " + format_number(damage_taken) + " damage [CRIT]" + spec_hint, "hero_attacked_critically");
+        if((!options.option_combat_filter) || damage_taken != 0) log_message(character.name + " 受到了 " + format_number(damage_taken) + " 伤害[暴击]" + spec_hint, "hero_attacked_critically");
     } else {
-        log_message(character.name + " took " + format_number(damage_taken) + " damage" + spec_hint, "hero_attacked");
+        if((!options.option_combat_filter) || damage_taken != 0) log_message(character.name + " 受到了 " + format_number(damage_taken) + "  伤害" + spec_hint, "hero_attacked");
     }
 
 
 
     
-    if(!attacker.spec.includes(28)) add_xp_to_skill({skill: skills["Iron skin"], xp_to_add: enemy_base_damage*E_atk_mul_f*spec_mul/10});
+    if(!attacker.spec.includes(28)) add_xp_to_skill({skill: skills["Iron skin"], xp_to_add: enemy_base_damage*spec_mul/10});
     if(attacker.spec.includes(31)){
         attacker.stats.health += attacker.stats.max_health * 0.30;
         log_message(attacker.name + " recovered " + format_number(attacker.stats.max_health * 0.30) + " HP","enemy_enhanced");
         update_displayed_health_of_enemies();
     }//回春
 
-    if(fainted) faint(" was defeated");
-    else if(active_effects["Reversal B9"]!=undefined){
-        attacker.stats.health -= damage_taken * 0.50;
-        log_message(attacker.name + " took " + format_number(damage_taken * 0.50) + " rebound damage","hero_attacked");
+    if(attacker.spec.includes(66)){
+        chara_cd -= 500 / character.stats.full.attack_speed;
+        log_message(`${attacker.name} 将 ${character.name} 的攻击 延迟了0.5轮![吹火掌].`,"enemy_enhanced");
+    }//吹火掌
+
+    if(fainted) faint(" 失败了");
+    else if(active_effects["反戈 B9"]!=undefined){
+        attacker.stats.health -= damage_taken * 0.75;
+        log_message(attacker.name + " 受到了 " + format_number(damage_taken * 0.75)  + " 点反弹伤害","hero_attacked");
+        
+        update_displayed_health_of_enemies();
+        update_displayed_enemies()
         //attacker受到damage_taken点伤害
         if(attacker.stats.health <= 0){
-            total_kills++;
-            attacker.stats.health = 0; //to not go negative on displayed value
-            log_message(attacker.name + " was defeated by rebound damage. No experience gained.","enemy_defeated");
-
-            var loot = attacker.get_loot();
-            if(loot.length > 0) {
-                log_loot(loot);
-                add_to_character_inventory(loot);
-            }
-            
-            kill_enemy(attacker);
-            if(current_enemies.filter(enemy => enemy.is_alive).length == 0){ //all enemies defeated, do relevant things and set new combat
-                current_location.enemy_groups_killed += 1;
-                if(current_location.enemy_groups_killed > 0 && current_location.enemy_groups_killed % current_location.enemy_count == 0) {
-                    get_location_rewards(current_location);
-                }
-                document.getElementById("enemy_count_div").children[0].children[1].innerHTML = current_location.enemy_count - current_location.enemy_groups_killed % current_location.enemy_count;
-                set_new_combat();
-            }
+            attacker.stats.health = 1; //to not go negative on displayed value
         }
     }
+
 
     update_displayed_health();
 }
 function get_enemy_realm(enemy){
-    const match = enemy.realm.match(/<b>([^<]+)<\/b>/);
-    if (!match) return 0;
-    const text = match[1];
-
-    let base = 0;
-    if (text.startsWith("Myriad")) base = 3;
-    else if (text.startsWith("Tidal")) base = 6;
-    else if (text.startsWith("Earth")) base = 9;
-    else if (text.startsWith("Sky")) base = 18;
-    // else Dust: base = 0
-
-    const stage_match = text.match(/Stage (\d+)/);
-    if (stage_match) return base + (parseInt(stage_match[1]) - 1);
-
-    if (text.includes("Pinnacle") || text.includes("Breakthrough")) {
-        if (base >= 9) return base + 8; // Earth/Sky: pinnacle = stage 9 equivalent
-        return base + 2;               // Dust/Myriad/Tidal: 3 sub-ranks
+    let realm_index = enemy.realm.search("<b>")
+    let realm_e = 0;//enemy
+    let realm_f = enemy.realm[realm_index + 3];//first
+    let realm_l = enemy.realm[realm_index + 6];//last
+    switch (realm_f){
+        case "微":
+            realm_e += 0;
+            break;
+        case "万":
+            realm_e += 3;
+            break;
+        case "潮":
+            realm_e += 6;
+            break;
+        case "大":
+            realm_e += 9;
+            break;  
+        case "天":
+            realm_e += 18;
+            break;  
+        case "云":
+            realm_e += 27;
+            break;  
+        case "领":
+            realm_e += 36;
+            break;  
+        case "世":
+            realm_e += 45;
+            break;  
     }
     if (text.includes("Expert")) return base === 0 ? 2 : base + 1; // Dust Expert is index 2
     if (text.includes("Adept")) return base + 1;
@@ -1964,19 +2355,73 @@ function update_neko_realm()
     else if(S_level >= 30 && inf_combat.RM < 3)
     {
         add_to_character_inventory([{item: getItem({...item_templates["焰海霜天[领域二重]"], quality: 200}), count: 1}]);
-        log_message(`Domain 2nd Layer story [WIP]!`, "location_unlocked");
+        log_message(`水，滋润万物，温和优雅……`, "gathered_loot");
+        log_message(`火，残酷暴戾，却照耀一切，点燃希望。`, "gathered_loot");
+        log_message(`获取新领悟 [焰海霜天]！`, "location_unlocked");
+        log_message(`[极寒相变引擎] - [焰海] / [霜天] 环境 现已解锁！`, "location_unlocked");
         inf_combat.RM = 3;
     }
-    else if(S_level >= 40 && inf_combat.RM < 4)
+    else if(S_level >= 35 && inf_combat.RM < 4)
     {
         add_to_character_inventory([{item: getItem({...item_templates["焰海霜天[领域三重]"], quality: 200}), count: 1}]);
-        log_message(`Domain 3rd Layer story [WIP]!`, "location_unlocked");
+        log_message(`领域【焰海霜天】晋升为第三重！请检查装备栏查看详情！`, "location_unlocked");
         inf_combat.RM = 4;
     }
+    else if(S_level >= 40 && inf_combat.RM < 5)
+    {
+        add_to_character_inventory([{item: getItem({...item_templates["出云落月[领域四重]"], quality: 240}), count: 1}]);
+        log_message(`领悟了第四重领域【出云落月】！请检查装备栏查看详情！`, "location_unlocked");
+        inf_combat.RM = 5;
+    }
+    else if(S_level >= 45 && inf_combat.RM < 6)
+    {
+        add_to_character_inventory([{item: getItem({...item_templates["出云落月[领域五重]"], quality: 240}), count: 1}]);
+        log_message(`领域【出云落月】晋升为第五重！请检查装备栏查看详情！`, "location_unlocked");
+        inf_combat.RM = 6;
+    }
+    else if(S_level >= 55 && inf_combat.RM < 7)
+    {
+        add_to_character_inventory([{item: getItem({...item_templates["出云落月[领域六重]"], quality: 240}), count: 1}]);
+        log_message(`领域【出云落月】晋升为第六重！请检查装备栏查看详情！`, "location_unlocked");
+        inf_combat.RM = 7;
+    }
+}
+function get_spirit_buff(S3_sp){
+    
+    locations["幻境核心 - B1"].is_unlocked = (inf_combat.S3.b1 != 0);
+    locations["幻境核心 - B2"].is_unlocked = (inf_combat.S3.b2 != 0);
+    locations["幻境核心 - B3"].is_unlocked = (inf_combat.S3.b3 != 0);
+    //判定自选关解锁
+    if(S3_sp == 5){
+        log_message(`${character.name} 生命上限提升了20%！`,"enemy_enhanced");
+        active_effects["灵魂之力 I"] = new ActiveEffect({...effect_templates["灵魂之力 I"], duration: 99999999});
+    }
+    if(S3_sp == 10){
+        log_message(`${character.name} 生命上限提升了20%！`,"enemy_enhanced");
+        active_effects["灵魂之力 II"] = new ActiveEffect({...effect_templates["灵魂之力 II"], duration: 99999999});
+    }
+    if(S3_sp == 15){
+        log_message(`${character.name} 攻防敏提升了1亿！`,"enemy_enhanced");
+        active_effects["灵魂之力 III"] = new ActiveEffect({...effect_templates["灵魂之力 III"], duration: 99999999});
+    }
+    if(S3_sp == 20){
+        log_message(`${character.name} 攻防敏提升了1亿！`,"enemy_enhanced");
+        active_effects["灵魂之力 IV"] = new ActiveEffect({...effect_templates["灵魂之力 IV"], duration: 99999999});
+    }
+    if(S3_sp >= 25){
+        locations["幻境核心 - X"].is_unlocked = true;
+        log_message(`【左阿】封印完成，全属性降低10081倍！`,"enemy_enhanced");
+        log_message(`${character.name} 将全身心的灵魂力量投入幻境！ 攻防敏提升了5亿！`,"enemy_enhanced");
+        active_effects["灵魂之力 V"] = new ActiveEffect({...effect_templates["灵魂之力 V"], duration: 99999999});
+    }
+    
+                        character.stats.add_active_effect_bonus();
+                        update_character_stats();
+                        update_displayed_effect_durations();
+                        update_displayed_effects();
 }
 
 function do_character_combat_action({target, attack_power}, target_num,c_atk_mul,c_hint) {
-
     let satk_mul = 1;//角色攻击乘数
     let sdmg_mul = 1;//角色伤害乘数
     let Spec_E = c_hint;
@@ -2001,6 +2446,19 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
         satk_mul *= 1 - target.stats.health / character.stats.full.health;
         satk_mul = Math.max(satk_mul,0);
     }//散华
+    if(target.spec.includes(68))
+    {
+        Spec_E += "[散华]";
+        satk_mul *= 1 - 0.1 * target.stats.health / character.stats.full.health;
+        satk_mul = Math.max(satk_mul,0);
+    }//散华·改
+    if(target.spec.includes(63)){
+        if(character.stats.full.attack_power > character.stats.full.defense){
+            satk_mul = character.stats.full.defense / character.stats.full.attack_power;
+            Spec_E += "[硬化]";
+        }
+        else Spec_E += "[硬化·免疫]"
+    }//硬化
 
     const hero_base_damage = attack_power * satk_mul * c_atk_mul;
 
@@ -2013,9 +2471,11 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
     //it will be changed with environment or spec stat.
 
     add_xp_to_skill({skill: skills["Combat"], xp_to_add: target.xp_value});
-
+    let enemy_agi_modifier = 1;
+    if(target.spec.includes(65)) enemy_agi_modifier = 1 + target.stats.health / target.stats.max_health * 99;
+    if(active_effects["血遁 C6"]!=undefined) hit_agi_modifier *= 1 + character.stats.full.health / character.stats.full.max_health * 2.5;
     
-    const hit_chance = get_hit_chance(character.stats.full.agility * hit_agi_modifier, target.stats.agility );
+    const hit_chance = get_hit_chance(character.stats.full.agility * hit_agi_modifier, target.stats.agility * enemy_agi_modifier);
     
     if(hit_chance > Math.random()) {//hero's attack hits
 
@@ -2029,6 +2489,7 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
         if(character.equipment.method != null){
             if(character.equipment.method.id=="三月断宵") add_xp_to_skill({skill: skills['3Moon/Night'], xp_to_add: target.xp_value});
             if(character.equipment.method.id=="星解之术") add_xp_to_skill({skill: skills['StarDestruction'], xp_to_add: target.xp_value});
+            if(character.equipment.method.id=="映星紫华") add_xp_to_skill({skill: skills['ReflectStarVioletLight'], xp_to_add: target.xp_value});
         }
         if(character.stats.full.crit_rate > Math.random()) {
             vibra_damage *= character.stats.full.crit_multiplier;
@@ -2040,22 +2501,28 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
         let proto_d = damage_dealt;
         damage_dealt = Math.ceil(10*Math.max(damage_dealt - target.stats.defense,0))/10;
 
-        if(global_flags.is_realm_enabled)
-        {
-            add_xp_to_skill({skill: skills['Neko_Realm'], xp_to_add: damage_dealt});//战斗领悟(领域)
-            update_neko_realm();
-        }
-        if(active_effects["Magic Attack A9"]!=undefined && damage_dealt < proto_d * 0.1)
+        if(active_effects["魔攻 A9"]!=undefined && damage_dealt < proto_d * 0.1)
         {
             damage_dealt = proto_d * 0.1;
             Spec_E += "[Magic ATK]";
         }
-        if(active_effects["Suppression A9"]!=undefined)
+        if(active_effects["烈日祝福·坎"]!=undefined && damage_dealt < proto_d * 0.2)
+        {
+            damage_dealt = proto_d * 0.1;
+            Spec_E += "[魔攻·祝福]";
+        }
+        if(active_effects["牵制 A9"]!=undefined)
         {
             sdmg_mul *= Math.min(character.stats.full.defense / (target.stats.defense + 0.0001) * 0.6,10);
             Spec_E += "[Suppression]";
         }
-        if(active_effects["Void Gate B9"]!=undefined)
+        if(active_effects["烈日祝福·巽"]!=undefined)
+        {
+            sdmg_mul *= Math.min(character.stats.full.defense / (target.stats.defense + 0.0001) * 0.8,10);
+            Spec_E += "[牵制·祝福]";
+        }
+        
+        if(active_effects["异界之门 B9"]!=undefined)
         {
             target.stats.spec_value ||= {};
             
@@ -2064,7 +2531,14 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
             target.stats.spec_value[-1] += 1;
             Spec_E += "[Void Gate]";
         }
+        if(active_effects["压制 C6"]!=undefined)
+        {
+            sdmg_mul *= 1.25 * (character.stats.full.defense+character.stats.full.attack_power) / (target.stats.defense+target.stats.attack);
+            
+            if(sdmg_mul == Infinity) sdmg_mul = 9999.99;//防止除以0
+        }
 
+    
 
         if(target.spec.includes(1))
         {
@@ -2095,13 +2569,19 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
         }
         let b_health = target.stats.health;
         target.stats.health -= damage_dealt;
+        let filter = false;
+        if(options.option_combat_filter && ((damage_dealt == 0) || (target.stats.health <= 0))) filter = true;
         if(critted) {
-            log_message(target.name + " took " + format_number(damage_dealt) + " damage [CRIT]" + Spec_E, "enemy_attacked_critically");
+            if(!filter) log_message(target.name + " 受到了 " + format_number(damage_dealt) + " 伤害[暴击]" + Spec_E, "enemy_attacked_critically");
         }
         else {
-            log_message(target.name + " took " + format_number(damage_dealt) + " damage" + Spec_E, "enemy_attacked");
+            if(!filter) log_message(target.name + " 受到了 " + format_number(damage_dealt) + " 伤害" + Spec_E, "enemy_attacked");
         }
         
+        if(active_effects["吹火 C6"]!=undefined){
+            cur_cd[target_num] -= 500 / target.stats.attack_speed;
+            log_message(`${character.name} 将 ${target.name} 的攻击 延迟了0.5轮![吹火 C6].`,"hero_regened");
+        }//吹火 C6
         const effect = document.getElementById(`E${target_num}_effect`);
             effect.classList.add('active');
                 effect.addEventListener('animationend', () => {
@@ -2110,8 +2590,11 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
                 //受击动画
 
         if(target.stats.health <= 0) {
-            damage_dealt = b_health;
+            damage_dealt = b_health;//防止超杀的伤害被计算
             total_kills++;
+            if(target.spec.includes(61)){total_kills += 9;}
+            if(target.spec.includes(64)){total_kills += 99;}
+
             target.stats.health = 0; //to not go negative on displayed value
         
             //gained xp multiplied ny TOTAL size of enemy group raised to 1/3
@@ -2132,11 +2615,50 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
 
             log_message(target.name + " defeated, gained " + format_number(xp_display) + " XP" + tooltip_ex, 
             "enemy_defeated");
+            //敌人亡语判定区
+            if(target.spec.includes(56))
+            {
+                log_message(`${character.name} 获取了60s【迟缓】效果！`,"enemy_enhanced");
+                active_effects["迟缓"] = new ActiveEffect({...effect_templates["迟缓"], duration:60});
+                inf_combat.S3.b1 -= 1;
+            }//禁锢
+            if(target.spec.includes(57))
+            {
+                log_message(`场上增加了3只【心之灵·暴走】！`,"enemy_enhanced");
+                inf_combat.S3.b2 -= 1;
+                inf_combat.S3.b3 += 3;
+            }//滋生
+            if(target.spec.includes(58))
+            {
+                log_message(`【心之灵·暴走】的攻击与血量提高了5%！`,"enemy_enhanced");
+                //计算公式:((8-inf_combat.S3.b2)*3-inf_combat.S3.b3)*0.05)
+                inf_combat.S3.b3 -= 1;
+            }//暴走
+            if(target.spec.includes(59))
+            {
+                log_message(`获取了1点【灵魂之力】！`,"enemy_enhanced");
+                inf_combat.S3.sp += 1;
+                get_spirit_buff(inf_combat.S3.sp);
+            }//心之力
+            if(target.spec.includes(62))
+            {
+                
+                if(character.equipment.props?.name == "凝滞力场"){
+                    log_message(`${character.name} 获取了20s【死线】效果！`,"enemy_enhanced");
+                    active_effects["死线"] = new ActiveEffect({...effect_templates["死线"], duration:20});
+                }
+                else{
+                    log_message(`${character.name} 获取了60s【死线】效果！`,"enemy_enhanced");
+                    active_effects["死线"] = new ActiveEffect({...effect_templates["死线"], duration:60});
+                }
+            }//死线(1/3)
             if(target.rank >= 3100 && target.rank <= 3200){
                 inf_combat.B3 = inf_combat.B3 || 0;
                 log_message(`Swamp radiation spread: ${format_number(inf_combat.B3)} % -> ${format_number(inf_combat.B3 + 0.004)} % `,"enemy_defeated");
                 inf_combat.B3 += 0.004;
             }//3-1的怪
+
+
             var loot = target.get_loot();
             if(loot.length > 0) {
                 log_loot(loot);
@@ -2203,15 +2725,51 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
                 //unlock_location("荒兽森林营地");
                 if(enemy_killcount["舰船中枢B6[BOSS]"] <= 1){
                     current_game_time.go_up(1080000);
+                    log_message(`[纱雪]为性能考虑，【地宫养殖者】前的商人将不再进货。`,"sayuki");
                     //2年
                 }
             }
+            if(target.name == "左阿(垂死)[BOSS]"){
+                locations["幻境核心 - B1"].is_unlocked = false;
+                locations["幻境核心 - B2"].is_unlocked = false;
+                locations["幻境核心 - B3"].is_unlocked = false;
+                inf_combat.S3.live = false;
+                locations["幻境核心·决战"].is_unlocked = false;
+                locations["幻境核心·出口"].is_unlocked = true;
+                change_location("幻境核心·出口");
+                
+                log_message(`击败左阿！自动切换地图【幻境核心·出口】！`,"enemy_enhanced");
+                log_message(`【幻境核心·决战】已封锁且无法进入！`,"enemy_enhanced");
+                log_message(`所有状态效果已清除！`,"enemy_enhanced");
+                Object.keys(active_effects).forEach(key => {
+                    delete active_effects[key];
+                });
+                log_message(`[纱雪]为性能考虑，【舰船中枢B6】前的商人将不再进货。`,"sayuki");
+
+            }
             kill_enemy(target);
         }
-
-
         update_displayed_health_of_enemies();
         
+
+        //和造成伤害有关的判定区(反伤，吸血，领域)
+        if(global_flags.is_realm_enabled)
+        {
+            let Realm_XP = damage_dealt / 100;
+            if(skills["Neko_Realm"].current_level < 39) Realm_XP *= (skills["AquaElement"].get_coefficient("multiplicative") || 1);
+            else Realm_XP *= (skills["AquaElement"].get_coefficient("multiplicative") || 1) ** 0.5;
+            add_xp_to_skill({skill: skills['Neko_Realm'], xp_to_add: Realm_XP});//战斗领悟(领域)
+            update_neko_realm();
+        }
+        if(current_stance == 'SR_Blood'){
+            let extract_blood = skills["ReflectStarSkyRainbow"].current_level * 0.001 + 0.01;//吸血倍率
+            let pre_health = character.stats.full.health
+            character.stats.full.health += damage_dealt * extract_blood;
+            character.stats.full.health = Math.min(character.stats.full.health,character.stats.full.max_health);
+
+            log_message(`${character.name} 恢复了 ${format_number(character.stats.full.health - pre_health)} 点血量[吸血${(1+skills["ReflectStarSkyRainbow"].current_level*0.1).toFixed(1)}%]`, "hero_regened");
+        }
+
         if(target.spec.includes(32)){
             let {damage_taken, fainted} = character.take_damage([],{damage_value: damage_dealt*0.2},0);
             
@@ -2238,7 +2796,7 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
             log_message(character.name + " missed, and took " + format_number(damage_taken) + " damage [Repel]", "hero_missed");
             if(fainted) faint(" was defeated by repel damage")
         }
-        else log_message(character.name + " missed", "hero_missed");
+        else if(!options.option_combat_filter) log_message(character.name + " 未命中", "hero_missed");
     }
     if(target.spec.includes(35)){
         let {damage_taken, fainted} = character.take_damage([],{damage_value: Math.max(target.spec_value[35]-character.stats.full.agility,0)},0);
@@ -2257,18 +2815,21 @@ function kill_enemy(target) {
     target.is_alive = false;
     const enemy_key = target.id || target.name;
     if(target.add_to_bestiary) {
-        if(enemy_killcount[enemy_key]) {
-            enemy_killcount[enemy_key] += 1;
-            update_bestiary_entry(enemy_key);
+        if(enemy_killcount[target.name] >= 0) {
+            enemy_killcount[target.name] += 1;
+            update_bestiary_entry(target.name);
         } else {
-            enemy_killcount[enemy_key] = 1;
-            create_new_bestiary_entry(enemy_key);
-            if(enemy_key == "毛茸茸" || target.name == "Fluffy") add_bestiary_lines(11);
-            add_bestiary_zones(enemy_key);
+            enemy_killcount[target.name] = 1;
+            create_new_bestiary_entry(target.name);
+            add_bestiary_zones(target.name);
         }
     }
     const enemy_id = current_enemies.findIndex(enemy => enemy===target);
     clear_enemy_attack_loop(enemy_id);
+
+    //彻底清理敌人的数据！
+    target.dispose();
+
 }
 
 
@@ -2278,7 +2839,7 @@ function kill_enemy(target) {
  * @param {Number} xp_to_add 
  * @param {Boolean} should_info 
  */
-function add_xp_to_skill({skill, xp_to_add = 1, should_info = true, use_bonus = true, add_to_parent = true})
+function add_xp_to_skill({skill, xp_to_add = 1, should_info = true, use_bonus = true})
 {
     let leveled = false;
     if(xp_to_add == 0) {
@@ -2301,14 +2862,14 @@ function add_xp_to_skill({skill, xp_to_add = 1, should_info = true, use_bonus = 
     
     const {message, gains, unlocks} = skill.add_xp({xp_to_add: xp_to_add});
     const new_name = skill.name();
-    if(skill.parent_skill && add_to_parent) {
+    if(skill.parent_skill) {
         if(skill.total_xp > skills[skill.parent_skill].total_xp) {
             /*
                 add xp to parent if skill would now have more than the parent
                 calc xp ammount so that it's no more than the difference between child and parent
             */
             let xp_for_parent = Math.min(skill.total_xp - skills[skill.parent_skill].total_xp, xp_to_add);
-            add_xp_to_skill({skill: skills[skill.parent_skill], xp_to_add: xp_for_parent, should_info, use_bonus: false, add_to_parent});
+            add_xp_to_skill({skill: skills[skill.parent_skill], xp_to_add: xp_for_parent, should_info, use_bonus: false});
         }
     }
 
@@ -2446,9 +3007,17 @@ function get_spec_rewards(money){
         log_message(`Obtained Star Destruction`, "activity_unlocked");
         return;
     }
+    if(money == 11039){
+        if(Math.random() < 0.05)
+        {
+            add_to_character_inventory([{ "item": getItem(item_templates["中等进化结晶碎片"]), "count": 1 }]);
+            log_message(`在古墓里发现了一颗中等进化结晶碎片！`, "activity_unlocked");
+        }
+        return;
+    }
     if(money == 216){
-        add_xp_to_skill({skill: skills["Moonwheels"],xp_to_add: 9999e12,should_info:true,use_bonus:false,add_to_parent:false},);
-        log_message(`Brother Feng demonstrated the moonwheel technique, [Silver Frost Moonwheel] gained 9999 trillion XP!`, "activity_unlocked");
+        add_xp_to_skill({skill: skills["Moonwheels"],xp_to_add: 9999e12,should_info:true,use_bonus:false},);
+        log_message(`峰大哥演示了月轮的使用方法，【银霜月轮】获取了9999兆 经验！`, "activity_unlocked");
         return;
     }
     let RNG_M = Math.pow(Math.max(Math.random(),1e-6),-1.5)
@@ -2456,7 +3025,8 @@ function get_spec_rewards(money){
     
     character.money += Math.floor(RNG_M * money);
     update_displayed_money();
-    const trader = traders["Ruins Merchant"];
+    if(money >= 1e9) return;
+    const trader = traders["废墟商人"];
     if(!trader.is_unlocked) {
         if(Math.random() >= money * 2e-7) {//4% 8% 12% 16% 20%
             trader.is_unlocked = true;
@@ -2466,7 +3036,6 @@ function get_spec_rewards(money){
             log_message(`${character.name} senses an aura of wealth and trade nearby ....`, "location_reward");
         }//6 12 18 24 30
     }
-    //TODO:增加Ruins Merchant的解锁，并且在已经解锁之后不再提示。
 
 }
 /**
@@ -2478,6 +3047,12 @@ function get_location_rewards(location) {
     let should_return = false;
         if(location.is_challenge) {
             location.is_finished = true;
+            if(location.name.includes("幻境核心 - B")){
+                location.is_finished = false;
+                should_return = true;
+                //特判：幻境核心自选打怪虽然是挑战区域但是不会清空
+                //挑战区域仅仅为了避开楼层手册
+            }
         }
     update_displayed_combat_location(location,true);
     if(location.repeatable_reward.money && typeof location.repeatable_reward.money === "number") {
@@ -2489,18 +3064,18 @@ function get_location_rewards(location) {
 
     if(location.first_reward.xp && typeof location.first_reward.xp === "number") {
             create_new_levelary_entry(location.name);
-            log_message(`First clear of ${location.name}, gained ${location.first_reward.xp} XP `, "location_reward");
-            add_xp_to_character(location.first_reward.xp);
-            if(location.name == "Wild Beast Forest - 1"){
-                log_message(`In battle, ${character.name} gained an insight for breaking through to Earth Rank.`, "enemy_enhanced");
+            log_message(`首次通过 ${location.name} ，获取 ${format_number(location.first_reward.xp)} 经验 `, "location_reward");
+            add_xp_to_character(location.first_reward.xp,true,false,false);
+            if(location.name == "荒兽森林 - 1"){
+                log_message(`在战斗中，${character.name} 获取了突破大地级的感悟。`, "enemy_enhanced");
                 add_to_character_inventory([{item: item_templates["凝实荒兽森林感悟"], count: 1}]);
             }
         }
     } else if(location.repeatable_reward.xp && typeof location.repeatable_reward.xp === "number") {
-        log_message(`Cleared ${location.name}, gained bonus ${location.repeatable_reward.xp} XP `, "location_reward");
-        add_xp_to_character(location.repeatable_reward.xp);
-        if(location.name.includes("Wild Beast Forest") && (Math.random()<0.1) && character.xp.current_level <= 8){
-            log_message(`In battle, ${character.name} randomly gained another insight for breaking through to Earth Rank.`, "enemy_enhanced");
+        log_message(`通过 ${location.name} ，获取额外 ${format_number(location.repeatable_reward.xp)} 经验 `, "location_reward");
+        add_xp_to_character(location.repeatable_reward.xp,true,false,false);
+        if(location.name.includes("荒兽森林") && (Math.random()<0.1) && character.xp.current_level <= 8){
+            log_message(`在战斗中，${character.name} 再次随机地获取了突破大地级的感悟。`, "enemy_enhanced");
             add_to_character_inventory([{item: item_templates["凝实荒兽森林感悟"], count: 1}]);
         }
         
@@ -2617,7 +3192,7 @@ function use_recipe(target,stated = false) {
         const recipe_div = document.querySelector(`[data-crafting_category="${category}"] [data-crafting_subcategory="${subcategory}"] [data-recipe_id="${recipe_id}"]`);
         let leveled = false;
         let result;
-        if(subcategory === "items" || subcategory === "items2" || subcategory === "items3") {
+        if(subcategory.includes("items")) {
             if(selected_recipe.get_availability()) {
                 total_crafting_attempts++;
                 const success_chance = selected_recipe.get_success_chance(station_tier);
@@ -2752,34 +3327,63 @@ function use_recipe(target,stated = false) {
                 if(!character.inventory[component_1_key] || !character.inventory[component_2_key]) {
                     throw new Error(`Tried to create item with components that are not present in the inventory!`);
                 } else {
-                    total_crafting_attempts++;
-                    total_crafting_successes++;
-                    result = selected_recipe.getResult(character.inventory[component_1_key].item, character.inventory[component_2_key].item, station_tier);
-                    if(!stated) {
-                        remove_from_character_inventory([{item_key: component_1_key}, {item_key: component_2_key}]);
-                        add_to_character_inventory([{item: result}]);
-                    }
+                    let E_ttl = Math.min(character.inventory[component_1_key]?.count,character.inventory[component_2_key]?.count);
+                    let E_range,E_base,E_imp1,E_cur,E_q,E_exp;
+                    if(E_ttl >= 100 && stated){
+                        const id_1 = JSON.parse(component_1_key).id;
+                        const id_2 = JSON.parse(component_2_key).id;
+                    //console.log("reached 3");
+
+                        total_crafting_attempts+=E_ttl;
+                        total_crafting_successes+=E_ttl;
+                        E_range = selected_recipe.get_quality_range(selected_recipe.get_component_quality_weighted(character.inventory[component_1_key].item, character.inventory[component_2_key].item), (station_tier-Math.max(character.inventory[component_1_key].item.component_tier, character.inventory[component_2_key].item.component_tier)) || 0);
+                        E_base = Math.floor(1e-10 + E_ttl / (E_range[1] - E_range[0] + 1));
+                        E_imp1 = E_ttl - E_base * (E_range[1] - E_range[0] + 1) + E_range[0];
+                        H_q = E_range[1] + 1e4 * E_ttl;
+                        E_exp = 0;
+                        for(E_q = E_range[0];E_q <= E_range[1];E_q += 1){
+                            E_cur = E_base + ((E_q < E_imp1)?1:0) ;
+                            result = selected_recipe.getResultWithFixedQuality(character.inventory[component_1_key].item, character.inventory[component_2_key].item, E_q);
+                            
+                            character.add_to_inventory([{item: result,count: E_cur}]);
+
+                            E_exp += get_recipe_xp_value({category, subcategory, recipe_id, selected_components: [item_templates[id_1], item_templates[id_2]], rarity_multiplier: rarity_multipliers[result.getRarity()]})
+                        }
+                        remove_from_character_inventory([{item_key: component_1_key,item_count:E_ttl}, {item_key: component_2_key,item_count:E_ttl}]);
+                        add_xp_to_skill({skill: skills[selected_recipe.recipe_skill], xp_to_add: E_exp * E_ttl});
+
+                        
+                    }//装备真·批量(两个部件都超过100件且在批量模式激活)
                     else{
-                        character.remove_from_inventory([{item_key: component_1_key}, {item_key: component_2_key}]);
-                        character.add_to_inventory([{item: result}]);
+                        total_crafting_attempts++;
+                        total_crafting_successes++;
+                        result = selected_recipe.getResult(character.inventory[component_1_key].item, character.inventory[component_2_key].item, station_tier);
+                        if(!stated) {
+                            remove_from_character_inventory([{item_key: component_1_key}, {item_key: component_2_key}]);
+                            add_to_character_inventory([{item: result}]);
+                        }
+                        else{
+                            character.remove_from_inventory([{item_key: component_1_key}, {item_key: component_2_key}]);
+                            character.add_to_inventory([{item: result}]);
+                        }
+
+                        
+                        if(!stated) log_message(`制造了 ${result.getName()} [品质 ${result.quality}%]`, "crafting");
+                        else H_q = result.quality;
+                    
+                        const id_1 = JSON.parse(component_1_key).id;
+                        const id_2 = JSON.parse(component_2_key).id;
+
+                        const exp_value = get_recipe_xp_value({category, subcategory, recipe_id, selected_components: [item_templates[id_1], item_templates[id_2]], rarity_multiplier: rarity_multipliers[result.getRarity()]})
+                        
+                        leveled = add_xp_to_skill({skill: skills[selected_recipe.recipe_skill], xp_to_add: exp_value});
+                        
                     }
+                    
 
-                    
-                    if(!stated) log_message(`Crafted ${result.getName()} [Quality ${result.quality}%]`, "crafting");
-                    else H_q = result.quality;
-                
-                    const id_1 = JSON.parse(component_1_key).id;
-                    const id_2 = JSON.parse(component_2_key).id;
-
-                    const exp_value = get_recipe_xp_value({category, subcategory, recipe_id, selected_components: [item_templates[id_1], item_templates[id_2]], rarity_multiplier: rarity_multipliers[result.getRarity()]})
-                    
-                    leveled = add_xp_to_skill({skill: skills[selected_recipe.recipe_skill], xp_to_add: exp_value});
-                    
                     const component_keys = {};
                     component_keys[component_1_key] = true;
                     component_keys[component_2_key] = true;
-                    
-
                     update_displayed_component_choice({category, recipe_id, component_keys});
                 }
                 if(stated) return H_q;
@@ -2805,35 +3409,118 @@ function use_recipe_max(target) {
         const recipe_div = document.querySelector(`[data-crafting_category="${category}"] [data-crafting_subcategory="${subcategory}"] [data-recipe_id="${recipe_id}"]`);
         let leveled = false;
         let result;
-        if(subcategory === "items" || subcategory === "items2" || subcategory === "items3") {
+        if(subcategory.includes("items")) {
             let cnt = 0;
             let cnt_s = 0;
-            while(selected_recipe.get_availability()) {
-                cnt++;
-                cnt_s += use_recipe(target,true);
-            }
-            result = selected_recipe.getResult();
-            const {result_id, count} = result;
-            update_displayed_character_inventory();
-            update_item_recipe_visibility();
-            update_item_recipe_tooltips();
-            log_message(`Batch crafted ${item_templates[result_id].getName()}, ${cnt_s}/${cnt} succeeded`, "crafting");
+            let S_chance = selected_recipe.get_success_chance(station_tier);
+            if(S_chance != 1){
+                while(selected_recipe.get_availability() && cnt <= 1000) {
+                    cnt++;
+                    cnt_s += use_recipe(target,true);
+                }
+                result = selected_recipe.getResult();
+                const {result_id, count} = result;
+                update_displayed_character_inventory();
+                update_item_recipe_visibility();
+                update_item_recipe_tooltips();
+                log_message(`批量制造了 ${item_templates[result_id].getName()} ,其中 ${cnt_s}/${cnt} 成功`, "crafting");
+            }//伪批量(不足100%,上限1000)
+            else{
+                let max_todo = 1e308;
+                for(let i = 0; i < selected_recipe.materials.length; i++) {
+                    const key = item_templates[selected_recipe.materials[i].material_id].getInventoryKey();
+                    max_todo = Math.min(max_todo,Math.floor((character.inventory[key]?.count || 0) / selected_recipe.materials[i].count));
+                } //检查批量数量
+                for(let i = 0; i < selected_recipe.materials.length; i++) {
+                    const key = item_templates[selected_recipe.materials[i].material_id].getInventoryKey();
+                    remove_from_character_inventory([{item_key: key, item_count: selected_recipe.materials[i].count * max_todo}]);
+                } //扣除物品
+                const exp_value = get_recipe_xp_value({category, subcategory, recipe_id});
+                total_crafting_attempts += max_todo;
+                total_crafting_successes += max_todo;
+
+                result = selected_recipe.getResult();
+                const {result_id, count} = result;
+                //读取结果
+                if(selected_recipe.Q_able != undefined){
+                    add_to_character_inventory([{item: getItem({...item_templates[result_id], quality: selected_recipe.Q_able}), count: count * max_todo}]);
+                    
+                    //console.log("试做了",result_id,count,max_todo);
+                }
+                else{
+                    add_to_character_inventory([{item: item_templates[result_id], count: count * max_todo}]); 
+                }//给予物品
+                log_message(`真·批量制造了 ${item_templates[result_id].getName()} x${count}(${max_todo}轮)`, "crafting");
+                add_xp_to_skill({skill: skills[selected_recipe.recipe_skill], xp_to_add: exp_value * max_todo});
+                update_displayed_character_inventory();
+                update_item_recipe_visibility();
+                update_item_recipe_tooltips();
+            }//真·批量(100%,9e15前不会出事)
 
         } else if(subcategory === "components" || selected_recipe.recipe_type === "component" ) {
         
             let cnt = 0;
             let cnt_b = 0;
             let cnt_f = 0;
-            
-            while(cnt_f != -1)
-            {
-                cnt++;
-                cnt_f = use_recipe(target,true)
-                cnt_b = Math.max(cnt_b,cnt_f);
-            }
-            
-            update_displayed_character_inventory();
-            log_message(`Batch crafted ${latest_comp} * ${cnt - 1}, highest quality: ${cnt_b}%`, "crafting");
+            const material_div = recipe_div.children[1].querySelector(".selected_material");
+            const material_1_key = material_div.dataset.item_key;
+            const {id} = JSON.parse(material_1_key);
+            const recipe_material = selected_recipe.materials.filter(x=> x.material_id===id)[0];
+            if(recipe_material.count * 1000 >= character.inventory[material_1_key]?.count) {
+                while(cnt_f != -1)
+                {
+                    cnt++;
+                    cnt_f = use_recipe(target,true)
+                    cnt_b = Math.max(cnt_b,cnt_f);
+                }
+                update_displayed_character_inventory();
+                log_message(`批量制造了 ${latest_comp} * ${cnt - 1} ,其中最高品质为 ${cnt_b} %`, "crafting");
+            }//伪·批量(<=1000)
+            else{
+                let c_ttl = Math.floor(character.inventory[material_1_key]?.count / recipe_material.count)
+                let c_base = Math.floor(c_ttl/100);
+                let c_imp1 = c_ttl - c_base * 100;
+                let c_cur,result;
+                let proto_result = selected_recipe.getResult(character.inventory[material_1_key].item, station_tier);//quality字段仍需改动
+                let q_range,q_groups,q_base,q_imp1,q_cur,q_exp;
+                //每轮制作c_base个物品，如果轮数<=c_imp1则制作c_base+1个
+                
+                for(let c_cnt = 1;c_cnt <= 100;c_cnt += 1){
+                    c_cur = c_base + ((c_cnt <= c_imp1)?1:0);
+                    //c_cur即为本轮制作部件数
+                    //轮内细分
+                    q_range = selected_recipe.get_quality_range(station_tier - proto_result.component_tier);
+                    q_groups = (q_range[1]-q_range[0])/4 + 1;
+                    q_base = Math.floor(c_cur/q_groups + 1e-10);
+                    q_imp1 = q_range[0] + 4*(c_cur - q_base * q_groups);
+                    q_exp = 0;
+                    for(let c_quality = q_range[0];c_quality <= q_range[1];c_quality += 4)
+                    {//按品质:优先供给低品质，同时每个品质都滚一遍，分别计算经验等
+                        q_cur = q_base + ((c_quality < q_imp1)?1:0);
+                        result = selected_recipe.getResultWithFixedQuality(character.inventory[material_1_key].item, c_quality);
+                        character.add_to_inventory([{item: result, count: q_cur}]);
+                        q_exp += get_recipe_xp_value({category, subcategory, recipe_id, material_count: recipe_material.count * q_cur, rarity_multiplier: rarity_multipliers[result.getRarity()], result_tier: result.component_tier});
+                        //计算经验并给予物品
+                    }
+                    add_xp_to_skill({skill: skills[selected_recipe.recipe_skill], xp_to_add: q_exp});
+                    //叠加经验
+                }
+                remove_from_character_inventory([{item_key: material_1_key, item_count: recipe_material.count * c_ttl}]);
+                total_crafting_attempts += c_ttl;
+                total_crafting_successes += c_ttl;
+                //后拿走材料/计算总数
+                update_displayed_character_inventory();
+                update_item_recipe_visibility();
+                update_item_recipe_tooltips();
+                log_message(`真·批量制造了 ${result.id} * ${c_ttl} ,其中最高品质为 ${q_range[1]} %`, "crafting");
+                material_div.classList.remove("selected_material");
+                if(character.inventory[material_1_key]) { 
+                    if(recipe_material.count > character.inventory[material_1_key].count) { 
+                        material_div.classList.add("recipe_unavailable");
+                    }
+                } else material_div.remove();
+                update_displayed_material_choice({category, subcategory, recipe_id, refreshing: true});
+            }//部件的真·批量合成
 
         } else if(subcategory === "equipment") {
             let cnt = 0;
@@ -2844,11 +3531,17 @@ function use_recipe_max(target) {
             {
                 cnt++;
                 cnt_f = use_recipe(target,true)
+                if(cnt_f >= 1e4){
+                    cnt += Math.floor(cnt_f / 1e4);
+                    cnt -= 1;
+                    cnt_f -= 1e4 * Math.floor(cnt_f / 1e4);
+                }
                 cnt_b = Math.max(cnt_b,cnt_f);
             }
             
             update_displayed_character_inventory();
-            log_message(`Batch crafted ${cnt - 1} pieces of equipment, highest quality: ${cnt_b}%`, "crafting");
+            if(cnt_b >= 1e12) log_message(`真·批量制造了 ${cnt - 1} 件装备 ,其中最高品质为 ${cnt_b - 1e12} %`, "crafting");
+            else log_message(`批量制造了 ${cnt - 1} 件装备 ,其中最高品质为 ${cnt_b} %`, "crafting");
             
         }
     }
@@ -2869,7 +3562,7 @@ function character_unequip_item(item_slot) {
 }
 
 
-function use_item(item_key,stated = false) { 
+function use_item(item_key,stated = false){
     const {id} = JSON.parse(item_key);
     const item_effects = item_templates[id].effects;
     const G_value = item_templates[id].gem_value;
@@ -2887,10 +3580,47 @@ function use_item(item_key,stated = false) {
 
     let used = false;
     if(item_templates[id].spec != 0){
-        if(item_templates[id].spec == "T8-table"){
+        let I_spec = item_templates[id].spec;
+        if(I_spec == "T8-table"){
             //unlock 符文之屋
             unlock_location(locations["符文之屋"]);
             log_message(`As the rune workbench set is placed, a small cottage rises from the ground. In these ruins, ${character.name} has found a warm haven.`,"gather_loot")
+        }
+        else if(I_spec == "freezing_engine"){
+            //unlock 极寒相变引擎
+            engine_init();
+            dialogues["极寒相变引擎"].textlines["engine"].is_unlocked = true;
+            log_message(`旋律合金作为活塞，多孔冰晶作为隔热，冰原超流体作为热容……冰原的环境本十分恶劣，${character.name} 却掌握了巧妙利用它的方法。`,"gather_loot")
+        }
+        else if(I_spec == "saved_trader"){
+            inf_combat.B6 = inf_combat.B6 || 0;
+            inf_combat.B6 += 1;
+            log_message(`释放了第${inf_combat.B6}个冰宫商人！`,"gather_loot");
+            if(inf_combat.B6 <= 9999) log_message(`进货倍率 ${(inf_combat.B6 ** 0.8).toFixed(2)}x , 品质加成: ${(Math.log(inf_combat.B6) * 9).toFixed(1)}%`,"gather_loot");
+            else log_message(`之前的9999个商人已经垄断了燕岗领的生意！抓来更多的也没用了！`,"gather_loot");
+            //基础品质:140%~180%
+            if(inf_combat.B6 == 1){
+                //解锁冰宫商人！
+                
+                const bg_trader = traders["冰宫商人"];
+                bg_trader.is_unlocked = true;
+            }
+        }
+        else if(I_spec == "random-potion"){
+            let Potion_name = {0:"B9·灵闪药剂",1:"B9·异界药剂",2:"B9·散华药剂",3:"B9·反戈药剂"}
+            let Rnd = '';
+            for(let cnt=1;cnt<=5;cnt++){
+                Rnd = Potion_name[Math.floor(Math.random()*4)]
+                //log_message(`从 B9·??药剂 中获取了 ${Rnd}! (${cnt} / 5)`,"combat_loot");
+                character.add_to_inventory([{ "item": getItem(item_templates[Rnd]), "count": 1 }]);
+            }
+            
+            update_displayed_character_inventory({was_anything_new_added:true});
+        }
+        else if(I_spec = "HeartDemon_nerf"){
+            global_flags["qz_percent"] = (global_flags["qz_percent"] || 0) + 1;
+            if(global_flags["qz_percent"]>100) global_flags["qz_percent"] = 100;
+            log_message(`牵制领悟度提升到了 ${global_flags["qz_percent"]}%!`,"gather_loot");
         }
     }
     if(item_templates[id].realmcap!=-1)
@@ -2917,38 +3647,61 @@ function use_item(item_key,stated = false) {
     if(G_value > 0)//using gems
     {
         used=true;
-        let message = `Used ${item_templates[id].getName()}, `
-        let SCGV = 30;//SoftCappedGemValue
+        let message = `使用 ${item_templates[id].name} , `
+        let SCGV = character.stats.full.SCGV;//SoftCappedGemValue
         let HPMV = 50;//HealthPointMultiplierValue
         if(G_value > 7500) HPMV *= 2;//殿堂级修正
+        if(G_value > 7500e4){
+            HPMV *= 2;//神话级修正
+        }
         let P1,P2,P3,P4;//相对概率(修正后)
-        P1=Math.pow(((character.stats.flat.gems.attack_power||0)/G_value +1),-1.5);
+        P1=Math.pow(((character.stats.flat.gems.attack_power||0)/G_value/SCGV*30 +1),-1.5);
         if(character.stats.flat.gems.attack_power >= SCGV*G_value) P1*=0.5;
-        P2=Math.pow(((character.stats.flat.gems.defense||0)/G_value +1),-1.5);
+        P2=Math.pow(((character.stats.flat.gems.defense||0)/G_value/SCGV*30 +1),-1.5);
         if(character.stats.flat.gems.defense >= SCGV*G_value) P2*=0.5;
-        P3=Math.pow(((character.stats.flat.gems.agility||0)/G_value +1),-1.5);
+        P3=Math.pow(((character.stats.flat.gems.agility||0)/G_value/SCGV*30 +1),-1.5);
         if(character.stats.flat.gems.agility >= SCGV*G_value) P3*=0.5;
-        P4=Math.pow(((character.stats.flat.gems.max_health||0)/G_value/HPMV +1),-1.5);
+        P4=Math.pow(((character.stats.flat.gems.max_health||0)/G_value/HPMV/SCGV*30 +1),-1.5);
         if(character.stats.flat.gems.max_health >= SCGV*HPMV*G_value) P4*=0.5;
         let pa = 0;
-        if(character.stats.flat.gems.attack_power >= SCGV*G_value*3)
+        if(character.stats.flat.gems.max_health >= SCGV*HPMV*G_value*3)
         {
-            let PM = Math.max(Math.max(P1,P2),Math.max(P3,P4));
-            if(PM==P1){
-                pa=0.5;
-            }
-            else if(PM==P2)
-            {
-                pa=1.5;
-            }
-            else if(PM==P3)
-            {
-                pa=2.5;
-            }
-            else pa=3.5;
-            P1 = P2 = P3 = P4 =1;
-        }//3倍软上限/抛弃RNG
-        else pa = Math.random()*(P1+P2+P3+P4);
+            let gem_key = "{\"id\":\"" + item_templates[id].name + "\"}";
+            let gem_cnt = character.item_inventory_cnt(gem_key);
+            let remain_gem = gem_cnt;
+            if(gem_cnt >= 100 && stated){
+                let CSCM = [character.stats.flat.gems.attack_power/SCGV/G_value , character.stats.flat.gems.defense/SCGV/G_value , character.stats.flat.gems.agility/SCGV/G_value , character.stats.flat.gems.max_health/HPMV/SCGV/G_value]
+                let FSCM = [character.stats.flat.gems.attack_power/SCGV/G_value , character.stats.flat.gems.defense/SCGV/G_value , character.stats.flat.gems.agility/SCGV/G_value , character.stats.flat.gems.max_health/HPMV/SCGV/G_value];//Final Softcapped muitiplier
+                let CGPR = 1;//Consumed Gems Per Row
+                while(remain_gem > 0){
+                    if(remain_gem >= CGPR) remain_gem -= CGPR;
+                    else{
+                        CGPR = remain_gem;
+                        remain_gem= 0;
+                    }
+                    for(var sk=0;sk<=3;sk++) FSCM[sk] += Math.exp(-5 * (FSCM[sk] + 1 - 2 * Math.sqrt(FSCM[sk]))) * CGPR / 4 / SCGV;//传统软上限公式，不过按1.2倍的一段
+                    CGPR *= 1.2;
+                }
+                log_message(`真·批量使用了 ${gem_cnt} 个 ${item_templates[id].name}`, `gather_loot`);
+                log_message(`攻击 + ${format_number(G_value*SCGV*(FSCM[0] - CSCM[0]))} (软上限 ${format_number(CSCM[0])}x -> ${format_number(FSCM[0])}x)`, `gather_loot`);
+                log_message(`防御 + ${format_number(G_value*SCGV*(FSCM[1] - CSCM[1]))} (软上限 ${format_number(CSCM[1])}x -> ${format_number(FSCM[1])}x)`, `gather_loot`);
+                log_message(`敏捷 + ${format_number(G_value*SCGV*(FSCM[2] - CSCM[2]))} (软上限 ${format_number(CSCM[2])}x -> ${format_number(FSCM[2])}x)`, `gather_loot`);
+                log_message(`血量 + ${format_number(G_value*SCGV*HPMV*(FSCM[3] - CSCM[3]))} (软上限 ${format_number(CSCM[3])}x -> ${format_number(FSCM[3])}x)`, `gather_loot`);
+                remove_from_character_inventory([{item_key: gem_key, item_count: gem_cnt}]);
+
+                character.stats.flat.gems.attack_power = FSCM[0] * SCGV * G_value;
+                character.stats.flat.gems.defense = FSCM[1] * SCGV * G_value;
+                character.stats.flat.gems.agility = FSCM[2] * SCGV * G_value;
+                character.stats.flat.gems.max_health = FSCM[3] * SCGV * HPMV * G_value;
+
+                update_displayed_effects();
+                character.stats.add_active_effect_bonus();
+                update_character_stats();
+                return;
+            }//剩余宝石多于100/启动宝石真批量
+        }//3倍软上限
+        pa = Math.random()*(P1+P2+P3+P4);
+        if(id.includes("剑")) pa=0;
         if(pa<P1)//STR
         {
             message += `Attack increased by `;
@@ -3051,6 +3804,22 @@ function use_item_max(item_key)
     let cnt=0;
     let A0,D0,G0,H0,A1,D1,G1,H1;
     A0=character.stats.flat.gems.attack_power,D0=character.stats.flat.gems.defense,G0=character.stats.flat.gems.agility,H0=character.stats.flat.gems.max_health;
+    if(id == 'B9·??药剂' && character.item_inventory_cnt(item_key) >= 100){
+        let B9_all = character.item_inventory_cnt(item_key) * 5;
+        let B9_per = Math.floor(B9_all / 4 + 1e-6);
+        let B9_res = B9_all - B9_per * 4;
+        //console.log(item_key);
+        remove_from_character_inventory([{item_key: "{\"id\":\"B9·??药剂\"}", item_count: Math.round(B9_all/5)}]);
+        add_to_character_inventory([{item: getItem(item_templates["B9·散华药剂"]),count:(B9_per + (B9_res>0?1:0))}]);
+        add_to_character_inventory([{item: getItem(item_templates["B9·反戈药剂"]),count:(B9_per + (B9_res>1?1:0))}]);
+        add_to_character_inventory([{item: getItem(item_templates["B9·灵闪药剂"]),count:(B9_per + (B9_res>2?1:0))}]);
+        add_to_character_inventory([{item: getItem(item_templates["B9·异界药剂"]),count:(B9_per)}]);
+        log_message(`批量使用了 ${Math.round(B9_all/5)} 个 B9·??药剂。`,`gather_loot`);
+        log_message(`因数量过多(>100)，直接均分到了4种药剂上。`,`gather_loot`);
+        update_displayed_character_inventory(character_sorting);
+        return;
+    }//特判:B9药剂解包
+
     while(character.is_in_inventory(item_key))
     {
         use_item(item_key,true);
@@ -3060,7 +3829,7 @@ function use_item_max(item_key)
     character.stats.add_active_effect_bonus();
     update_character_stats();
     A1=character.stats.flat.gems.attack_power,D1=character.stats.flat.gems.defense,G1=character.stats.flat.gems.agility,H1=character.stats.flat.gems.max_health;
-    log_message(`Batch used ${cnt} x ${item_templates[id]?.getName?.() ?? id}.`, `gather_loot`);
+    if(!(id.includes("宝石") && cnt == 1)) log_message(`批量使用了 ${cnt} 个 ${id}.`, `gather_loot`);
     A0=A0||0,A1=A1||0,D0=D0||0,D1=D1||0,G0=G0||0,G1=G1||0,H0=H0||0,H1=H1||0;
     if(A1!=A0||D1!=D0||G1!=G0||H1!=H0) log_message(`Gained ${format_number((A1-A0)||0)} attack, ${format_number((D1-D0)||0)} defense, ${format_number((G1-G0)||0)} agility, ${format_number((H1-H0)||0)} max HP.`, `gather_loot`);
     return;
@@ -3110,6 +3879,7 @@ function create_save() {
         save_data.global_flags = global_flags;
         save_data.gem_stats = character.stats.flat.gems;//存储宝石属性
         save_data.inf_combat = inf_combat;//无限秘境
+        save_data.family_data = family_data;//家族系统
         
         save_data["character"] = {
                                 name: character.name, titles: character.titles, 
@@ -3332,7 +4102,7 @@ function load(save_data) {
     total_crafting_attempts = save_data.total_crafting_attempts || 0;
     total_crafting_successes = save_data.total_crafting_successes || 0;
     inf_combat = save_data.inf_combat || {"A6":{cur:6,cap:8},"A7":{cur:0},"VP":{num:0}};//无限秘境
-
+    family_data = save_data.family_data || {};
     name_field.value = save_data.character.name;
     character.name = save_data.character.name;
     character.bonus_skill_levels = save_data.character.bonus_skill_levels;
@@ -3351,6 +4121,7 @@ function load(save_data) {
     option_combat_autoswitch(options.disable_combat_autoswitch);
 
     options.remember_message_log_filters = save_data.options?.remember_message_log_filters;
+    
     if(save_data.message_filters) {
         Object.keys(message_log_filters).forEach(filter => {
             message_log_filters[filter] = save_data.message_filters[filter] ?? true;
@@ -3358,9 +4129,21 @@ function load(save_data) {
     }
     option_remember_filters(options.remember_message_log_filters);
 
+    options.option_combat_filter = save_data.options?.option_combat_filter;
+    option_combat_filter(options.option_combat_filter);
+
+    options.option_format_change = save_data.options?.option_format_change;
+    option_format_change(options.option_format_change);
+
+
     //this can be removed at some point
     const is_from_before_eco_rework = compare_game_version("v0.3.5", save_data["game version"]) == 1;
     setLootSoldCount(save_data.loot_sold_count || {});
+
+    update_displayed_family();
+    update_displayed_family_members();
+    document.getElementById("baby_born_num").value = family_data.baby;
+    //重载家族
 
     character.money = (save_data.character.money || 0) * ((is_from_before_eco_rework == 1)*10 || 1);
     update_displayed_money();
@@ -3368,7 +4151,8 @@ function load(save_data) {
     if(save_data.character.C_scaling != undefined) character.C_scaling = save_data.character.C_scaling;
     else character.C_scaling = {};
     character.xp.current_level = save_data.character.xp.current_level || 0;
-    add_xp_to_character(save_data.character.xp.current_xp || 0, false);
+    character.xp.current_xp = save_data.character.xp.current_xp;
+    //add_xp_to_character(save_data.character.xp.current_xp || 0, false);
     for(let realm = 1;realm <= character.xp.current_level || 0;realm ++)
     {
         let this_realm = window.REALMS[realm];
@@ -3388,6 +4172,10 @@ function load(save_data) {
             let Luck_gain = (this_realm[0]==19?0.2:0.1);
             character.stats.flat.level.luck = ( character.stats.flat.level.luck || 0) + Luck_gain;
         }
+        if(this_realm[0]>=29 && this_realm[0]<=37){
+            let SCGV_gain = (this_realm[0]==29?4:2);
+            character.stats.flat.level.SCGV = ( character.stats.flat.level.SCGV || 0) + SCGV_gain;
+        }
         if(this_realm[0]==19){
             character.stats.multiplier.level.crit_rate = 0.25;
             character.stats.multiplier.level.crit_multiplier = 4;
@@ -3397,6 +4185,7 @@ function load(save_data) {
         if(this_realm[0]>=6) total_skill_xp_multiplier += 0.05;
         if(this_realm[0]>=9) total_skill_xp_multiplier += 0.05;
         if(this_realm[0]>=19) total_skill_xp_multiplier += 0.15;
+        if(this_realm[0]>=29) total_skill_xp_multiplier += 0.20;
         character.xp_bonuses.multiplier.levels.all_skill = (character.xp_bonuses.multiplier.levels.all_skill || 1) * total_skill_xp_multiplier;
         //复制粘贴的升级代码，只不过没有提示
         //注：以后升级代码需要在这里多写一份。
@@ -3405,7 +4194,8 @@ function load(save_data) {
     update_displayed_character_xp(true);
     if(save_data.character.xp.total_xp != 0) add_xp_to_character(save_data.character.xp.total_xp, false);
         const E_body = document.body;
-    if(character.xp.current_level >= 19) E_body.classList.add('sky_root');
+    if(character.xp.current_level >= 29) E_body.classList.add('cloudy_root');
+    if(character.xp.current_level >= 19 && character.xp.current_level <= 28) E_body.classList.add('sky_root');
     else if(character.xp.current_level >= 9 && character.xp.current_level <= 18) E_body.classList.add('terra_root');
 
 
@@ -3416,8 +4206,8 @@ function load(save_data) {
         const resolved_skill_key = resolve_skill_key(key);
         if(resolved_skill_key && skills[resolved_skill_key] && !skills[resolved_skill_key].is_parent){
             if(save_data.skills[key].total_xp > 0) {
-                add_xp_to_skill({skill: skills[resolved_skill_key], xp_to_add: save_data.skills[key].total_xp, 
-                                    should_info: false, add_to_parent: true, use_bonus: false
+                add_xp_to_skill({skill: skills[key], xp_to_add: save_data.skills[key].total_xp, 
+                                    should_info: false, use_bonus: false
                                 });
             }
         } else if(save_data.skills[key].total_xp > 0) {
@@ -3734,6 +4524,41 @@ function load(save_data) {
         }
     }); //load for dialogues and their textlines their unlocked/finished status
 
+
+    
+
+    Object.keys(save_data.locations).forEach(function(key) {
+        if(locations[key]) {
+            if(save_data.locations[key].is_unlocked) {
+                locations[key].is_unlocked = true;
+            }
+            if(save_data.locations[key].is_finished) {
+                locations[key].is_finished = true;
+            }
+            if("parent_location" in locations[key]) { // if combat zone
+                locations[key].enemy_groups_killed = save_data.locations[key].enemy_groups_killed || 0;   
+            }
+
+            //unlock activities
+            if(save_data.locations[key].unlocked_activities) {
+                for(let i = 0; i < save_data.locations[key].unlocked_activities.length; i++) {
+                    if(!locations[key].activities[save_data.locations[key].unlocked_activities[i]]) {
+                        continue;
+                    }
+                    if(save_data.locations[key].unlocked_activities[i] === "plowing the fields") {
+                        locations[key].activities["fieldwork"].is_unlocked = true;
+                    } else {
+                        locations[key].activities[save_data.locations[key].unlocked_activities[i]].is_unlocked = true;
+                    }
+                }
+            }
+        } else {
+            console.warn(`Location "${key}" couldn't be found!`);
+            return;
+        }
+    }); //load for locations their unlocked status and their killcounts
+
+
     Object.keys(save_data.traders).forEach(function(trader) { 
         const resolved_trader_key = resolve_trader_key(trader);
         let trader_item_list = [];
@@ -3752,8 +4577,13 @@ function load(save_data) {
                             //if it's present, item is "simple" (no components)
                             //and if it has no quality, it's something non-equippable
                             if(item_templates[id]) {
-                                if(save_data.traders[trader].inventory[key].count >= 1) trader_item_list.push({item: getItem(item_templates[id]), count: save_data.traders[trader].inventory[key].count});
-                                else console.warn(`Illegal value of ${id} x ${save_data.character.inventory[key].count} in traders , item was deleted`);
+                                if(save_data.traders[trader].inventory[key] == undefined){
+                                     console.warn(`undefined of ${id} in traders , item was deleted`);
+                                }
+                                else{
+                                    if(save_data.traders[trader].inventory[key].count >= 1) trader_item_list.push({item: getItem(item_templates[id]), count: save_data.traders[trader].inventory[key].count});
+                                    else console.warn(`Illegal value of ${id} x ${save_data.traders[trader].inventory[key].count} in traders , item was deleted`);
+                                }
                             } else {
                                 console.warn(`Inventory item "${key}" from save on version "${save_data["game version"]} couldn't be found!`);
                                 return;
@@ -3904,37 +4734,6 @@ function load(save_data) {
         }
     }); //load trader inventories
 
-    Object.keys(save_data.locations).forEach(function(key) {
-        if(locations[key]) {
-            if(save_data.locations[key].is_unlocked) {
-                locations[key].is_unlocked = true;
-            }
-            if(save_data.locations[key].is_finished) {
-                locations[key].is_finished = true;
-            }
-            if("parent_location" in locations[key]) { // if combat zone
-                locations[key].enemy_groups_killed = save_data.locations[key].enemy_groups_killed || 0;   
-            }
-
-            //unlock activities
-            if(save_data.locations[key].unlocked_activities) {
-                for(let i = 0; i < save_data.locations[key].unlocked_activities.length; i++) {
-                    if(!locations[key].activities[save_data.locations[key].unlocked_activities[i]]) {
-                        continue;
-                    }
-                    if(save_data.locations[key].unlocked_activities[i] === "plowing the fields") {
-                        locations[key].activities["fieldwork"].is_unlocked = true;
-                    } else {
-                        locations[key].activities[save_data.locations[key].unlocked_activities[i]].is_unlocked = true;
-                    }
-                }
-            }
-        } else {
-            console.warn(`Location "${key}" couldn't be found!`);
-            return;
-        }
-    }); //load for locations their unlocked status and their killcounts
-
     Object.keys(save_data.activities).forEach(function(activity) {
         if(activities[activity]) {
             activities[activity].is_unlocked = save_data.activities[activity].is_unlocked || false;
@@ -3962,6 +4761,16 @@ function load(save_data) {
     //if missing hp is null (save got corrupted) or its more than max_health, set health to minimum allowed (which is 1)
     //otherwise just do simple substraction
     //then same with s.t.a.m.i.n.a below
+
+    // if(character.stats.flat.gems.attack_power >= 1939.88e8 || character.stats.flat.gems.defense >= 1939.88e8 || character.stats.flat.gems.agility >= 1939.88e8 || character.stats.flat.gems.max_health >= 38.7978e12){
+    //     character.stats.flat.gems.attack_power = character.stats.flat.gems.defense = character.stats.flat.gems.agility = character.stats.flat.gems.max_health = 0;
+        
+    //     log_message("[纱雪]宝石的力量超越了极限……触发了【大坍缩】！","sayuki");
+    //     log_message("你已获取1无限点，请移步AntiNeko Dimensions 领取。","sayuki");
+    //     log_message("宝石提供的所有属性已经清空！","sayuki");
+    // }
+
+
     character.stats.add_active_effect_bonus();
     character.stats.add_gem_bonus();
 
@@ -4146,13 +4955,29 @@ function load_other_release_save() {
 }
 
 //update game time
+function get_time_passed(){
+
+    let time_passed = 6;
+    if((character.xp.current_level>=19)) time_passed = 48;
+    if((character.xp.current_level>=29)) time_passed = 288;
+    if(is_sleeping){
+        time_passed *= 5;
+        if(skills["Sleeping"].current_level >= 50){
+            time_passed *= 2;
+        }
+    }
+    if(current_location?.name.includes("水牢")) time_passed /= 3;
+    time_passed = Math.ceil(time_passed);
+    return time_passed;
+}
+
 function update_timer() {
-    let time_passed = (character.xp.current_level>=19)?48:6;
-    time_passed *= is_sleeping?5:1
     let D_C = current_game_time.day_count;
-    current_game_time.go_up(time_passed);
+    current_game_time.go_up(get_time_passed());
     update_character_stats(); //done every second, mostly because of daynight cycle; gotta optimize it at some point
+    if(global_flags['is_family_enabled']) update_displayed_family();
     update_displayed_time();
+    //update_family_daily();
     if(D_C != current_game_time.day_count){
         
         inf_combat.B3 = inf_combat.B3 || 0;
@@ -4163,9 +4988,12 @@ function update_timer() {
             log_message(`Swamp radiation spread: ${format_number(inf_combat.B3)} % -> ${format_number(B3_after)} % `,"gather_loot")
             inf_combat.B3 = B3_after;
         }
+        if(global_flags['is_family_enabled']) update_family_daily();
     }
+    
 }
 let MouseDown = false;
+    let mousePos = { clientX: 0, clientY: 0 };   // 全局保存最新鼠标位置
 function setupMouseControl() {
     document.addEventListener('pointerdown', () => {
         MouseDown = true;
@@ -4185,6 +5013,12 @@ function setupMouseControl() {
     window.addEventListener('blur', () => {
         MouseDown = false;
     });
+
+// 这个监听器非常轻，只负责更新坐标
+    document.addEventListener('mousemove', (e) => {
+    mousePos.clientX = e.clientX;
+    mousePos.clientY = e.clientY;
+}, { passive: true });   // passive: true 性能更好
 }
 setupMouseControl();
 
@@ -4214,7 +5048,6 @@ function start_fishing_minigame()
 {
     fish_div.style.display ="inherit";
     action_div.style.display = "none";
-    console.log("start")
     let FishRNG = (get_total_skill_level("Fishing") * 0.2) * Math.random();
     let cur_fish = fishs[1];
     if(FishRNG > 0.5) cur_fish = fishs[2];
@@ -4280,6 +5113,432 @@ function start_fishing_minigame()
 
     },frametime * 1000)
 }//完整钓鱼小游戏
+
+
+
+
+const fish_changed_div = document.getElementById("fish_changed_div");
+const fish_progress_changed_bar = document.getElementById("fish_progress_changed_bar");
+const fish_game_changed_div = document.getElementById("fish_game_changed_div");
+const fish_rod_changed_div = document.getElementById("fish_rod_changed_div");
+const fish_rod_2nd_div = document.getElementById("fish_rod_2nd_div");
+let fish_vx = 0,fish_xx = 100;
+let rod_vx = 0,rod_xx = 100;
+let fish_vy = 0,fish_xy = 100;
+let rod_vy = 0,rod_xy = 100;
+let center_x,center_y,offset_x,offset_y;
+let rod_diff = 0.750;//操控力度
+let fishs_changed = {1:{name:"冰柱鱼",str:80},2:{name:"血莲鱼",str:120},3:{name:"冰柱鱼王",str:160}}
+//bar_health rod_length保留
+function update_displayed_fish_changed()
+{
+    fish_progress_changed_bar.style.height = bar_health.toFixed(0) + "%";
+    fish_progress_changed_bar.style.top = (100-bar_health).toFixed(0) + "%";
+    fish_progress_changed_bar.style.background = `rgb(${Math.min((100 - bar_health)*5.1,255)},${Math.min((bar_health)*5.1,255)},0)`
+
+    fish_game_changed_div.style.bottom = fish_xx + "px";
+    fish_rod_changed_div.style.bottom = rod_xx + "px";
+    fish_game_changed_div.style.left = fish_xy + "px";
+    fish_rod_changed_div.style.left = rod_xy + "px";
+    fish_rod_2nd_div.style.bottom = rod_xx - rod_length * 0.3 + "px";
+    fish_rod_2nd_div.style.left = rod_xy - rod_length * 0.3 + "px";
+}
+
+
+function start_fishing_minigame_changed()
+{
+    fish_changed_div.style.display ="inherit";
+    action_div.style.display = "none";
+    let FishRNG = (get_total_skill_level("Fishing") * 0.2) * Math.random();
+    let cur_fish = fishs_changed[1];
+    if(FishRNG > 2.5) cur_fish = fishs_changed[2];
+    if(FishRNG > 4.0) cur_fish = fishs_changed[3];
+    bar_health = 25;
+    rod_length = 30 + get_total_skill_level("Fishing") * 3;
+    fish_rod_changed_div.style.height = rod_length + "px";
+    fish_rod_changed_div.style.width = rod_length + "px";
+    fish_rod_2nd_div.style.height = rod_length * 1.6 + "px";
+    fish_rod_2nd_div.style.width = rod_length * 1.6 + "px";
+    fish_vx = 0,fish_xx = 40;
+    rod_vx = 0,rod_xx = 30;
+    fish_vy = 0,fish_xy = 40;
+    rod_vy = 0,rod_xy = 30;
+    rod_diff = Math.min(1.00,get_total_skill_level("Fishing") * 0.05);
+    let movinginterval = Math.round(3000 / cur_fish.str);
+    let remaininterval = 1;
+    let frametime = 0.03;
+
+
+    //游戏初始化
+    const fishId = setInterval(() => {
+        
+        if((fish_xx + 12 < rod_xx + rod_length && rod_xx < fish_xx + 12) && (fish_xy + 12 < rod_xy + rod_length && rod_xy < fish_xy + 12)) bar_health += 0.4;//鱼，上钩
+        else if((fish_xx + 12 < rod_xx + rod_length * 1.3 && rod_xx - rod_length * 0.3 < fish_xx + 12) && (fish_xy + 12 < rod_xy + rod_length * 1.3 && rod_xy - rod_length * 0.3 < fish_xy + 12)) bar_health += 0;//鱼，不动
+        else bar_health -= 0.3;//鱼，脱钩
+        remaininterval -= 1;
+        if(remaininterval <= 0){
+            remaininterval = movinginterval;
+            fish_vx += (Math.random()*2-0.9)*cur_fish.str;
+            fish_vy += (Math.random()*2-1)*cur_fish.str;
+        }//鱼，扑腾(水平方向没有倾向)
+        fish_xx += fish_vx * frametime;
+        fish_xy += fish_vy * frametime;//鱼，移动
+        fish_vx -= 60 * frametime;//感受到了重力
+        if((fish_xx <= 0 && fish_vx < 0)||(fish_xx >= 290 && fish_vx > 0)){
+            fish_vx = fish_vx * -0.7;
+        }//鱼，反弹(X)
+        if((fish_xy <= 0 && fish_vy < 0)||(fish_xy >= 290 && fish_vy > 0)){
+            fish_vy = fish_vy * -0.9;
+        }//鱼，反弹(Y)
+        fish_vx = fish_vx * 0.99;
+        fish_vy = fish_vy * 0.99;//鱼，受阻。
+
+        if(MouseDown){
+            center_x = rod_xx + rod_length / 2;
+            center_y = rod_xy + rod_length / 2;
+            offset_x = - mousePos.clientY - center_x + 731.5;
+            offset_y = mousePos.clientX - center_y - 483.5;
+
+            rod_vx += offset_x * rod_diff * frametime;
+            rod_vy += offset_y * rod_diff * frametime;
+
+            
+        }
+        rod_vx -= 60 * frametime;
+
+
+        rod_xx += rod_vx * frametime;
+        rod_xy += rod_vy * frametime;
+        rod_vx *= 0.99,rod_vy *= 0.99;
+        //条，移动
+        if((rod_xx + rod_length >= 318 && rod_vx > 0)){
+            rod_vx = rod_vx * -0.4;
+            rod_xx = 318 - rod_length;
+        }//条，反弹(上)
+        if((rod_xx <= 0 && rod_vx < 0)){
+            rod_vx = rod_vx * -0.8;
+            rod_xx = 0;
+        }//条，反弹(下)
+        if((rod_xy + rod_length >= 318 && rod_vy > 0)){
+            rod_vy = rod_vy * -0.9;
+            rod_xy = 318 - rod_length;
+        }//条，反弹(右)
+        if((rod_xy <= 0 && rod_vy < 0)){
+            rod_vy = rod_vy * -0.9;
+            rod_xy = 0;
+        }//条，反弹(左)
+        //注意左右弹性系数0.9 上0.4下0.8
+
+        update_displayed_fish_changed();
+        if (bar_health >= 100) {
+            log_message(cur_fish.name + " 上钩了！","enemy_defeated");
+            action_div.style.display = "inherit";
+            fish_changed_div.style.display = "none";
+            add_xp_to_skill({skill: skills["Fishing"], xp_to_add: cur_fish.str / 5});//四倍经验
+            add_to_character_inventory([{item: item_templates[cur_fish.name], count: 1}]);
+            clearInterval(fishId);
+        }
+        if (bar_health <= 0) {
+            log_message(cur_fish.name + " 逃跑了！","enemy_enhanced");
+            action_div.style.display = "inherit";
+            fish_changed_div.style.display = "none";
+            clearInterval(fishId);
+        }
+        current_activity.gathering_time = 0;
+        //不准继续！
+
+    },frametime * 1000)
+}//完整钓鱼小游戏·改
+
+
+function grass_add(a, b) {
+    inf_combat.GR.grass.add([a, b]);  
+}
+function grass_remove(a, b) {
+    for (const pair of inf_combat.GR.grass) {
+        if (pair[0] === a && pair[1] === b) {
+            inf_combat.GR.grass.delete(pair);
+            return true;
+        }
+    }
+    return false;
+}
+function grass_check(cursorX,cursorY) {
+    for (const [a, b] of inf_combat.GR.grass) {
+        if(((cursorX-a)**2+(cursorY-b)**2)**0.5 < 20 + skills["GrassCutting"].current_level * 2)
+        {
+            grass_remove(a,b);
+            add_to_character_inventory([{ "item": getItem(item_templates["绝音蕨"]), "count": 1 }]);
+            let light_chance = Math.floor(inf_combat.GR.eff_lvl ** 0.7 * 500);//
+            let light_rnd = Math.floor(Math.random() * 1e6);
+            if(light_rnd <= light_chance){
+                log_message(`收割检定:1d1000000=${light_rnd}/${light_chance} `,"combat_loot");
+                log_message(`成功!已获取【噬芒兰】*1.`,"combat_loot");
+                add_to_character_inventory([{ "item": getItem(item_templates["噬芒兰"]), "count": 1 }]);
+            }
+            //nf_combat.GR.harvested += 1;
+            add_xp_to_skill({skill: skills["GrassCutting"], xp_to_add: 1,should_info:true,use_bonus:true});
+        }
+    }
+}
+function grass_drew(callback) {
+    for (const [a, b] of tupleSet) {
+        callback(a, b);
+    }
+}
+const grass_div = document.getElementById("grass_div");
+const grass_canvas = document.getElementById('grassCanvas');
+const ctx = grass_canvas.getContext('2d');
+let grass_able = true;
+const GRASS_SIZE = 7;
+function grass_clear() {
+    inf_combat.GR.grass.clear();
+}
+function grass_init(){
+    //主要内容：草的位置，草的总数，当前收割半径等
+    inf_combat.GR = {}
+    inf_combat.GR.grass = new Set();
+    inf_combat.GR.radius = 20;
+    inf_combat.GR.grass_amount = 0;
+    inf_combat.GR.grass_cap = 100;
+    inf_combat.GR.eff_lvl = 0;
+    inf_combat.GR.harvested = 0;//已弃用
+}
+function redraw_grass(){
+    ctx.clearRect(0, 0, grass_canvas.width, grass_canvas.height);
+    
+    ctx.fillStyle = '#0f0';
+    ctx.strokeStyle = '#464';
+    ctx.lineWidth = 2;
+    
+    for (const [x, y] of inf_combat.GR.grass) {
+        ctx.beginPath();
+        ctx.arc(x, y, GRASS_SIZE, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+    }
+    ctx.save();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.lineWidth = 1.5;
+    
+    offset_x =  mousePos.clientX - 435;
+    offset_y = mousePos.clientY - 431;
+    ctx.beginPath();
+    ctx.arc(offset_x , offset_y, inf_combat.GR.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    grass_check(offset_x,offset_y);
+}
+const grassfield_current = document.getElementById("grassfield_current");
+const grassfield_cap = document.getElementById("grassfield_cap");
+const grasstimer_current = document.getElementById("grasstimer_current");
+const grasstimer_cap = document.getElementById("grasstimer_cap");
+const grass_harvested = document.getElementById("grass_harvested");
+
+let grass_spawn_cooldown = 1.00;
+let grass_cur_cooldown = 0.00;
+function update_displayed_grass(){
+    
+    redraw_grass();
+    grassfield_current.innerText = inf_combat.GR.grass.size.toFixed(0);
+    grassfield_cap.innerText = inf_combat.GR.grass_cap.toFixed(0);
+    grasstimer_current.innerText = grass_cur_cooldown.toFixed(2);
+    grasstimer_cap.innerText = grass_spawn_cooldown.toFixed(2);
+    if((character.inventory[`{"id":"绝音蕨"}`]?.count) != undefined) grass_harvested.innerText = (character.inventory[`{"id":"绝音蕨"}`]?.count).toFixed(0);
+    else grass_harvested.innerText = 0;
+    //inf_combat.GR.harvested 弃用，直接读取物品栏
+    //更新收割圆环形状
+    //更新储存草量
+    //主要内容：更新草场，更新收割圆环，更新目前储存的草
+    
+}
+function start_grass_minigame(){
+
+    grass_able = true;
+    grass_div.style.display ="inherit";
+    action_div.style.display = "none";
+    let frametime = 0.04;
+    if(inf_combat.GR == undefined) grass_init();
+    if(inf_combat.GR.grass.size == undefined) grass_init();
+    redraw_grass();
+    grass_spawn_cooldown = 1.00;
+    grass_cur_cooldown = 0.00;
+    const GrassId = setInterval(() => {
+        inf_combat.GR.eff_lvl = skills["GrassCutting"].current_level + ((character.equipment.sickle?.name == "死神之镰")?4:0);
+        inf_combat.GR.radius = inf_combat.GR.eff_lvl * 1.5 + 15;
+        grass_spawn_cooldown = 10.0 / (5 + inf_combat.GR.eff_lvl);
+        inf_combat.GR.grass_cap = Math.floor((inf_combat.GR.eff_lvl + 1) ** 1.5 * 10);
+        
+        grass_cur_cooldown += frametime;
+        if(grass_cur_cooldown > grass_spawn_cooldown){
+            grass_cur_cooldown -= grass_spawn_cooldown;
+            if(inf_combat.GR.grass.size < inf_combat.GR.grass_cap){
+                let X_grass = Math.round(Math.random()*(384-2*GRASS_SIZE) + GRASS_SIZE);
+                let Y_grass = Math.round(Math.random()*(320-2*GRASS_SIZE) + GRASS_SIZE);
+                grass_add(X_grass,Y_grass);
+            }
+        }
+        if (!grass_able) {
+            action_div.style.display = "inherit";
+            grass_div.style.display = "none";
+            clearInterval(GrassId);
+        }
+        update_displayed_grass();
+    },frametime * 1000);
+}
+
+function leave_grass()
+{
+    grass_able = false;
+    
+}
+window.leave_grass = leave_grass;
+//割草小游戏
+
+let digging_able = true;
+const dig_loots = [[0,60,15,2,"极冰骨髓"],[0.7,85,3,4,"灵蓝补给品"],[1.0,135,1,8,"焚血花王"],[1.199,360,1,960,"峰"]]
+//[0]:RNG需要量,[1]:移动速度，[2]:一次获取量，[3]:回收速度/伸长的速度
+//spec/fishmark_lootX.png，格式统一
+let fish_cd = 1.00;
+let fish_id = 0;
+const digging_div = document.getElementById("digging_div");
+const digging_field_div = document.getElementById("digging_field_div");
+const digging_claw = document.getElementById("digging_claw");
+const claw_line = document.getElementById("claw_line");
+let fish_list = [];
+let claw_op = 1;
+let claw_angle = 0.00;//弧度制，75°~-75°
+let claw_length = 0.00,claw_x = 200,claw_y = 0;
+let claw_fish = -1;
+let angle_time = 0.00;//记录上面那个生成函数的输入
+function summon_fish(){
+    fish_id += 1;
+    let NewFish = {id:fish_id};
+    let RNG_index =  Math.random() * Math.random() + skills["GroundDigging"].current_level * 0.01;//初始状态18%出二阶，最终状态50%一阶42%二阶8%三阶
+    for(let f=0;f<=3;f+=1){
+        if(RNG_index >= dig_loots[f][0]) NewFish.tier = f;
+    }
+    NewFish.vx = Math.random()>0.5?(1):(-1);//决定方向
+    NewFish.px = NewFish.vx>0?-32:432;//从边界外40px处移来
+    NewFish.vx *= dig_loots[NewFish.tier][1];//鱼速乘数
+    NewFish.vx *= Math.random()*0.4+0.8;//随机生成
+    NewFish.py = Math.random()*250 + 50;//0~320边界，16px半径->8~312.保险起见50~300可以生成。
+    fish_list.push(NewFish);
+    //console.log('编号为',NewFish.id,"的鱼已经被生成");
+}
+function update_displayed_digging_minigame(){
+    let fish_display = ``;
+    Object.keys(fish_list).forEach(skey => {
+        let sfish = fish_list[skey];
+        fish_display += `<div class="digging_fish" style="position: absolute;top:${sfish.py-16}px;left:${sfish.px-16}px"><img src='image/spec/fishmark_loot${sfish.tier}.png'></div>`
+    })
+    digging_claw.style.transform = 'rotate(' + (claw_angle * 360 / 6.283 + 45) + 'deg)';
+    digging_claw.style.top = (91+claw_y) + 'px';
+    digging_claw.style.left = claw_x + 'px';
+
+    claw_line.style.transform = 'rotate(' + (claw_angle * 360 / 6.283 + 90) + 'deg)';
+    claw_line.style.width = (claw_length + 4) + 'px';
+
+    if(claw_fish != -1) fish_display += `<div class="digging_fish" style="position: absolute;top:${claw_y-16+40*Math.cos(claw_angle)}px;left:${claw_x-24-40*Math.sin(claw_angle)}px ;transform-origin:center;transform:rotate(${claw_angle*360/6.283-45}deg)"><img src='image/spec/fishmark_loot${claw_fish}.png'></div>`;//绘制被抓到的鱼
+
+    digging_field_div.innerHTML = fish_display;
+}
+function start_digging_minigame(){
+    
+    digging_able = true;
+    digging_div.style.display ="inherit";
+    action_div.style.display = "none";
+    let frametime = 0.01;
+    let vf = 0;
+    fish_cd = 1.00,fish_id = 0,fish_list = [];
+    claw_angle = 0.00,angle_time = 0,claw_op = 1;//三角函数模式，每秒运行2pi(0.2+0.02*value)
+    claw_length = 0.00,claw_x = 200,claw_y = 0;
+    claw_fish = -1;
+    const DiggingId = setInterval(() => {
+        fish_cd -= frametime;
+        if(fish_cd <= 0){
+            fish_cd += 3 - skills["GroundDigging"].current_level * 0.1;
+            summon_fish();
+        }//生成鱼
+        Object.keys(fish_list).forEach(sfish => {
+            fish_list[sfish].px += fish_list[sfish].vx * frametime;
+
+            if(fish_list[sfish].px>432&&fish_list[sfish].vx>0 || fish_list[sfish].px<-32&&fish_list[sfish].vx<0){
+                
+                //console.log('编号为',fish_list[sfish].id,"的鱼已经被销毁");
+                delete fish_list[sfish];
+                //销毁鱼
+            }
+        })
+        //移动鱼
+        if(claw_op == 1){
+            angle_time += 6.283 * (0.2 + 0.02 * skills["GroundDigging"].current_level) * frametime;
+            claw_angle = Math.sin(angle_time) * 3.14159 * 5 / 12;//±75° 
+        }//待机/不断旋转
+        if(claw_op == 3){
+            let reco_nerf = claw_fish==-1?1:dig_loots[claw_fish][3];
+            claw_length -= frametime * (character.stats.full.agility/1e8)**(2/3) * (1 + 0.1 * skills["GroundDigging"].current_level) / reco_nerf;
+            //缩短爪子
+            if(claw_length < 0 ){
+                claw_length = 0;
+                claw_op = 1;
+                if(claw_fish != -1){
+                    add_xp_to_skill({skill: skills["GroundDigging"], xp_to_add: (dig_loots[claw_fish][3]/2)**2,should_info:true,use_bonus:true});
+                    add_to_character_inventory([{ "item": getItem(item_templates[dig_loots[claw_fish][4]]), "count": dig_loots[claw_fish][2] }]);
+                    
+                    log_message("钻探地层，发掘出了" + dig_loots[claw_fish][2] + " 个 " + dig_loots[claw_fish][4] + "！","enemy_defeated");
+                }
+
+                claw_fish = -1;
+            }
+            claw_y = claw_length * Math.cos(claw_angle);
+            claw_x = claw_length * Math.sin(-claw_angle) + 200;
+            
+        }
+        if(claw_op == 2){
+            claw_length += frametime * (character.stats.full.agility/1e6)**0.4;
+            //伸长爪子
+            claw_y = claw_length * Math.cos(claw_angle);
+            claw_x = claw_length * Math.sin(-claw_angle) + 200;
+            if(claw_x >= 392 || claw_x <= 8|| claw_y >= 320) claw_op = 3;//反弹
+            let caught_fish = -1;
+            Object.keys(fish_list).forEach(skey => {
+                let sfish = fish_list[skey];
+                if(caught_fish == -1 && ((sfish.px - claw_x - Math.sin(-claw_angle) * 32)**2 + (sfish.py - claw_y - Math.cos(claw_angle) * 32)**2 < (16+0.5*skills["GroundDigging"].current_level)**2)){//距离判定(钳子中心点碰触)
+                    caught_fish = sfish.tier;
+                    delete fish_list[skey];//鱼被抓走了！
+                }
+            })
+            if(caught_fish != -1){
+                claw_fish = caught_fish;
+                claw_op = 3;
+                //抓到了！立刻折返
+            }
+        }
+        vf += 1;
+        if(vf % 4 == 0) update_displayed_digging_minigame();
+        if (!digging_able) {
+            action_div.style.display = "inherit";
+            digging_div.style.display = "none";
+            clearInterval(DiggingId);
+        }
+    },frametime * 1000);
+}
+function leave_digging()
+{
+    digging_able = false;
+}
+function claw_use()
+{
+    if(claw_op == 1) claw_op = 2;
+}
+window.leave_digging = leave_digging;
+window.claw_use = claw_use;
+//地层钻探小游戏
+
 
 
 const reactor_div = document.getElementById("reactor_div");
@@ -4437,6 +5696,37 @@ function reactor(item_id,count)
     }
 }
 
+function engine(item_id,count){
+    let item_map = {1:"冰原超流体",2:"多孔冰晶"};
+    //检查物品是否足够，扣除物品，如果不够就返回
+    let key = "{\"id\":\""+item_map[item_id]+"\"}";
+    if(count==-2){
+        count = inf_combat.FE.IM.num - 1;
+        inf_combat.FE.IM.num = 1;
+        log_message("提取了 多孔冰晶 * " + count,"combat_loot");
+        add_to_character_inventory([{ "item": getItem(item_templates["多孔冰晶"] ), "count": count}]);
+        return;
+    }
+    if(character.inventory[key] != undefined)
+    {
+        if(count==-1) count = character.inventory[key].count;
+        if(character.inventory[key].count >= count)
+        {
+            remove_from_character_inventory([{ 
+                item_key: key,           
+                item_count: count,
+            }]);
+        }
+        else return;
+    }
+    else return;
+    if(item_id==1){
+        inf_combat.FE.SF.num += count;
+        inf_combat.FE.SF.temp += (inf_combat.FE.outer_temp - inf_combat.FE.SF.temp) * (count / inf_combat.FE.SF.num);
+    }
+    if(item_id==2) inf_combat.FE.IM.num += count;
+}
+
 function leave_reactor()
 {
     reactor_able = false;
@@ -4475,7 +5765,656 @@ window.reactor =  reactor;
 window.leave_reactor =  leave_reactor;
 window.extract_reactor =  extract_reactor;
 window.extract_evolve =  extract_evolve;
+window.engine = engine;
 
+//极寒引擎minigame！
+let engine_able = true;
+
+function engine_init()
+{
+    inf_combat.FE = {};//FreezingEngine,更准确的名称是[极寒二阶相变引擎]/FreezingSecondOrderPhaseTransformationEngine
+    inf_combat.FE.IA = {};//IcelandAir
+    inf_combat.FE.SF = {};//SuperFuild
+    inf_combat.FE.IM = {};//IsolationMaterial
+    inf_combat.FE.FR = {};
+    //为了避免进一步的麻烦，以下内容将尽可能遵守【SI纯粹主义】
+    inf_combat.FE.power = 0;//喵可做功速度(W)
+    inf_combat.FE.outer_temp = 240;
+    inf_combat.FE.fruit = -1;//-1代表未放入，反之代表玄冰果实中积累的冰元素
+    inf_combat.FE.piston = 1;//0:隔热袋内，1:环境中。默认在1.
+    inf_combat.FE.piston_mode = 0;
+    inf_combat.FE.IA.num = 150000000;//物质的量(mol)
+    inf_combat.FE.IA.volume = 30.000;//体积(m^3),也作为活塞推入百分比依据
+    inf_combat.FE.IA.temp = 240.0;//温度(K)
+    inf_combat.FE.IA.pressure = 9977.4e6;//压强(Pa)，作为导出单位
+    inf_combat.FE.SF.num = 25;//加入的25单位超流体，每个单位是1m^3
+    inf_combat.FE.SF.ice = 0;//冰元素积累量
+    inf_combat.FE.SF.temp = 240.0;//同样是温度
+    inf_combat.FE.SF.surface = 41.347;//按m^2计的表面积
+    inf_combat.FE.IM.num = 15;//加入的15单位多孔冰晶 每10单位为1m^3
+    inf_combat.FE.IM.thickness = 0.0356;//冰晶厚度[M]
+    engine_able = true;
+}
+const engine_div = document.getElementById("engine_div");
+const sas_div = document.getElementById("skills_and_stances_div");
+const lr_div = document.getElementById("location_related_div");
+const piston_div = document.getElementById("engine_piston");
+const piston_mode = document.getElementById("piston_mode");
+const piston_temp = document.getElementById("piston_temp");
+const piston_pressure = document.getElementById("piston_pressure");
+const piston_volume = document.getElementById("piston_volume");
+const neko_power = document.getElementById("neko_power");
+const piston_pt2 = document.getElementById("piston_pt2");
+const container_circle = document.getElementById("container_circle");
+const container_square = document.getElementById("container_square");
+const container_sf = document.getElementById("container_sf");
+const container_sf_S = document.getElementById("container_sf_S");
+const container_temp = document.getElementById("container_temp");
+const container_temp_change = document.getElementById("container_temp_change");
+const container_isolate = document.getElementById("container_isolate");
+const container_isolate_thickness = document.getElementById("container_isolate_thickness");
+const container_element = document.getElementById("container_element");
+const container_element_max = document.getElementById("container_element_max");
+const container_element_speed = document.getElementById("container_element_speed");
+const container_element_time = document.getElementById("container_element_time");
+const container_element_bar = document.getElementById("engine_element_bar_current");
+const engine_result_name = document.getElementById("engine_result_name");
+const engine_result_fruit_status = document.getElementById("engine_result_fruit_status");
+const engine_result_temp = document.getElementById("engine_result_temp");
+const engine_env1 = document.getElementById("engine_env1");
+const engine_env2 = document.getElementById("engine_env2");
+
+
+
+function update_displayed_engine(){
+    engine_result_name.innerText = (inf_combat.FE.SF.num * 999.999 - inf_combat.FE.SF.ice < 0)?"万载冰髓锭":"冰原超流体";
+    engine_result_fruit_status.innerText = (inf_combat.FE.fruit == -1)?"未放入":`觉醒${(inf_combat.FE.fruit / 1e4).toFixed(4)}%`
+    engine_result_temp.innerText = (inf_combat.FE.outer_temp.toFixed(0)) + 'K / '+ ((inf_combat.FE.outer_temp/240)**2*12).toFixed(2) + 'MPa';
+    engine_env1.style.display = (character.equipment.realm?.name == "焰海霜天[领域二重]" || character.equipment.realm?.name == "焰海霜天[领域三重]")?"inline-block":"none";
+    engine_env2.style.display = (character.equipment.realm?.name == "焰海霜天[领域二重]" || character.equipment.realm?.name == "焰海霜天[领域三重]")?"inline-block":"none";
+
+
+    piston_div.style.left = Math.round(120 * (1+Math.cos(3.1415927*(1+inf_combat.FE.piston))) + 64) + 'px';
+    let modemap = {0:"摸鱼ing",1:"压缩内部气体",2:"内部气体自由膨胀",3:"向内部充入气体",4:"释放内部气体"};
+    piston_mode.innerText = modemap[inf_combat.FE.piston_mode];
+    piston_temp.innerText = inf_combat.FE.IA.temp.toFixed(2);
+    let pres = inf_combat.FE.IA.pressure;
+    if(pres <= 1e9) piston_pressure.innerText = (pres/1e3).toFixed(0) + ' kPa';
+    else if(pres <= 1e12) piston_pressure.innerText = (pres/1e6).toFixed(0) + ' MPa';
+    else if(pres <= 1e15) piston_pressure.innerText = (pres/1e9).toFixed(0) + ' GPa';
+    else if(pres <= 1e18) piston_pressure.innerText = (pres/1e12).toFixed(0) + ' TPa';
+    else piston_pressure.innerText = (pres/1e17).toFixed(2) + ' TBar';
+    //动态单位:1GPa以下kPa,……1000000TPa以下TPa，以上TBar。
+    piston_volume.innerText = inf_combat.FE.IA.volume.toFixed(3);
+    neko_power.innerText = (character.stats.full.attack_power ** 1.5 / 1e9).toFixed(1);
+    piston_pt2.style.left = Math.round(10 + 100 * (inf_combat.FE.IA.volume / 30)) + 'px';
+    container_square.style.width = Math.round(100 * (inf_combat.FE.IA.volume / 30)) + 'px';
+
+    let transparenty = Math.log10(inf_combat.FE.IA.num / inf_combat.FE.IA.volume / 1e4) / 6;
+    transparenty = Math.min(1,Math.max(0,transparenty));
+    //1e10mol/m^3时完全不透明，1e4mol/m^3时完全透明。
+    //我知道后者已经是液体而前者是简并物质，但游戏性需要。
+    let temp_index = inf_combat.FE.IA.temp ** 0.5 / 15.4919;
+    temp_index = Math.min(temp_index,3);
+    if(temp_index <= 1) container_square.style.backgroundColor = `rgb(${Math.round(255*temp_index)},255,255,${transparenty.toFixed(3)})`;
+    else container_square.style.backgroundColor = `rgb(255,${Math.round(Math.max(255*(4-temp_index)/2,0))},${Math.round(Math.max(255*(2-temp_index),0))},${transparenty.toFixed(3)})`;
+    //气体颜色：
+    //0K纯青色，240K纯白色，960K纯黄色，2240K纯橙色。
+    //不符合黑体辐射，但是符合对温度的直观感受
+    temp_index = inf_combat.FE.SF.temp ** 0.5 / 15.4919;
+    temp_index = Math.min(temp_index,3);
+    if(temp_index <= 1) container_circle.style.backgroundColor = `rgb(${Math.round(255*temp_index)},255,255,1.0)`;
+    else container_circle.style.backgroundColor = `rgb(255,${Math.round(Math.max(255*(4-temp_index)/2,0))},${Math.round(Math.max(255*(2-temp_index),0))},1.0)`;
+    //对于球
+
+
+    container_sf.innerText = inf_combat.FE.SF.num;
+    container_sf_S.innerText = inf_combat.FE.SF.surface.toFixed(2);
+    container_temp.innerText = inf_combat.FE.SF.temp.toFixed(1);
+    container_isolate.innerText = inf_combat.FE.IM.num;
+    container_isolate_thickness.innerText = inf_combat.FE.IM.thickness.toFixed(4);
+    container_element.innerText = format_number(inf_combat.FE.SF.ice);
+    container_element_max.innerText = format_number(inf_combat.FE.SF.num * 1000);
+    container_element_bar.style.width = Math.min(inf_combat.FE.SF.ice / (inf_combat.FE.SF.num * 10),100).toFixed(1)  + "%" ;
+    let outer_temp = inf_combat.FE.outer_temp;//调整外界温度
+    let SF_heat = (outer_temp - inf_combat.FE.SF.temp) * inf_combat.FE.SF.surface / inf_combat.FE.SF.num / inf_combat.FE.IM.thickness * 0.001;
+    if(inf_combat.FE.piston == 0) SF_heat += 0.5 * (inf_combat.FE.IA.temp - inf_combat.FE.SF.temp) * ((inf_combat.FE.IA.num * inf_combat.FE.SF.num * 1e7)/(inf_combat.FE.IA.num + inf_combat.FE.SF.num * 1e7)) / (inf_combat.FE.SF.num * 1e7);
+    container_temp_change.innerText = SF_heat.toFixed(2);
+    let ice_speed = inf_combat.FE.SF.surface * 3.4764e-14 * Math.exp(2623.17 / inf_combat.FE.SF.temp);
+    container_element_speed.innerText = ice_speed.toFixed(2);
+    let ice_time = (inf_combat.FE.SF.num * 1000 - inf_combat.FE.SF.ice) / ice_speed;
+    ice_time = Math.max(ice_time,0);
+    if(ice_time <= 60) container_element_time.innerText = ice_time.toFixed(1) + '秒';
+    else if(ice_time <= 3600) container_element_time.innerText = (ice_time/60).toFixed(1) + '分钟';
+    else if(ice_time <= 86400) container_element_time.innerText = (ice_time/3600).toFixed(2) + '小时';
+    else if(ice_time <= 31557020) container_element_time.innerText = (ice_time/86400).toFixed(2) + '天';
+    else container_element_time.innerText = (ice_time/31557020).toFixed(2) + '年';
+}
+
+function start_engine_minigame()
+{
+    //设定1：冰原的外界气压为1.2 MPa！
+    if(inf_combat.FE == undefined) engine_init();
+    if(inf_combat.FE.SF.temp != inf_combat.FE.SF.temp ||inf_combat.FE.IA.temp != inf_combat.FE.IA.temp) engine_init();
+    update_displayed_engine()
+    engine_able = true;
+    engine_div.style.display ="inherit";
+    sas_div.style.display = "none";
+    lr_div.style.display = "none";
+    let frametime = 0.005;
+    let dP,dV,dN,dT,P_index;
+    let cnt=0;
+    let outer_temp = inf_combat.FE.outer_temp;
+    let outer_pressure = 12e6;
+    const EngineId = setInterval(() => {
+        outer_temp = inf_combat.FE.outer_temp;//调整外界温度
+        outer_pressure = ((inf_combat.FE.outer_temp/240)**2*12e6);
+        inf_combat.FE.IA.pressure = inf_combat.FE.IA.num * inf_combat.FE.IA.temp * 8.3144626 / inf_combat.FE.IA.volume;
+        // nRT / V
+        if(inf_combat.FE.IA.pressure <= outer_pressure)
+        {
+            inf_combat.FE.IA.num = outer_pressure * inf_combat.FE.IA.volume /  inf_combat.FE.IA.temp / 8.3144626;
+            inf_combat.FE.IA.pressure = inf_combat.FE.IA.num * inf_combat.FE.IA.temp * 8.3144626 / inf_combat.FE.IA.volume;
+        }//内压小于外压就内压=外压！高压锅！
+        if(inf_combat.FE.piston_mode == 1){
+            dP = inf_combat.FE.IA.pressure - outer_pressure;
+            dV = (character.stats.full.attack_power ** 1.5) / dP * frametime * 3/5;
+            if(dV >= frametime * inf_combat.FE.IA.volume) dV = frametime * inf_combat.FE.IA.volume;
+            if(inf_combat.FE.IA.volume - dV < 0.3){
+                dV = inf_combat.FE.IA.volume - 0.3;
+            }//设定：极限压缩是0.01m^3.
+            if(dV < 1e-8){
+                inf_combat.FE.piston_mode = 0;//已经压缩到极限了，结束压缩
+                dV = 0;
+            }
+            dT = inf_combat.FE.IA.temp * ( 2/3 ) * dV / inf_combat.FE.IA.volume;
+
+            inf_combat.FE.IA.temp += dT;
+            inf_combat.FE.IA.volume -= dV;
+        }//压缩气体
+        if(inf_combat.FE.piston_mode == 2){
+            P_index = (inf_combat.FE.IA.pressure - 1.2) / (inf_combat.FE.IA.pressure);//膨胀系数
+            dV = inf_combat.FE.IA.volume * frametime * P_index;
+            if(dV + inf_combat.FE.IA.volume >= 30) dV = 30 - inf_combat.FE.IA.volume;
+            if(dV < 1e-8){
+                inf_combat.FE.piston_mode = 0;//已经膨胀到极限了，结束膨胀
+                dV = 0;
+            }
+            dT = inf_combat.FE.IA.temp * ( 2/3 ) * dV / inf_combat.FE.IA.volume;
+            
+            inf_combat.FE.IA.temp -= dT;
+            inf_combat.FE.IA.volume += dV;
+        }//膨胀气体
+        if(inf_combat.FE.piston_mode == 3){
+            //Pdt/(RT1(25/6(p2/p1)^0.4-2.5))
+            dN = (character.stats.full.attack_power ** 1.5) * frametime / (8.3144626 * outer_temp * (25/6 * (inf_combat.FE.IA.pressure / outer_pressure) ** 0.4 - 2.5))  ;
+            if(dN >= frametime * inf_combat.FE.IA.num) dN = frametime * inf_combat.FE.IA.num;
+            dT = (dN / inf_combat.FE.IA.num ) * (5/3*outer_temp*(inf_combat.FE.IA.pressure / outer_pressure) ** 0.4  -  inf_combat.FE.IA.temp);
+            if(dN<1e-8){
+                dN = 0;
+                inf_combat.FE.piston_mode = 0;//已经膨胀到极限了，结束膨胀
+            }
+
+            inf_combat.FE.IA.num += dN;
+            inf_combat.FE.IA.temp += dT;
+            inf_combat.FE.IA.temp = (inf_combat.FE.IA.temp * inf_combat.FE.IA.num + outer_temp * dN) / (dN + inf_combat.FE.IA.num);
+            //+混合冷却
+        }
+        if(inf_combat.FE.piston_mode == 4){
+            P_index = (inf_combat.FE.IA.pressure - outer_pressure) / (inf_combat.FE.IA.pressure);//散逸
+            dN = inf_combat.FE.IA.num * frametime * P_index;
+            inf_combat.FE.IA.num -= dN;
+        }
+        //设定2：膨胀，压缩速度不能超过每秒1倍自然对数
+        //设定3：冰原空气是单原子气体，绝热系数5/3
+
+        if(inf_combat.FE.piston == 1){
+            let dT = frametime * 0.1 * (inf_combat.FE.IA.temp - outer_temp);
+            //热传导(低温主导)
+            inf_combat.FE.IA.temp -= dT;
+        }
+        else if(inf_combat.FE.piston == 0){
+            let heat_changed = frametime * 0.5 * (inf_combat.FE.IA.temp - inf_combat.FE.SF.temp) * ((inf_combat.FE.IA.num * inf_combat.FE.SF.num * 1e7)/(inf_combat.FE.IA.num + inf_combat.FE.SF.num * 1e7))
+            //使用约化质量 1份超流体视为10M mol冰原空气
+            //空气温度>流体温度时heat_changed为正
+            inf_combat.FE.IA.temp -= heat_changed / inf_combat.FE.IA.num;
+            inf_combat.FE.SF.temp += heat_changed / (inf_combat.FE.SF.num * 1e7);
+            //与隔热袋换热
+        }
+        //V=4pi/3 r^3,S=4pir^2,所以S=(6pi^0.5V)^2/3
+        inf_combat.FE.SF.surface = 4.835975862 * (inf_combat.FE.SF.num ** (2/3));
+        inf_combat.FE.IM.thickness = (0.2387324 * (inf_combat.FE.IM.num * 0.1 + inf_combat.FE.SF.num)) ** (1/3) - (0.2387324 * (inf_combat.FE.SF.num)) ** (1/3);
+        //两球体积之差即为厚度
+
+        inf_combat.FE.SF.temp += (outer_temp - inf_combat.FE.SF.temp) * inf_combat.FE.SF.surface / inf_combat.FE.SF.num / inf_combat.FE.IM.thickness * 0.001 * frametime;
+        //隔热袋与外界换热 开局条件下是0.05倍/s
+
+        inf_combat.FE.SF.ice += frametime * inf_combat.FE.SF.surface * 3.4764e-14 * Math.exp(2623.17 / inf_combat.FE.SF.temp);
+
+        if(inf_combat.FE.SF.ice >= inf_combat.FE.SF.num * 1000) inf_combat.FE.SF.ice = 1000 * inf_combat.FE.SF.num;
+
+        if(inf_combat.FE.fruit != -1 && inf_combat.FE.fruit < 1000000){
+            let dI = inf_combat.FE.SF.ice * frametime;
+            if(inf_combat.FE.fruit + dI > 1000000) dI = 1000000 - inf_combat.FE.fruit;
+            inf_combat.FE.fruit += dI;
+            inf_combat.FE.SF.ice -= dI;
+        }
+        
+        if (!engine_able) {
+            lr_div.style.display = "block";
+            sas_div.style.display = "block";
+            engine_div.style.display = "none";
+            clearInterval(EngineId);
+        }
+        cnt++;
+        if(cnt%5==0) update_displayed_engine();
+    },frametime * 1000);
+
+}
+let piston_changing = 0;
+function changePistonStatus(){
+    if(piston_changing != 0) return;
+    let frametime = 0.025;
+    piston_changing = 1 - inf_combat.FE.piston * 2;
+    const PistonId = setInterval(() => {
+        inf_combat.FE.piston += piston_changing * frametime;
+        if(inf_combat.FE.piston <= 0){
+            inf_combat.FE.piston = 0;
+            piston_changing = 0;
+            clearInterval(PistonId);
+        } 
+        else if(inf_combat.FE.piston >= 1){
+            inf_combat.FE.piston = 1;
+            piston_changing = 0;
+            clearInterval(PistonId);
+        }
+    },frametime * 1000);
+}
+function changePistonMode(mode){
+    if(inf_combat.FE.piston_mode != mode)
+        inf_combat.FE.piston_mode = mode;
+    else
+        inf_combat.FE.piston_mode = 0;
+}
+
+function engine_r(item_id,count){
+    let r_id = (inf_combat.FE.SF.num * 999.999 - inf_combat.FE.SF.ice < 0)?"万载冰髓锭":"冰原超流体";
+    let key = "{\"id\":\""+r_id+"\"}";
+    if(count == -1 && inf_combat.FE.SF.num > 1){
+        count = inf_combat.FE.SF.num - 1;
+    }
+    else if(count > inf_combat.FE.SF.num - 1) return;
+    inf_combat.FE.SF.ice *= (inf_combat.FE.SF.num - count) / inf_combat.FE.SF.num;
+    inf_combat.FE.SF.num -= count;
+    log_message(`提取了 ${r_id} x ${count} !`,"combat_loot");
+
+    add_to_character_inventory([{ "item": getItem(item_templates[r_id]), "count": count}]);
+    update_displayed_character_inventory();
+
+}
+function engine_f(oper){
+    if(oper==1 && inf_combat.FE.fruit == -1){
+        let fr_key = "{\"id\":\""+"玄冰果实"+"\"}";//应为玄冰果实
+        if(character.inventory[fr_key] != undefined){
+            remove_from_character_inventory([{ 
+                item_key: fr_key,           
+                item_count: 1,
+            }]);
+            inf_combat.FE.fruit = 0;
+            log_message(`玄冰果实 已开始吸取冰元素 !`,"enemy_defeated");
+        }
+        //拿走玄冰果实
+    }
+    if(oper==2 && inf_combat.FE.fruit != -1){
+        //根据是否抵达1e6判定取出什么
+        let q_id = inf_combat.FE.fruit > 999900 ? "玄冰果实·觉醒" : "玄冰果实" ;
+        log_message(`提取了 ${q_id} !`,"combat_loot");
+
+        add_to_character_inventory([{ "item": getItem(item_templates[q_id]), "count": 1}]);
+        update_displayed_character_inventory();
+        inf_combat.FE.fruit = -1;
+    }
+}
+function engine_e(e_temp){
+    if(e_temp != -1) inf_combat.FE.outer_temp = e_temp;
+    else{
+        
+            if(character.equipment.special?.name == "飞船之心")
+            {
+                character.equipment.special = null;
+                add_to_character_inventory([{item: item_templates["飞船之心·材"], count: 1}]);
+                update_displayed_equipment(); 
+                character.stats.add_all_equipment_bonus();
+                update_displayed_stats();
+                log_message("你的【飞船之心】已经被转化为【飞船之心·材】，","combat_loot");
+                log_message("可以继续升级为【冰原之心】。","combat_loot");
+            }
+            else log_message("请将【飞船之心】佩戴后再次尝试！`","combat_looot");
+            //借用代码……
+    }
+}
+function engine_l(){
+    engine_able = false;
+}
+
+window.changePistonStatus = changePistonStatus;
+window.changePistonMode = changePistonMode;
+window.engine_r = engine_r;
+window.engine_f = engine_f;
+window.engine_e = engine_e;
+window.engine_l = engine_l;
+
+function unlock_influ_related(influ){
+    if(influ>1 && !locations["城门战 - 歧路"].is_unlocked){
+        
+        log_message(`<span class='realm_sky'>[百方]</span>：苦苦追寻这些年，总算让我找到了……`,"activity_money");
+        log_message(`纳可老祖，被族人簇拥的滋味好受吗？`,"activity_money");
+        log_message(`现在关于你的消息可是不胫而走哦？`,"activity_money");
+        log_message(`要不是在荒兽森林我抢来了牵制药水的配方，`,"activity_money");
+        log_message(`或许我也和炎塔他们一样，`,"activity_money");
+        log_message(`成为十三斧下的亡魂了吧。`,"activity_money");
+        log_message(`多说无益！来战！！`,"activity_money");
+        unlock_location(locations["城门战 - 歧路"]);
+    };
+    if(influ>50 && locations["古墓战 - 2"].is_unlocked && !locations["古墓战 - I"].is_unlocked){
+        
+        log_message(`<span class='realm_cloudy'>[枫杏红]</span>：苦苦追寻这些年，总算让我找到了……`,"activity_money");
+        log_message(`等会，有话好好说，先别拔月轮，我不是来找事的！`,"activity_money");
+        log_message(`如此如此，这般这般……总之纳家先祖于我有救命之恩，无以为报。`,"activity_money");
+        log_message(`小友这些日子也闯出了些名气，不如和我切磋一场？`,"activity_money");
+        log_message(`我观小友困在<span class='realm_sky'>天空级破限</span>也有些时日了。`,"activity_money");
+        log_message(`<img src='image/item/evolve_1e16_shard.png'>中等进化结晶碎片本身不足打破境界壁垒，`,"activity_money");
+        log_message(`又不好轻易熔炼成完整的<img src='image/item/evolve_1e17.png'>中等进化结晶，很困扰吧？`,"activity_money");
+        log_message(`我只用六成力量，如果让我满意，就教你一种全新的突破思路~`,"activity_money");
+        unlock_location(locations["古墓战 - I"]);
+    };
+
+
+}
+
+
+const baby_num = document.getElementById("baby_born_num");
+baby_num.addEventListener("change", () => family_data.baby = (Number(baby_num.value)!=Number(baby_num.value))?0:baby_num.value);
+const realm_rate =[
+    [1.0,2e-4,0.01,"微尘级初级","realm_basic"],
+    [0.4,2e-4,0.0215,"微尘级中级","realm_basic"],
+    [0.15,2e-4,0.0465,"微尘级高级","realm_basic"],
+    [0.05,2e-4,0.1,"万物级初等","realm_basic"],
+    [0.02,2e-4,0.215,"万物级高等","realm_basic"],
+    [0.01,2e-4,0.465,"万物级巅峰","realm_basic"],
+    [4e-3,2e-4,1.0,"潮汐级初等","realm_basic"],
+    [1e-3,2e-4,2.15,"潮汐级高等","realm_basic"],
+    [1e-4,2e-4,4.65,"潮汐级巅峰","realm_basic"],
+    [3e-4,2e-5,100,"大地级一阶","realm_terra"],
+    [3e-4,2e-5,215,"大地级二阶","realm_terra"],
+    [3e-4,2e-5,465,"大地级三阶","realm_terra"],
+    [1e-4,2e-5,1e3,"大地级四阶","realm_terra"],
+    [1e-4,2e-5,2.15e3,"大地级五阶","realm_terra"],
+    [1e-4,2e-5,4.65e3,"大地级六阶","realm_terra"],
+    [4e-5,2e-5,10e3,"大地级七阶","realm_terra"],
+    [4e-5,2e-5,21.5e3,"大地级八阶","realm_terra"],
+    [4e-6,2e-5,46.5e3,"大地级巅峰","realm_terra"],
+    [2e-5,2e-6,1e6,"天空级一阶","realm_sky"],
+    [2e-5,2e-6,2.15e6,"天空级二阶","realm_sky"],
+    [2e-5,2e-6,4.65e6,"天空级三阶","realm_sky"],
+    [6e-6,2e-6,10e6,"天空级四阶","realm_sky"],
+    [6e-6,2e-6,21.5e6,"天空级五阶","realm_sky"],
+    [6e-6,2e-6,46.5e6,"天空级六阶","realm_sky"],
+    [2e-6,2e-6,100e6,"天空级七阶","realm_sky"],
+    [2e-6,2e-6,215e6,"天空级八阶","realm_sky"],
+    [1e-7,2e-6,465e6,"天空级巅峰","realm_sky"],
+    [1e-6,2e-7,10e9,"云霄级一阶","realm_cloudy"],
+    [1e-6,2e-7,21.5e9,"云霄级二阶","realm_cloudy"],
+    [1e-6,2e-7,46.5e9,"云霄级三阶","realm_cloudy"],
+    [3.5e-7,2e-7,100e9,"云霄级四阶","realm_cloudy"],
+    [3.5e-7,2e-7,215e9,"云霄级五阶","realm_cloudy"],
+    [3.5e-7,2e-7,465e9,"云霄级六阶","realm_cloudy"],
+    [1.2e-7,2e-7,1e12,"云霄级七阶","realm_cloudy"],
+    [1.2e-7,2e-7,2.15e12,"云霄级八阶","realm_cloudy"],
+    [4e-9,2e-7,4.65e12,"云霄级巅峰","realm_cloudy"],
+    [0,2e-8,100e12,"领域级一阶","realm_domain"],
+
+ 
+
+
+]
+//0位是升级率，1位是暴毙率，2位是赚钱速度
+//3位名称，4位颜色
+//不含破限，不能和角色等级混用
+function binary_distri(num,prob){
+    if(prob >= 1) return num;
+    if(num*prob >= 10){
+        let N_RNG = Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random());
+        let expection = num*prob;
+        let sigma = Math.sqrt(prob*(1-prob)*num);
+        let redirected_RNG = Math.round(expection + sigma * N_RNG);//标准正态分布化
+        if(redirected_RNG>num) redirected_RNG=num;
+        if(redirected_RNG<0) redirected_RNG=0;
+        return redirected_RNG;
+        //正态分布模拟
+    }
+    if(num>=200){
+        let lmd = num * prob;
+        let pb = [],pb_len = 0,pb_pointer = 1;
+        let fr = [];//前缀和
+        while(true){
+            pb[pb_len] = Math.exp(-lmd)*(lmd**pb_len)/pb_pointer;//期望
+            fr[pb_len] = (pb_len==0?0:fr[pb_len - 1]) + pb[pb_len];
+            if(pb_len > 10 && pb[pb_len]<1e-8) break;//舍去尾部
+            pb_len += 1;
+            pb_pointer *= pb_len;//计算阶乘
+        }
+        let pb_RNG = Math.random();
+        for(let q=0;q<=pb_len;q+=1){
+            if(pb_RNG * fr[pb_len] <= fr[q]) return Math.min(q,num);
+        }
+        return Math.min(pb_len,num);
+        //泊松分布模拟
+    }
+    //直接模拟
+    
+    let ans=0;
+    for(let q=1;q<=num;q+=1) ans+=(Math.random()<prob)?1:0;
+    return ans;
+}
+let mem_data = {vis:false,num:0.0,break:0,die:0,ali:2};
+function init_family(){
+    console.log("family inited!");
+    family_data = {
+    unlocked:true,
+    baby:0,
+    mem:[],
+    re_gain:0,
+    re_influ:0,
+    influ:0,
+    }
+    for(let r = 1; r <= 99 ; r += 1){ family_data.mem[r] = {vis:false,num:0.0,break:0,die:0,ali:2};}
+    //console.log(family_data.mem[r])}
+    //console.log(family_data);
+    family_data.mem[0]={vis:true,num:0.0,break:-1,die:-1,ali:2}; 
+    //console.log(family_data);
+}
+function update_family_data_sign(num,realm,op)//num当前【出事】人数，realm境界，op:1突破2暴毙
+{
+    if(!family_data.mem[realm].vis) return;//不显示自然无需统计生死
+    if(op==1){
+        if(num!=0) family_data.mem[realm].break = num;
+        else if(family_data.mem[realm].break>0) family_data.mem[realm].break = -1;
+        else if(family_data.mem[realm].break<0) family_data.mem[realm].break -= 1;
+    }
+    if(op==2){
+        if(num!=0) family_data.mem[realm].die = num;
+        else if(family_data.mem[realm].die>0) family_data.mem[realm].die = -1;
+        else if(family_data.mem[realm].die<0) family_data.mem[realm].die -= 1;
+    }
+}
+function get_baby_cost(num){
+    if(num<=1e4) return 1e5 * num;
+    if(num<=1e8) return 1e3 * num ** 1.5;
+    if(num<=1e12) return 10 * num ** 1.75;
+    return 0.01 * num ** 2;
+}
+let ali_data = [[],
+[0.4,1,1],
+[1,3,5],
+[2,5,15],
+[5,10,60],
+[20,30,300],
+]//5个档次
+function update_family_daily(){
+    //realm_rate;//0突破率 1暴毙率 2赚钱率
+    //每个境界先计算暴毙，再计算突破:
+    family_data.mem[0].break -= 1;
+    for(let r=0;r<=99;r+=1){
+        if(family_data.mem[r].vis){
+            
+            let rel_die = binary_distri(family_data.mem[r].num,realm_rate[r][1] * ali_data[family_data.mem[r].ali][2])
+            if(rel_die > family_data.mem[r].num) rel_die = family_data.mem[r].num;//死掉的人不能比原来活着的人多！\o/
+            family_data.mem[r].num -= rel_die;
+            update_family_data_sign(rel_die,r,2);
+        }
+    }//暴毙计算
+    for(let r=99;r>=1;r-=1){
+        if(family_data.mem[r-1].vis){
+            if(r>27 && character.xp.current_level < r) continue;
+            //本次要突破的境界超过【云霄级一阶】云霄1 r=27 29时最多可以允许r=28
+
+            let rel_break = binary_distri(family_data.mem[r-1].num,realm_rate[r-1][0] * ali_data[family_data.mem[r-1].ali][1])
+            
+            if(rel_break > family_data.mem[r-1].num) rel_break = family_data.mem[r-1].num;
+            family_data.mem[r].num += rel_break;
+            family_data.mem[r-1].num -= rel_break;
+
+            if(rel_break > 0 && (!family_data.mem[r].vis)){
+                family_data.mem[r].vis = true;//解锁新境界
+                console.log("unlocked",r);
+                log_message(`夺位之后${family_data.mem[0].break * -1}天，首位纳家天骄子弟重回<span class='${realm_rate[r][4]}'>${realm_rate[r][3]}！`,"activity_money");
+                if(character.inventory[`{"id":"冰家玉简"}`]?.count == 1){
+                    if(r==25){
+                        log_message(`<span class='realm_sky'>秋兴【天空级八阶】</span>加入了新纳家！`,"activity_money");
+                        family_data.mem[r].num += 1;
+                        rel_break += 1;
+                    }
+                    if(r==26){
+                        log_message(`<span class='realm_sky'>冰蓝【天空级巅峰】</span>加入了新纳家！`,"activity_money");
+                        log_message(`或许你可以考虑把玉简卖了。`,"activity_money");
+                        family_data.mem[r].num += 1;
+                        rel_break += 1;
+                    }
+                }
+                if(r==21){
+                    log_message(`<span class='realm_sky'>纳娜米【天空级四阶】</span>加入了新纳家！`,"activity_money");
+                    family_data.mem[r].num += 1;
+                    rel_break += 1;
+                }
+            }
+
+            update_family_data_sign(rel_break,r,1);
+        }
+    }//突破计算
+    family_data.re_gain = 0;
+    for(let r=1;r<=99;r+=1){
+        if(family_data.mem[r].vis){
+            //console.log(r,realm_rate,realm_rate[r]);
+            family_data.re_gain += family_data.mem[r].num * realm_rate[r][2] * ali_data[family_data.mem[r].ali][0];
+        }
+    }//算钱
+    if(character.money + family_data.re_gain < 0)
+    {
+        log_message(`因开了太多的[1]常规工作，家族净利润仅为 ${format_money(family_data.re_gain)} ，纳可破产了！`,"activity_money");
+        log_message(`所有[1]常规工作 已经改为 [2]秘境试炼！`,"activity_money");
+        
+        for(let r=0;r<=99;r+=1){
+            if(family_data.mem[r].vis){
+                if(family_data.mem[r].alt == 1){
+                    family_data.mem[r].alt = 2;
+
+                }
+            }
+        }
+    }
+    else character.money += family_data.re_gain;
+
+    family_data.re_influ = 0;
+    family_data.influ ||= 0;
+    
+    for(let r=1;r<=99;r+=1){
+        if(family_data.mem[r].vis){
+            family_data.re_influ += (family_data.mem[r].num ** 0.5) * realm_rate[r][2] * (ali_data[family_data.mem[r].ali][0] ** 2)/ 1e8;
+        }
+    }//影响力(被策略影响^2)
+
+    family_data.influ += family_data.re_influ;
+
+    unlock_influ_related(family_data.influ);
+
+
+
+
+    if(!(family_data.baby >= 0)){
+        
+        log_message(`哪个天才想出来的要${family_data.baby}个孩子！`,"message_sayuki");
+        log_message(`计划每日新生儿数目已经自动归零！`,"message_sayuki");
+        document.getElementById("baby_born_num").value = 0;
+        family_data.baby = 0;
+    }
+    if((Math.round(family_data.baby) != family_data.baby) && family_data.baby < 1e9){
+        
+        log_message(`要${family_data.baby}个孩子又是什么个思路啊！`,"message_sayuki");
+        log_message(`多出来的是${((family_data.baby-Math.floor(family_data.baby))*5)}条悟吗！`,"message_sayuki");
+        log_message(`计划每日新生儿数目已经自动取整到${Math.round(family_data.baby)}！`,"message_sayuki");
+        document.getElementById("baby_born_num").value = Math.round(family_data.baby);
+        family_data.baby = Math.round(family_data.baby);
+    }
+    if(character.money < get_baby_cost(family_data.baby))
+    {
+        log_message(`因无力负担 ${format_number(family_data.baby )} 个新生儿产生的 ${format_money(get_baby_cost(family_data.baby))} 费用，纳可破产了！`,"activity_money");
+        log_message(`计划每日新生儿数目已经归零！`,"activity_money");
+        family_data.baby = 0;
+        document.getElementById("baby_born_num").value = 0;
+    }
+
+    family_data.mem[0].num = Number(family_data.mem[0].num) + Number(family_data.baby);//获取新生儿
+    if(family_data.mem[0].num>0 && !family_data.mem[0].vis){
+        family_data.mem[0].vis = true;
+    }
+    
+    character.money -= get_baby_cost(family_data.baby);
+    
+
+
+
+    update_displayed_family_members();
+    update_displayed_money();
+}
+
+
+document.getElementById("family_member_list").addEventListener('change',function(c_ali){
+    const target = c_ali.target.closest('select[id$="_family_ali"]');
+    if(target){
+        //console.log(target.id,target.value);
+        family_data.mem[Number(target.id[0]+target.id[1])].ali = Number(target.value);
+    }
+})
+
+
+function GetSaveRewards() {
+    let time = (new Date()).valueOf();
+    inf_combat.ST = inf_combat.ST || 0;
+    if(time - inf_combat.ST >= 3.6e6)//1h
+    {
+        //获取灵感
+        active_effects["灵感"] = new ActiveEffect({...effect_templates["灵感"], duration:900});
+        character.stats.add_active_effect_bonus();
+        update_character_stats();
+        update_displayed_effect_durations();
+        update_displayed_effects();
+        inf_combat.ST = time;
+    }
+
+
+}
+window.GetSaveRewards = GetSaveRewards;
 
 function update() {
     setTimeout(function()
@@ -4552,7 +6491,8 @@ function update() {
                         const items = [];
                         if(current_activity.activity_name == "fishing")
                         {
-                            start_fishing_minigame();
+                            if(current_activity.skill_xp_per_tick == 1) start_fishing_minigame();
+                            else start_fishing_minigame_changed();
                             //把鱼丢到物品栏里
                             //log_loot
                         }
@@ -4722,7 +6662,7 @@ function update() {
 
         total_playtime += 1/tickrate;
         update();
-    }, 1000/tickrate - time_adjustment);
+    }, 1000/tickrate - time_adjustment);//100更为1000
     //uses time_adjustment based on time_variance_accumulator for more precise overall stabilization
     //(instead of only stabilizing relative to previous tick, it stabilizes relative to sum of deviations)
     //probably completely unnecessary lol, but hey, it sounds cool
@@ -4741,8 +6681,8 @@ function run() {
 
 function update_quests(){
     const quests = document.getElementById("quest_list");
-    if(character.xp.current_level < 9){
-        quests.innerHTML = "<span class='realm_terra'>Earth Rank Stage 1</span> unlocks Mind Realm - 1st Layer!"
+    if(character.xp.current_level <= 8){
+        quests.innerHTML = "<span class='realm_terra'>大地级一阶</span>解锁心之境界 - 一重！"
     }
     else{
         let R=255,G=255,B=255;
@@ -4752,33 +6692,41 @@ function update_quests(){
         //lgVP = 3;
         if(lgVP <= 10){
             R = B = Math.round(255-lgVP*25.5)
-        }
+        }//FFFFFF~00FF00
         else if(lgVP <= 20){
             R = Math.round((lgVP - 10) * 12.75);
             G = Math.round((20 - lgVP ) * 12.75 + 127.5);
             B = Math.round((lgVP - 10) * 25.5);
-        }
+        }//00FF00~8080FF
+        else if(lgVP <= 30){
+            R = Math.round((lgVP - 10) * 12.75);
+            G = 128;
+            B = 255;
+        }//8080FF~FF80FF
         let s_color = `<span style="color:rgb(${R},${G},${B})">`
 
 
         quests.innerHTML = `<b>${s_color}Gem Devourer</span> </b> - Devour gems, grants global skill XP bonus<br>`;
         
-        quests.innerHTML += "<div id = 'gem_consumer' class = 'gem_consume_button' onclick='gem_consume()'>Devour all gems in inventory</div>"
-        quests.innerHTML += `Current devoured value points:${s_color}${format_number(inf_combat.VP.num)}</span> <br>(Bonus:${s_color}${format_number(Math.pow(inf_combat.VP.num+1,0.07)*100-100)}%</span>)<br><br><br><br>`;
-        if(character.xp.current_level < 19){
-            quests.innerHTML += "<span class='realm_sky'>Sky Rank Stage 1</span> unlocks Mind Realm - 2nd Layer!"
+        quests.innerHTML += "<div id = 'gem_consumer' class = 'gem_consume_button' onclick='gem_consume()'>吞噬物品栏中全部宝石</div>"
+        quests.innerHTML += `当前吞噬价值点:${s_color}${format_number(inf_combat.VP.num)}</span> <br>(加成:${s_color}${format_number(Math.pow(inf_combat.VP.num+1,0.07)*100-100)}%</span>)<br><br><br><br>`;
+        if(character.xp.current_level <= 18){
+            quests.innerHTML += "<span class='realm_sky'>天空级一阶</span>解锁心之境界 - 二重！"
         }
         else{
-            quests.innerHTML += `<b><span style="color:cyan">God of Greed</span> </b> - Sacrifice money, grants global luck bonus<br>`;
-            quests.innerHTML += "<div id = 'coin_consumer' class = 'coin_consume_button' onclick='coin_consume()'>Sacrifice all Treasure Coins and above from inventory</div>"
-            quests.innerHTML += `Current sacrificed amount:<span style="color:cyan">${format_money(inf_combat.MP*1e12)}</span> <br>(Bonus:<span style="color:cyan">${(format_number((Math.pow(inf_combat.MP+1,0.10)-1)*100))}%</span>)<br><br><br><br>`;
-            //WIP:需要可以吞噬宇宙币
+            quests.innerHTML += `<b><span style="color:cyan">贪婪之神</span> </b> - 献祭金钱，提供全局运气加成<br>`;
+            quests.innerHTML += "<div id = 'coin_consumer' class = 'coin_consume_button' onclick='coin_consume()'>献祭物品栏中宝钱以上货币</div>"
+            quests.innerHTML += `当前献祭金额:<span style="color:cyan">${format_money(inf_combat.MP*1e12)}</span> <br>(加成:<span style="color:cyan">${(format_number((Math.pow(inf_combat.MP+1,0.10)-1)*100))}%</span>)<br><br><br><br>`;
             //心境二重
-            if(character.xp.current_level < 28){
-                quests.innerHTML += "<span class='realm_cloudy'>Cloud Sky Rank Stage 1</span> unlocks Mind Realm - 3rd Layer!"
+            if(character.xp.current_level <= 28){
+                quests.innerHTML += "<span class='realm_cloudy'>云霄级一阶</span>解锁心之境界 - 三重！"
             }
             else{
-
+                inf_combat.InP = inf_combat.InP || 0;
+                quests.innerHTML += `<b><span style="color:#ff11dd">信仰祭坛</span> </b> - 炼化影响力<img src='image/item/B9_soul.png'>，延后宝石软上限<br>`;
+                quests.innerHTML += "<div id = 'influ_consumer' class = 'influ_consume_button' onclick='influ_consume()'>炼化1%的纳家影响力</div>"
+                quests.innerHTML += `<span style="color:lightskyblue">已炼化的影响力:${format_number(inf_combat.InP)}<img src='image/item/B9_soul.png'></span> <br>(加成 : <span style="color:#ff11dd">+${(format_number(0.5*(Math.log10(inf_combat.InP+1) ** 1.5)))}</span>)<br><br><br><br>`;
+                //心境三重
             }
         }
     }
@@ -4806,18 +6754,32 @@ function gem_consume(){
 function coin_consume(){
     inf_combat.MP = inf_combat.MP || 0;
     Object.keys(character.inventory).forEach(key =>{
-        if(character.inventory[key].item.value == 1e12)
+        if(character.inventory[key].item.name == "紫色刀币" || character.inventory[key].item.name?.includes("宇宙币"))
         {
-            inf_combat.MP += character.inventory[key].count;
+            inf_combat.MP += character.inventory[key].count * character.inventory[key].item.value / 1e12;
             remove_from_character_inventory([{ 
                 item_key: key,           
                 item_count: character.inventory[key].count,
             }
         ]);
         }
-    });//暂时只吃宝钱，以后可能吃宇宙币
+    });//吃宇宙币，宝钱
     update_quests();
     update_displayed_character_inventory();
+    character.stats.add_gem_bonus();
+    update_character_stats();
+}
+
+
+function influ_consume(){
+    inf_combat.InP = inf_combat.InP || 0;
+    
+    inf_combat.InP += family_data.influ * 0.01;
+    family_data.influ *= 0.99;
+
+
+    document.getElementById("family_influ").innerHTML = format_number(family_data.influ);
+    update_quests();
     character.stats.add_gem_bonus();
     update_character_stats();
 }
@@ -4833,7 +6795,7 @@ function get_money(coin_type,coin_num)
     {
         log_message(`Wallet: ${format_money(character.money)} -> ${format_money(character.money - value)} `,"activity_money");
         character.money -= value;
-        let coin_map = {1:"红色刀币",2:"黑色刀币",3:"绿色刀币",4:"紫色刀币"}
+        let coin_map = {1:"红色刀币",2:"黑色刀币",3:"绿色刀币",4:"紫色刀币",5:"宇宙币",6:"宇宙币堆",7:"宇宙币山"}
         let coin = coin_map[coin_type];
         log_message(`Obtained ${item_templates[coin].getName()} x ${coin_num}!`,"combat_loot");
         add_to_character_inventory([{ "item": getItem(item_templates[coin]), "count": coin_num }]);
@@ -4845,6 +6807,7 @@ function get_money(coin_type,coin_num)
 
 window.gem_consume = gem_consume;
 window.coin_consume = coin_consume;
+window.influ_consume = influ_consume;
 window.get_money = get_money;
 
 window.equip_item = character_equip_item;
@@ -4908,6 +6871,8 @@ window.updateRecipeTooltip = update_recipe_tooltip;
 window.option_uniform_textsize = option_uniform_textsize;
 window.option_bed_return = option_bed_return;
 window.option_combat_autoswitch = option_combat_autoswitch;
+window.option_combat_filter = option_combat_filter;
+window.option_format_change = option_format_change;
 window.option_remember_filters = option_remember_filters;
 
 window.getDate = get_date;
@@ -5008,7 +6973,7 @@ if(is_on_dev()) {
 export { current_enemies, can_work, 
         current_location, active_effects, 
         enough_time_for_earnings, add_xp_to_skill, 
-        get_current_book, unlock_location,
+        get_current_book, unlock_location,get_enemy_killcount,
         last_location_with_bed, 
         last_combat_location, 
         inf_combat,
@@ -5016,4 +6981,7 @@ export { current_enemies, can_work,
         faved_stances, options,
         update_quests,
         global_flags,
-        character_equip_item };
+        total_crafting_successes,total_crafting_attempts,
+        get_time_passed,family_data,init_family,
+        realm_rate,
+        character_equip_item, get_baby_cost };

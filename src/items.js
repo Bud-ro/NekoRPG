@@ -141,12 +141,17 @@ function getItemRarity(quality) {
     return rarity;
 }
 
+function ScaledQualityMultiplier(quality){
+    if(quality <= 200) return quality / 100 * rarity_multipliers[getItemRarity(quality)];
+    else return 2 * Math.exp(quality / 200 - 1) * rarity_multipliers[getItemRarity(quality)];
+}
+
 function getEquipmentValue(components, quality) {
     let value = 0;
     Object.values(components).forEach(component => {
         value += item_templates[component].value;
     });
-    return round_item_price(value * (quality/100 ) * rarity_multipliers[getItemRarity(quality)]);
+    return round_item_price(value * ScaledQualityMultiplier(quality));
 }
 
 class Item {
@@ -417,10 +422,11 @@ class Equippable extends Item {
     }
 
     getValue(quality) {
-        return round_item_price(this.value * (quality/100 || this.quality/100) * rarity_multipliers[this.getRarity(quality)]);
+        let cal_quality = quality || this.quality;
+        return round_item_price(this.value * ScaledQualityMultiplier(cal_quality));
     } 
 
-    getRarity(quality){
+    getRarity(quality){                                         
         if(!quality) {
             if(!this.rarity) {
                 this.rarity = getItemRarity(this.quality);
@@ -759,25 +765,27 @@ class Armor extends Equippable {
             return this.calculateDefense(quality);
         }
     }
+    
     calculateDefense(quality) {
+        let cal_quality = this.quality || quality;
         if(this.components) {
             return Math.ceil(((item_templates[this.components.internal].defense_value || item_templates[this.components.internal].base_defense ||0) + 
                                         (item_templates[this.components.external]?.defense_value || 0 )) 
-                                        * (quality/100 || this.quality/100) * rarity_multipliers[this.getRarity(quality || this.quality)]
+                                        * ScaledQualityMultiplier(cal_quality)
             )
         } else {
-            return Math.ceil((this.base_defense || 0)  * (quality/100 || this.quality/100) * rarity_multipliers[this.getRarity(quality || this.quality)]);
+            return Math.ceil((this.base_defense || 0)  * ScaledQualityMultiplier(cal_quality));
         }
     }
 
     getValue(quality) {
-        
+        let cal_quality = quality || this.quality;
         if(this.components) {
             //value of internal + value of external (if present), both multiplied by quality and rarity
             return round_item_price((item_templates[this.components.internal].value + (item_templates[this.components.external]?.value || 0))
-                            * (quality/100 || this.quality/100) * rarity_multipliers[this.getRarity(quality)]);
+                            * ScaledQualityMultiplier(cal_quality));
         } else {
-            return round_item_price(item_templates[this.id].value * (quality/100 || this.quality/100) * rarity_multipliers[this.getRarity(quality)]);
+            return round_item_price(item_templates[this.id].value * ScaledQualityMultiplier(cal_quality));
         }
     } 
 
@@ -875,14 +883,14 @@ class Weapon extends Equippable {
             (item_templates[this.components.head].attack_value + item_templates[this.components.handle].attack_value)
             * item_templates[this.components.head].attack_multiplier * item_templates[this.components.handle].attack_multiplier
             * (item_templates[this.components.head].stats?.attack_power?.multiplier || 1) * (item_templates[this.components.handle].stats?.attack_power?.multiplier || 1)
-            * (quality/100) * rarity_multipliers[this.getRarity(quality)]
+            * ScaledQualityMultiplier(quality)
         );
     }
 
     getValue(quality) {
         if(!this.value) {
             //value of handle + value of head, both multiplied by quality and rarity
-            this.value = (item_templates[this.components.handle].value + item_templates[this.components.head].value) * (quality/100 || this.quality/100) * rarity_multipliers[this.getRarity(quality)]
+            this.value = (item_templates[this.components.handle].value + item_templates[this.components.head].value) * ScaledQualityMultiplier(quality)
         }
         return round_item_price(this.value);
     } 
@@ -2297,6 +2305,21 @@ item_templates["Twist liek a snek"] = new Book({
             "Mining": 4,
         }
     });
+    item_templates["晶化钻头"] = new Tool({
+        name: "晶化钻头",
+        description: "一把晶化合金钻头，即使是坚硬的冰块也可以迅速被刨开！",
+        value: 36e12,
+        equip_slot: "pickaxe",
+        bonus_skill_levels: {
+            "Mining": 15,
+        }
+    });
+    item_templates["死神之镰"] = new Tool({
+        name: "死神之镰",
+        description: "虽然名字很唬人，但这些附着的灵魂唯一作用就是更快的收割绝音蕨。<br>[收割]技能视为高4级！",
+        value: 12e15,
+        equip_slot: "sickle",
+    });
     item_templates["暗影斧"] = new Tool({
         name: "Shadow Axe",
         description: "A remarkably sharp axe. Even so, felling century-old willow trees still takes considerable time.",
@@ -2463,7 +2486,7 @@ item_templates["Twist liek a snek"] = new Book({
     item_templates["荒兽傀儡"] = new Props({
         name: "Wild Beast Puppet",
         id: "荒兽傀儡",
-        description: "A forbidden creation recorded in the spaceship's core. However, its actual use is only to run ahead and generate aggro... drawing more enemies.",
+        description: "飞船核心中记载的禁忌产物。然而，实际用途只是跑去拉仇恨...引来更多的敌人。<br><span class='realm_cloudy'><b>云霄级一阶</b></span>失效!", 
         value: 29.9e12,
         stats: {
             agility: {
@@ -2472,6 +2495,14 @@ item_templates["Twist liek a snek"] = new Book({
             luck: {
                 multiplier: 1.2,
             }
+        }
+    });
+    item_templates["光环法杖"] = new Props({
+        name: "光环法杖",
+        id: "光环法杖",
+        description: "对敌人释放额外的25%光环！<br>(掉落+25%,经验+39.7%) <br>PS:对<span class='realm_cloudy'>云霄级</span>以上目标或<b>[BOSS]</b>目标无效。", 
+        value: 864e12,
+        stats: {
         }
     });
     item_templates["冰刺装甲"] = new Props({
@@ -2488,6 +2519,128 @@ item_templates["Twist liek a snek"] = new Book({
             },
             agility: {
                 flat: -2400e4,
+            }
+        }
+    });
+    item_templates["虹彩灯球"] = new Props({
+        name: "虹彩灯球",
+        id: "虹彩灯球",
+        description: "大量虹彩杖芯拼合而成的迪斯科灯球，因为水素合金的硬度而难以击碎。可以让敌人愣神，无法组织防御！", 
+        value: 2880e12,
+        stats: {
+            attack_power: {
+                flat: +7500e4,
+            },
+            agility: {
+                flat: +4500e4,
+            },
+        }
+    });
+    item_templates["传承水晶·彩"] = new Props({
+        name: "传承水晶·彩",
+        id: "传承水晶·彩",
+        description: "幻境中的敌人都源自这些水晶，在它们附近时敌人精神最为松懈，等效于提供属性！", 
+        value: 24.16e15,
+        stats: {
+            attack_power: {
+                flat: +3e8,
+            },
+            defense: {
+                flat: +3e8,
+            },
+            agility: {
+                flat: +5e8,
+            },
+        }
+    });
+    item_templates["幻符灵阵"] = new Props({
+        name: "幻符灵阵",
+        id: "幻符灵阵",
+        description: "收拢月轮水晶，凝聚力量，蓄力一击。攻击的广度收窄许多，但深度却足以穿透最坚硬的天空级金属。<br><span class='realm_cloudy'><b>云霄级四阶</b></span>失效!", 
+        value: 24.16e15,
+        stats: {
+            attack_power: {
+                multiplier: 1.25,
+            },
+            attack_mul: {
+                multiplier: 0.4,
+            },
+        }
+    });
+
+    item_templates["伊芙"] = new Props({
+        name: "伊芙",
+        id: "伊芙",
+        description: "你猜为什么纳家没有云霄级，却可以在燕岗城经商？这面自适应盾牌连云霄级一阶的攻击都能进行层层削弱！", 
+        value: 1888e15,
+        stats: {
+            defense: {
+                flat: 30e8,
+            }
+        }
+    });
+    item_templates["凝滞力场"] = new Props({
+        name: "凝滞力场",
+        id: "凝滞力场",
+        description: "可以大幅度削弱【死线】带来的易伤效果(5x->2x)，以及持续时间(60s->20s)。", 
+        value: 516e15,
+        stats: {
+            defense: {
+                flat: 18e8,
+            }
+        }
+    });
+    item_templates["C1镭射枪·残"] = new Props({
+        name: "C1镭射枪·残",
+        id: "C1镭射枪·残",
+        description: "因为出现破损，无法进行超过10%的蓄力，必杀云霄级一阶的超级攻击也无从谈起。<br>但这也使得它的射速相当快，可以作为常规武器使用。<br>当然，还是有点容易被突然袭击的……", 
+        value: 1250e15,
+        stats: {
+            attack_power: {
+                flat: 60e8,
+            },
+            defense: {
+                flat: -20e8,
+            }
+        }
+    });
+    item_templates["血灵骨网"] = new Props({
+        name: "血灵骨网",
+        id: "血灵骨网",
+        description: "海量【血灵骨棉】制成的道具。释放后澎湃的血气能使敌人迅速迷失方向……就是对自己有点影响。", 
+        value: 2360e15,
+        stats: {
+            agility: {
+                flat: 800e8,
+            },
+            defense: {
+                flat: 800e8,
+            },
+            attack_speed: {
+                multiplier:0.85,
+            }
+        }
+    });
+    item_templates["伪·焚血花王"] = new Props({
+        name: "伪·焚血花王",
+        id: "伪·焚血花王",
+        description: "「この世で造花より綺麗な花は無いわ」", 
+        value: 6000e15,
+        stats: {
+            attack_power: {
+                flat: 486e8,
+            },
+            defense: {
+                flat: 486e8,
+            },
+            agility: {
+                flat: 486e8,
+            },
+            health_regeneration_flat: {
+                multiplier:0.5,
+            },
+            health_regeneration_percent: {
+                multiplier:0.5,
             }
         }
     });
@@ -2519,6 +2672,20 @@ item_templates["Twist liek a snek"] = new Book({
             },
         }
     });
+    item_templates["映星紫华"] = new Method({
+        name: "映星紫华",
+        id: "映星紫华",
+        description: "神秘令人难以捉摸的进阶术式，于内敛的紫色光华之中，蕴含着令人心惊胆颤的力量。", 
+        value: 909090909090909090,//16位数(90.91U)
+        stats: {
+            health_regeneration_flat: {
+                flat: 5e8,
+            },
+            crit_multiplier: {
+                flat: 0.12,
+            },
+        }
+    });
 })();
 
 
@@ -2536,7 +2703,7 @@ item_templates["Twist liek a snek"] = new Book({
                 flat: 1000,
             },
             attack_mul: {
-                multiplier: 1.5,
+                multiplier: 1.2,
             },
         }
     });
@@ -2556,7 +2723,7 @@ item_templates["Twist liek a snek"] = new Book({
                 multiplier: 1.2,
             },
             attack_mul: {
-                multiplier: 1.5,
+                multiplier: 1.3,
             },
         }
     });
@@ -2574,10 +2741,10 @@ item_templates["Twist liek a snek"] = new Book({
                 multiplier: 1.08,
             },
             max_health: {
-                multiplier: 1.3,
+                multiplier: 1.45,
             },
             attack_mul: {
-                multiplier: 2.0,
+                multiplier: 1.5,
             },
         }
     });
@@ -2595,10 +2762,10 @@ item_templates["Twist liek a snek"] = new Book({
                 multiplier: 1.12,
             },
             max_health: {
-                multiplier: 1.3,
+                multiplier: 1.75,
             },
             attack_mul: {
-                multiplier: 2.25,
+                multiplier: 2.0,
             },
         }
     });
@@ -2615,10 +2782,70 @@ item_templates["Twist liek a snek"] = new Book({
                 multiplier: 1.20,
             },
             max_health: {
-                multiplier: 1.35,
+                multiplier: 2.0,
             },
             attack_mul: {
-                multiplier: 2.50,
+                multiplier: 2.2,
+            },
+        }
+    });
+    item_templates["出云落月[领域四重]"] = new Realm({
+        name: "出云落月[领域四重]",
+        id: "出云落月[领域四重]",
+        description: "水火元素纵横交错而成的领域。水帘之间，一袭布裙如同仙子临凡，出云之姿风华绝代；火焰灼烧，暗藏杀机凌厉，剑锋所向，斩断天际，月落星沉！。", 
+        value: 28571427e9,//100U
+        stats: {
+            attack_power: {
+                multiplier: 1.30,
+            },
+            defense: {
+                multiplier: 1.30,
+            },
+            max_health: {
+                multiplier: 3.00,
+            },
+            attack_mul: {
+                multiplier: 2.5,
+            },
+        }
+    });
+    item_templates["出云落月[领域五重]"] = new Realm({
+        name: "出云落月[领域五重]",
+        id: "出云落月[领域五重]",
+        description: "水火元素纵横交错而成的领域。水帘之间，一袭布裙如同仙子临凡，出云之姿风华绝代；火焰灼烧，暗藏杀机凌厉，剑锋所向，斩断天际，月落星沉！。", 
+        value: 2857142e12,//10kU
+        stats: {
+            attack_power: {
+                multiplier: 1.35,
+            },
+            defense: {
+                multiplier: 1.35,
+            },
+            max_health: {
+                multiplier: 3.60,
+            },
+            attack_mul: {
+                multiplier: 2.75,
+            },
+        }
+    });
+    item_templates["出云落月[领域六重]"] = new Realm({
+        name: "出云落月[领域六重]",
+        id: "出云落月[领域六重]",
+        description: "水火元素纵横交错而成的领域。水帘之间，一袭布裙如同仙子临凡，出云之姿风华绝代；火焰灼烧，暗藏杀机凌厉，剑锋所向，斩断天际，月落星沉！。", 
+        value: 285714e15,//1MU
+        stats: {
+            attack_power: {
+                multiplier: 1.40,
+            },
+            defense: {
+                multiplier: 1.40,
+            },
+            max_health: {
+                multiplier: 4.50,
+            },
+            attack_mul: {
+                multiplier: 3.00,
             },
         }
     });
@@ -2732,6 +2959,46 @@ item_templates["Twist liek a snek"] = new Book({
             },
             max_health: {
                 multiplier: 1.03,
+            }
+        }
+    });
+    item_templates["冰原之心"] = new Special({
+        name: "冰原之心",
+        id: "冰原之心",
+        description: "结界湖之心的又一次升级。极寒相变引擎玩的开心吗~", 
+        value: 160e12,
+        stats: {
+            attack_power: {
+                multiplier: 1.06,
+            },
+            defense: {
+                multiplier: 1.06,
+            },
+            agility: {
+                multiplier: 1.06,
+            },
+            max_health: {
+                multiplier: 1.06,
+            }
+        }
+    });
+    item_templates["幻境之心"] = new Special({
+        name: "幻境之心",
+        id: "幻境之心",
+        description: "这甚至还不是最终形态。对了，这个超长的材料清单有没有出bug啊？", 
+        value: 218.7e15,
+        stats: {
+            attack_power: {
+                multiplier: 1.10,
+            },
+            defense: {
+                multiplier: 1.10,
+            },
+            agility: {
+                multiplier: 1.10,
+            },
+            max_health: {
+                multiplier: 1.10,
             }
         }
     });
@@ -3117,12 +3384,37 @@ item_templates["Twist liek a snek"] = new Book({
         }
     });
     item_templates["冰髓戟头"] = new WeaponComponent({
-        name: "Ice Marrow trident head", description: "A trident head made of ten-thousand-year ice marrow. This is a genuinely 【cold】 weapon.",
+        name: "冰髓戟头", description: "万载冰髓制造的戟头。这可是货真价实的【冷】兵器。",
         component_type: "triple blade",
         value: 5400e9,
         component_tier: 12,
         name_prefix: "Ice Marrow",
         attack_value: 8100000,
+        stats: {
+            crit_rate: {flat: 0.10,},
+            attack_mul: {multiplier: 3.60,},
+            attack_speed: {multiplier: 0.50,},
+        }
+    });
+    item_templates["晶化剑刃"] = new WeaponComponent({
+        name: "晶化剑刃", description: "晶化合金制造的剑刃。是时候该去做月轮了不是吗？",
+        component_type: "long blade",
+        value: 6e12,
+        component_tier: 13,
+        name_prefix: "晶化",
+        attack_value: 12960000,
+        stats: {
+            crit_rate: {flat: 0.15,},
+            attack_speed: {multiplier: 1.16,},
+        }
+    });
+    item_templates["晶化戟头"] = new WeaponComponent({
+        name: "晶化戟头", description: "晶化合金制造的戟头。部件经验和使用的材料量挂钩，我是说，做月轮不亏……",
+        component_type: "triple blade",
+        value: 18e12,
+        component_tier: 13,
+        name_prefix: "晶化",
+        attack_value: 16200000,
         stats: {
             crit_rate: {flat: 0.10,},
             attack_mul: {multiplier: 3.60,},
@@ -3273,7 +3565,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_tier: 11,
         stats: {
             crit_multiplier: {
-                flat: 0.5,
+                flat: 0.4,
             },
             attack_power: {
                 multiplier: 1.02,
@@ -3305,13 +3597,201 @@ item_templates["Twist liek a snek"] = new Book({
         attack_value: 9000000,
         stats: {
             crit_rate: {
-                flat: 0.21,
+                flat: 0.20,
             },
             attack_speed: {
                 multiplier: 1.16,
             },
         }
     });
+    item_templates["晶化轮锋"] = new WeaponComponent({
+        name: "晶化轮锋", description: "晶化合金制造的【月轮】镀层。融合之后冰元素可以更好地散发出来，增强威力。",
+        component_type: "wheel head",
+        value: 36e12,
+        component_tier: 13,
+        name_prefix: "晶化",
+        attack_value: 2400e4,
+        stats: {
+            crit_rate: {
+                flat: 0.22,
+            },
+            attack_speed: {
+                multiplier: 1.17,
+            },
+        }
+    });
+    item_templates["水素轮锋"] = new WeaponComponent({
+        name: "水素轮锋", description: "水素合金制造的【月轮】镀层。虽然水素合金几近透明，但越是如此越能让轮芯显得光彩夺目。",
+        component_type: "wheel head",
+        value: 248.4e12,
+        component_tier: 14,
+        name_prefix: "水素",
+        attack_value: 7200e4,
+        stats: {
+            crit_rate: {
+                flat: 0.24,
+            },
+            attack_speed: {
+                multiplier: 1.18,
+            },
+        }
+    });
+    
+    item_templates["虹彩轮芯"] = new WeaponComponent({
+        name: "虹彩轮芯", description: "初阶的【月轮】核心部件。借助它，月轮终于开始向流光溢彩的方向靠拢。",
+        component_type: "wheel core",
+        value: 100.8e12,
+        component_tier: 14,
+        stats: {
+            crit_multiplier: {
+                flat: 0.6,
+            },
+            attack_power: {
+                multiplier: 1.03,
+            },
+        }
+    });
+    item_templates["破空轮芯"] = new WeaponComponent({
+        name: "破空轮芯", description: "中阶的【月轮】核心部件。反重力场可以迷惑视线——也就是敌人甚至看不见它就被攻击了。",
+        component_type: "wheel core",
+        value: 4608e12,
+        component_tier: 16,
+        stats: {
+            crit_multiplier: {
+                flat: 0.8,
+            },
+            attack_power: {
+                multiplier: 1.04,
+            },
+        }
+    });
+    item_templates["血灵轮芯"] = new WeaponComponent({
+        name: "血灵轮芯", description: "中阶的【月轮】核心部件。暴击倍率的增幅已经抵达极限……接下来会有更好的！",//注释：crit_mul +0.2改为luck:+0.01
+        component_type: "wheel core",
+        value: 531.5e15,
+        component_tier: 19,
+        stats: {
+            crit_multiplier: {
+                flat: 1.0,
+            },
+            attack_power: {
+                multiplier: 1.05,
+            },
+        }
+    });
+    item_templates["宝石轮锋"] = new WeaponComponent({
+        name: "宝石轮锋", description: "宝石母制造的【月轮】镀层。嗯……A1的宝石锭造不了轮锋。没有歧义！",
+        component_type: "wheel head",
+        value: 1436.4e12,
+        component_tier: 15,
+        name_prefix: "宝石",
+        attack_value: 16800e4,
+        stats: {
+            crit_rate: {
+                flat: 0.26,
+            },
+            attack_speed: {
+                multiplier: 1.19,
+            },
+        }
+    });
+    item_templates["魂晶轮锋"] = new WeaponComponent({
+        name: "魂晶轮锋", description: "魂晶制造的【月轮】镀层。这是最后一处18个锭的消耗了……再往后会是完整版36锭的月轮！",
+        component_type: "wheel head",
+        value: 7290e12,
+        component_tier: 16,
+        name_prefix: "魂晶",
+        attack_value: 47040e4,
+        stats: {
+            crit_rate: {
+                flat: 0.28,
+            },
+            attack_speed: {
+                multiplier: 1.20,
+            },
+        }
+    });
+    item_templates["盖亚轮锋"] = new WeaponComponent({
+        name: "盖亚轮锋", description: "盖亚合金制造的【月轮】镀层。现在它已经变成完整版了！",
+        component_type: "wheel head",
+        value: 48210e12,
+        component_tier: 17,
+        name_prefix: "盖亚",
+        attack_value: 141120e4,
+        stats: {
+            crit_rate: {
+                flat: 0.30,
+            },
+            attack_speed: {
+                multiplier: 1.21,
+            },
+        }
+    });
+    item_templates["远古轮锋"] = new WeaponComponent({
+        name: "远古轮锋", description: "远古合金制造的【月轮】镀层。设定上应该可以缓慢成长，但是摸了。",
+        component_type: "wheel head",
+        value: 388.8e15,
+        component_tier: 18,
+        name_prefix: "远古",
+        attack_value: 38.88e8,
+        stats: {
+            crit_rate: {
+                flat: 0.32,
+            },
+            attack_speed: {
+                multiplier: 1.22,
+            },
+        }
+    });
+    item_templates["源金轮锋"] = new WeaponComponent({
+        name: "源金轮锋", description: "古源金制造的【月轮】镀层。话说没人想过吗？为什么魂魄永远是高级材料？",
+        component_type: "wheel head",
+        value: 1380e15,
+        component_tier: 19,
+        name_prefix: "源金",
+        attack_value: 77.76e8,
+        stats: {
+            crit_rate: {
+                flat: 0.34,
+            },
+            attack_speed: {
+                multiplier: 1.23,
+            },
+        }
+    });
+    item_templates["红钨轮锋"] = new WeaponComponent({
+        name: "红钨轮锋", description: "红钨制造的【月轮】镀层。月轮附加属性将会和274级以后的腐化一样，永远平衡的进行下去……",
+        component_type: "wheel head",
+        value: 2430e15,
+        component_tier: 20,
+        name_prefix: "红钨",
+        attack_value: 155.52e8,
+        stats: {
+            crit_rate: {
+                flat: 0.36,
+            },
+            attack_speed: {
+                multiplier: 1.24,
+            },
+        }
+    });
+    item_templates["血钻轮锋"] = new WeaponComponent({
+        name: "血钻轮锋", description: "血钻制造的【月轮】镀层。对于这样性质的材料来说，镀层和镶嵌的定义或许有些模糊？",
+        component_type: "wheel head",
+        value: 3999e15,
+        component_tier: 21,
+        name_prefix: "血钻",
+        attack_value: 311.04e8,
+        stats: {
+            crit_rate: {
+                flat: 0.38,
+            },
+            attack_speed: {
+                multiplier: 1.25,
+            },
+        }
+    });
+
 
 })();
 //武器
@@ -3391,6 +3871,60 @@ item_templates["Twist liek a snek"] = new Book({
         components: {
             head: "旋律戟头",
             handle: "光暗剑柄",
+        }
+    });
+    item_templates["晶化剑"] = new Weapon({
+        components: {
+            head: "晶化剑刃",
+            handle: "光暗剑柄",
+        }
+    });
+    item_templates["晶化戟"] = new Weapon({
+        components: {
+            head: "晶化戟头",
+            handle: "光暗剑柄",
+        }
+    });
+    item_templates["晶化月轮"] = new Weapon({
+        components: {
+            head: "晶化轮锋",
+            handle: "光暗轮芯",
+        }
+    });
+    item_templates["水素月轮"] = new Weapon({
+        components: {
+            head: "水素轮锋",
+            handle: "虹彩轮芯",
+        }
+    });
+    item_templates["宝石月轮"] = new Weapon({
+        components: {
+            head: "宝石轮锋",
+            handle: "虹彩轮芯",
+        }
+    });
+    item_templates["魂晶月轮"] = new Weapon({
+        components: {
+            head: "魂晶轮锋",
+            handle: "破空轮芯",
+        }
+    });
+    item_templates["盖亚月轮"] = new Weapon({
+        components: {
+            head: "盖亚轮锋",
+            handle: "破空轮芯",
+        }
+    });
+    item_templates["远古月轮"] = new Weapon({
+        components: {
+            head: "远古轮锋",
+            handle: "破空轮芯",
+        }
+    });
+    item_templates["源金月轮"] = new Weapon({
+        components: {
+            head: "源金轮锋",
+            handle: "血灵轮芯",
         }
     });
 })();
@@ -3623,12 +4157,9 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "helmet interior",
         base_defense: 810000,
         component_tier: 11,
-        stats: {
-            attack_power: {
+        stats: {attack_power: {
                 flat: 240000,
-            },
-        },
-    });
+            },},});
     item_templates["黑森背心"] = new Armor({
         name: "Black Forest Vest",
         description: "Inner armor made from black forest fabric. Body armor won't become obsolete as quickly as weapons for now.",
@@ -3636,12 +4167,9 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "chestplate interior",
         base_defense: 1080000,
         component_tier: 11,
-        stats: {
-            attack_power: {
+        stats: { attack_power: {
                 flat: 320000,
-            },
-        },
-    });
+            },},});
     item_templates["黑森裤子"] = new Armor({
         name: "Black Forest Pants",
         description: "Inner armor made from black forest fabric. Body armor won't become obsolete as quickly as weapons for now.",
@@ -3652,9 +4180,7 @@ item_templates["Twist liek a snek"] = new Book({
         stats: {
             attack_power: {
                 flat: 320000,
-            },
-        },
-    });
+            },},});
     item_templates["黑森袜子"] = new Armor({
         name: "Black Forest Socks",
         description: "Inner armor made from black forest fabric. Body armor won't become obsolete as quickly as weapons for now.",
@@ -3665,9 +4191,205 @@ item_templates["Twist liek a snek"] = new Book({
         stats: {
             attack_power: {
                 flat: 160000,
+            },},});
+    item_templates["极寒帽子"] = new Armor({
+        name: "极寒帽子", 
+        description: "极寒织料制成的内甲。附加词条也是防御：极寒织料的特性即是如此。", 
+        value: 10800e9,
+        component_type: "helmet interior",
+        base_defense: 216e4,
+        component_tier: 13,
+        stats: {defense: {
+                flat: 108e4,
+            },},});
+    item_templates["极寒背心"] = new Armor({
+        name: "极寒背心", 
+        description: "极寒织料制成的内甲，附加词条也是防御：极寒织料的特性即是如此。", 
+        value: 14400e9,
+        component_type: "chestplate interior",
+        base_defense: 288e4,
+        component_tier: 13,
+        stats: { 
+            defense: {
+                flat: 144e4,
+            },},});
+    item_templates["极寒裤子"] = new Armor({
+        name: "极寒裤子", 
+        description: "极寒织料制成的内甲，附加词条也是防御：极寒织料的特性即是如此。", 
+        value: 14400e9,
+        component_type: "leg armor interior",
+        base_defense: 288e4,
+        component_tier: 13,
+        stats: {
+            defense: {
+                flat: 144e4,
+            },},});
+    item_templates["极寒袜子"] = new Armor({
+        name: "极寒袜子", 
+        description: "极寒织料制成的内甲，附加词条也是防御：极寒织料的特性即是如此。", 
+        value: 7200e9,
+        component_type: "shoes interior",
+        base_defense: 144e4,
+        component_tier: 13,
+        stats: {
+            defense: {
+                flat: 72e4,
+            },},});
+    
+    item_templates["幻符帽子"] = new Armor({
+        name: "幻符帽子", 
+        description: "幻符织料制成的内甲。本来应该是隐身的，可惜外甲还是可以被看见……", 
+        value: 1920e12,
+        component_type: "helmet interior",
+        base_defense: 0.96e8,
+        component_tier: 16,
+        stats: {agility:{
+                flat: 0.36e8,
+            },},});
+    item_templates["幻符背心"] = new Armor({
+        name: "幻符背心", 
+        description: "幻符织料制成的内甲。本来应该是隐身的，可惜外甲还是可以被看见……", 
+        value: 3072e12,
+        component_type: "chestplate interior",
+        base_defense: 1.536e8,
+        component_tier: 16,
+        stats: { 
+            agility: {
+                flat: 0.576e8,
+            },},});
+    item_templates["幻符裤子"] = new Armor({
+        name: "幻符裤子", 
+        description: "幻符织料制成的内甲。本来应该是隐身的，可惜外甲还是可以被看见……", 
+        value: 2784e12,
+        component_type: "leg armor interior",
+        base_defense: 1.344e8,
+        component_tier: 16,
+        stats: {
+            agility: {
+                flat: 0.504e8,
+            },},});
+    item_templates["幻符袜子"] = new Armor({
+        name: "幻符袜子", 
+        description: "幻符织料制成的内甲。本来应该是隐身的，可惜外甲还是可以被看见……",  
+        value: 1536e12,
+        component_type: "shoes interior",
+        base_defense: 0.768e8,
+        component_tier: 16,
+        stats: {
+            agility: {
+                flat: 0.288e8,
+            },},});
+
+    //4.32e8
+
+    item_templates["密林帽子"] = new Armor({
+        name: "密林帽子", 
+        description: "密林织料制成的内甲。鲜红如血，在必要时候也能转化出血液用于恢复！", 
+        value: 50.5e15,
+        component_type: "helmet interior",
+        base_defense: 1.80e8,
+        component_tier: 18,
+        stats: {health_regeneration_flat:{
+                flat: 21.60e8,
+            },},});
+    item_templates["密林背心"] = new Armor({
+        name: "密林背心", 
+        description: "密林织料制成的内甲。鲜红如血，在必要时候也能转化出血液用于恢复！", 
+        value: 80.8e15,
+        component_type: "chestplate interior",
+        base_defense: 2.88e8,
+        component_tier: 18,
+        stats: { 
+            health_regeneration_flat: {
+                flat: 34.56e8,
+            },},});
+    item_templates["密林裤子"] = new Armor({
+        name: "密林裤子", 
+        description: "密林织料制成的内甲。鲜红如血，在必要时候也能转化出血液用于恢复！", 
+        value: 70.7e15,
+        component_type: "leg armor interior",
+        base_defense: 2.52e8,
+        component_tier: 18,
+        stats: {
+            health_regeneration_flat: {
+                flat: 30.24e8,
+            },},});
+    item_templates["密林袜子"] = new Armor({
+        name: "密林袜子", 
+        description: "密林织料制成的内甲。鲜红如血，在必要时候也能转化出血液用于恢复！", 
+        value: 40.4e15,
+        component_type: "shoes interior",
+        base_defense: 1.44e8,
+        component_tier: 18,
+        stats: {
+            health_regeneration_flat: {
+                flat: 17.28e8,
+            },},});
+    //基础防御2.7e8 基础敏捷/回血5.4e8 基础价格85e8
+
+    item_templates["冰棉帽子"] = new Armor({
+        name: "冰棉帽子", 
+        description: "青冰棉制成的内甲。侧重敏捷，也提供部分恢复和一丁点对宝石的吸收效果。", 
+        value: 425e15,
+        component_type: "helmet interior",
+        base_defense: 13.5e8,
+        component_tier: 20,
+        stats: {health_regeneration_flat:{
+                flat: 27.0e8,
+            },agility:{
+                flat: 27.0e8,
+            },SCGV:{
+                flat: 0.10,
             },
-        },
-    });
+        },});
+    item_templates["冰棉背心"] = new Armor({
+        name: "冰棉背心", 
+        description: "青冰棉制成的内甲。侧重敏捷，也提供部分恢复和一丁点对宝石的吸收效果。", 
+        value: 680e15,
+        component_type: "chestplate interior",
+        base_defense: 21.6e8,
+        component_tier: 20,
+        stats: { health_regeneration_flat:{
+                flat: 43.2e8,
+            },agility:{
+                flat: 43.2e8,
+            },SCGV:{
+                flat: 0.10,
+            },
+        },});
+    item_templates["冰棉裤子"] = new Armor({
+        name: "冰棉裤子", 
+        description: "青冰棉制成的内甲。侧重敏捷，也提供部分恢复和一丁点对宝石的吸收效果。", 
+        value: 595e15,
+        component_type: "leg armor interior",
+        base_defense: 18.9e8,
+        component_tier: 20,
+        stats: {health_regeneration_flat:{
+                flat: 37.8e8,
+            },agility:{
+                flat: 37.8e8,
+            },SCGV:{
+                flat: 0.10,
+            },
+        },});
+    item_templates["冰棉袜子"] = new Armor({
+        name: "冰棉袜子", 
+        description: "青冰棉制成的内甲。侧重敏捷，也提供部分恢复和一丁点对宝石的吸收效果。", 
+        value: 240e15,
+        component_type: "shoes interior",
+        base_defense: 10.8e8,
+        component_tier: 20,
+        stats: {health_regeneration_flat:{
+                flat: 21.6e8,
+            },agility:{
+                flat: 21.6e8,
+            },SCGV:{
+                flat: 0.10,
+            },
+        },});
+
+
+
     item_templates["铁制头盔"] = new ArmorComponent({
         name: "Iron helmet shell",
         description: "A standard iron helmet shell. Slightly reduces attack speed as it obstructs vision.",
@@ -4103,6 +4825,250 @@ item_templates["Twist liek a snek"] = new Book({
             },
         }
     });
+    
+    item_templates["水素头盔"] = new ArmorComponent({
+        name: "水素头盔",
+        description: "它本身是几乎透明的……外甲不能单独穿戴！想什么呢！",
+        component_type: "helmet exterior",
+        value: 41.4e12,
+        component_tier: 14,
+        full_armor_name: "水素头盔",
+        defense_value: 1728e4,
+        stats: {
+            attack_mul: {
+                flat: 0.05,
+            },
+        }
+    });
+    item_templates["水素胸甲"] = new ArmorComponent({
+        name: "水素胸甲",
+        description: "它本身是几乎透明的……外甲不能单独穿戴！想什么呢！",
+        component_type: "chestplate exterior",
+        value: 55.2e12,
+        component_tier: 14,
+        full_armor_name: "水素胸甲",
+        defense_value: 2304e4,
+        stats: {
+            attack_mul: {
+                flat: 0.05,
+            },
+        }
+    });
+    item_templates["水素腿甲"] = new ArmorComponent({
+        name: "水素腿甲",
+        description: "它本身是几乎透明的……外甲不能单独穿戴！想什么呢！",
+        component_type: "leg armor exterior",
+        value: 55.2e12,
+        component_tier: 14,
+        full_armor_name: "水素腿甲",
+        defense_value: 2304e4,
+        stats: {
+            attack_mul: {
+                flat: 0.05,
+            },
+        }
+    });
+    item_templates["水素战靴"] = new ArmorComponent({
+        name: "水素战靴",
+        description: "它本身是几乎透明的……外甲不能单独穿戴！想什么呢！",
+        component_type: "shoes exterior",
+        value: 27.6e12,
+        component_tier: 14,
+        full_armor_name: "水素战靴",
+        defense_value: 1152e4,
+        stats: {
+            attack_mul: {
+                flat: 0.05,
+            },
+        }
+    });
+    //价格基本单位:405e12,防御基本单位:0.216e8
+    item_templates["魂晶头盔"] = new ArmorComponent({
+        name: "魂晶头盔",
+        description: "从魂晶开始，因为需要更厚的装甲来发挥材料的潜力，它们的消耗翻倍了！(经验也翻倍了)",
+        component_type: "helmet exterior",
+        value: 2025e12,
+        component_tier: 16,
+        full_armor_name: "魂晶头盔",
+        defense_value: 1.08e8,
+        stats: {
+            attack_mul: {
+                flat: 0.06,
+            },
+        }
+    });
+    item_templates["魂晶胸甲"] = new ArmorComponent({
+        name: "魂晶胸甲",
+        description: "从魂晶开始，因为需要更厚的装甲来发挥材料的潜力，它们的消耗翻倍了！(经验也翻倍了)",
+        component_type: "chestplate exterior",
+        value: 3240e12,
+        component_tier: 16,
+        full_armor_name: "魂晶胸甲",
+        defense_value: 1.728e8,
+        stats: {
+            attack_mul: {
+                flat: 0.06,
+            },
+        }
+    });
+    item_templates["魂晶腿甲"] = new ArmorComponent({
+        name: "魂晶腿甲",
+        description: "从魂晶开始，因为需要更厚的装甲来发挥材料的潜力，它们的消耗翻倍了！(经验也翻倍了)",
+        component_type: "leg armor exterior",
+        value: 2835e12,
+        component_tier: 16,
+        full_armor_name: "魂晶腿甲",
+        defense_value: 1.512e8,
+        stats: {
+            attack_mul: {
+                flat: 0.06,
+            },
+        }
+    });
+    item_templates["魂晶战靴"] = new ArmorComponent({
+        name: "魂晶战靴",
+        description: "从魂晶开始，因为需要更厚的装甲来发挥材料的潜力，它们的消耗翻倍了！(经验也翻倍了)",
+        component_type: "shoes exterior",
+        value: 1620e12,
+        component_tier: 16,
+        full_armor_name: "魂晶战靴",
+        defense_value: 0.864e8,
+        stats: {
+            attack_mul: {
+                flat: 0.06,
+            },
+        }
+    });
+    //价格基本单位:10.8e15,防御基本单位:1.08e8
+    item_templates["远古头盔"] = new ArmorComponent({
+        name: "远古头盔",
+        description: "战场气息是叠易伤的一把好手。直观的体现就是普攻倍率。",
+        component_type: "helmet exterior",
+        value: 54e15,
+        component_tier: 18,
+        full_armor_name: "远古头盔",
+        defense_value: 5.4e8,
+        stats: {
+            attack_mul: {
+                flat: 0.07,
+            },agility:{
+                flat: 7.20e8,
+            },
+        }
+    });
+    item_templates["远古胸甲"] = new ArmorComponent({
+        name: "远古胸甲",
+        description: "战场气息是叠易伤的一把好手。直观的体现就是普攻倍率。",
+        component_type: "chestplate exterior",
+        value: 86.4e15,
+        component_tier: 18,
+        full_armor_name: "远古胸甲",
+        defense_value: 8.64e8,
+        stats: {
+            attack_mul: {
+                flat: 0.07,
+            },agility:{
+                flat: 11.52e8,
+            },
+        }
+    });
+    item_templates["远古腿甲"] = new ArmorComponent({
+        name: "远古腿甲",
+        description: "战场气息是叠易伤的一把好手。直观的体现就是普攻倍率。",
+        component_type: "leg armor exterior",
+        value: 75.6e15,
+        component_tier: 18,
+        full_armor_name: "远古腿甲",
+        defense_value: 7.56e8,
+        stats: {
+            attack_mul: {
+                flat: 0.07,
+            },agility:{
+                flat: 10.08e8,
+            },
+        }
+    });
+    item_templates["远古战靴"] = new ArmorComponent({
+        name: "远古战靴",
+        description: "战场气息是叠易伤的一把好手。直观的体现就是普攻倍率。",
+        component_type: "shoes exterior",
+        value: 43.2e15,
+        component_tier: 18,
+        full_armor_name: "远古战靴",
+        defense_value: 4.32e8,
+        stats: {
+            attack_mul: {
+                flat: 0.07,
+            },agility:{
+                flat: 5.76e8,
+            },
+        }
+    });
+    //价格基本单位:67.5e15,防御基本单位:5.4e8 攻击基本单位 2.7e8
+    item_templates["红钨头盔"] = new ArmorComponent({
+        name: "红钨头盔",
+        description: "让敌人因为自己的精血气息受到震慑……换谁谁不怕哇！",
+        component_type: "helmet exterior",
+        value: 337.5e15,
+        component_tier: 20,
+        full_armor_name: "红钨头盔",
+        defense_value: 27e8,
+        stats: {
+            attack_mul: {
+                flat: 0.08,
+            },attack_power:{
+                flat: 13.5e8,
+            },
+        }
+    });
+    item_templates["红钨胸甲"] = new ArmorComponent({
+        name: "红钨胸甲",
+        description: "让敌人因为自己的精血气息受到震慑……换谁谁不怕哇！",
+        component_type: "chestplate exterior",
+        value: 540e15,
+        component_tier: 20,
+        full_armor_name: "红钨胸甲",
+        defense_value: 43.2e8,
+        stats: {
+            attack_mul: {
+                flat: 0.08,
+            },attack_power:{
+                flat: 21.6e8,
+            },
+        }
+    });
+    item_templates["红钨腿甲"] = new ArmorComponent({
+        name: "红钨腿甲",
+        description: "让敌人因为自己的精血气息受到震慑……换谁谁不怕哇！",
+        component_type: "leg armor exterior",
+        value: 472.5e15,
+        component_tier: 20,
+        full_armor_name: "红钨腿甲",
+        defense_value: 37.8e8,
+        stats: {
+            attack_mul: {
+                flat: 0.08,
+            },attack_power:{
+                flat: 18.9e8,
+            },
+        }
+    });
+    item_templates["红钨战靴"] = new ArmorComponent({
+        name: "红钨战靴",
+        description: "让敌人因为自己的精血气息受到震慑……换谁谁不怕哇！",
+        component_type: "shoes exterior",
+        value: 270e15,
+        component_tier: 20,
+        full_armor_name: "红钨战靴",
+        defense_value: 21.6e8,
+        stats: {
+            attack_mul: {
+                flat: 0.08,
+            },attack_power:{
+                flat: 10.8e8,
+            },
+        }
+    });
 
 
 
@@ -4251,8 +5217,8 @@ item_templates["Twist liek a snek"] = new Book({
     });
     item_templates["万载冰髓锭"] = new Material({
         id: "万载冰髓锭",
-        name: "Eternal Ice Marrow Ingot",
-        description: "A phase-change product of [Arctic Superfluid]. Note: workbench recipe efficiency is extremely low, recommend using [Extreme Cold Phase Engine] for production.",
+        name: "万载冰髓锭", 
+        description: "【冰原超流体】的相变产物。强度为B6级中上。", 
         value: 1.92e12,
         material_type: "metal",
         image: "image/item/icesteel_ingot.png",
@@ -4290,9 +5256,152 @@ item_templates["Twist liek a snek"] = new Book({
         material_type: "metal",
         image: "image/item/barrierlake_heart.png",
     });
+    item_templates["飞船之心·材"] = new Material({
+        id: "飞船之心·材",
+        name: "飞船之心·材", 
+        description: "无法继续被佩戴，只是用于合成【冰原之心】的临时材料。", 
+        value: 4.8e12,
+        material_type: "metal",
+        image: "image/item/spaceship_heart.png",
+    });
+    item_templates["冰原之心·材"] = new Material({
+        id: "冰原之心·材",
+        name: "冰原之心·材", 
+        description: "无法继续被佩戴，只是用于合成【幻境之心】的临时材料。", 
+        value: 160e12,
+        material_type: "metal",
+        image: "image/item/iceland_heart.png",
+    });
+    item_templates["晶化合金锭"] = new Material({
+        id: "晶化合金锭",
+        name: "晶化合金锭", 
+        description: "【万载冰髓】与冰宫中的镶嵌宝石结合成的合金。表面十分锋利，因此不适合制作盔甲。强度为B7+级。", 
+        value: 6.61e12,
+        material_type: "metal",
+        image: "image/item/icealloy_ingot.png",
+    });
+    item_templates["极寒织料"] = new Material({
+        id: "极寒织料",
+        name: "极寒织料", 
+        description: "将万载冰髓打碎，研磨，注入能量回路中……冰元素固然寒冷刺骨，但广谱能量抵消的特性仍然使它值得作为材料。", 
+        value: 7.21e12,
+        material_type: "metal",
+        image: "image/item/mixed_comp05.png",
+    });
+    item_templates["冰块"] = new Material({
+        id: "冰块",
+        name: "冰块", 
+        description: "非常普通的冰块，在地宫都嫌便宜。完全就是建筑废料……", 
+        value: 233,
+        material_type: "metal",
+        image: "image/item/normal_ice.png",
+    });
+    item_templates["水素合金锭"] = new Material({
+        id: "水素合金锭",
+        name: "水素合金锭", 
+        description: "水素晶体注入冰原超流体得到的合金。比起冰元素，水元素与它的相性更好。它的强度为B9-级。", 
+        value: 27.6e12,
+        material_type: "metal",
+        image: "image/item/aquaalloy_ingot.png",
+    });
+    item_templates["虹彩杖芯"] = new Material({
+        id: "虹彩杖芯",
+        name: "虹彩杖芯", 
+        description: "悬浮着的光环杖芯本就是不错的念力兵器材料，而虹彩凝胶的多种元素更使得兵器可以更加灵活。", 
+        value: 16.8e12,
+        material_type: "metal",
+        image: "image/item/rainbow_ending.png",
+    });
+    item_templates["破空紫蕨"] = new OtherItem({
+        name: "破空紫蕨", 
+        description: "引力异常的功率可不止于让绝音蕨自动漂浮！它可以打乱战斗区域的光线，让敌人手忙脚乱！",
+        value: 768e12,
+        image: "image/item/floating_fern.png",
+    });
+    item_templates["宝石母锭"] = new Material({
+        id: "宝石母锭",
+        name: "宝石母锭", 
+        description: "吞噬星空的设定中，矿脉中会含有100ppm的【精】和10ppb的【母】，分别+1tier和+2tier。<br>因此，宝石锭是A1级，宝石母锭就是C1级了！", 
+        value: 133e12,
+        material_type: "metal",
+        image: "image/item/gemM_ingot.png",
+    });
+    item_templates["魂晶锭"] = new Material({
+        id: "魂晶锭",
+        name: "魂晶锭", 
+        description: "吸收魂魄的紫晶锭。粗制器灵，但是更强了——境界越高的修者，死后的魂魄残留越多的灵性。", 
+        value: 672e12,
+        material_type: "metal",
+        image: "image/item/violet_ingot.png",
+    });
+    item_templates["冰家玉简"] = new OtherItem({
+        name: "冰家玉简", 
+        description: "凭它可以招揽冰蓝(出狱后突破至天空级巅峰)和秋兴(出狱后突破至天空级八阶)加入重组纳家！<br>别跟我说这东西上面该写个冰字。<br>否则我就狡辩血洛大陆通用语是象形文字！",
+        value: 1000e15,
+        image: "image/item/ice_jade.png",
+    });
+    item_templates["盖亚合金锭"] = new Material({
+        id: "盖亚合金锭",
+        name: "盖亚合金锭", 
+        description: "与大地有着天然的亲和……人话就是很重！砍人超级疼！", 
+        value: 4.444e15,
+        material_type: "metal",
+        image: "image/item/gaia_ingot.png",
+    });
+    item_templates["远古合金锭"] = new Material({
+        id: "远古合金锭",
+        name: "远古合金锭", 
+        description: "吸收了战场气息的金属。打人带破甲，也就是相当高的等效攻击！", 
+        value: 18.6e15,
+        material_type: "metal",
+        image: "image/item/ancientalloy_ingot.png",
+    });
     
+    item_templates["密林织料"] = new OtherItem({
+        name: "密林织料", 
+        description: "可以视为大大增强的活性织料。正如看起来的一样，能给不少回血~",
+        value: 17.3e15,
+        image: "image/item/mixed_comp07.png",
+    });
+    item_templates["古源金锭"] = new Material({
+        id: "古源金锭",
+        name: "古源金锭", 
+        description: "某种意义上是高级魂晶。但是混入了太多魂魄，所以穿在身上会造反！", 
+        value: 67.67e15,
+        material_type: "metal",
+        image: "image/item/sourcegold_ingot.png",
+    });
+    item_templates["血灵骨棉"] = new Material({
+        id: "血灵骨棉",
+        name: "血灵骨棉", 
+        description: "爆燃粉末升华琥珀金骨，形成类似Raney Ni……串台了！总之倒进血灵液就可以用做轮芯了。", 
+        value: 47.2e15,
+        image: "image/item/bloody_bone.png",
+    });
+    item_templates["红钨锭"] = new Material({
+        id: "红钨锭",
+        name: "红钨锭", 
+        description: "也许有人好奇为什么这些百家精血的装备就不会造反了。其实是因为高温灭灵过了……", 
+        value: 162e15,
+        material_type: "metal",
+        image: "image/item/red_tungsten_ingot.png",
+    });
+    item_templates["青冰棉"] = new Material({
+        id: "青冰棉",
+        name: "青冰棉", 
+        description: "这一区虽然有茸茸和追光者……但凝胶的性质决定了它无法刻录稳定符文和法阵。这使凝胶类物品在C1级以上越来越不占优。", 
+        value: 204e15,
+        image: "image/item/cyan_ice_cotton.png",
+    });
+    item_templates["血钻锭"] = new Material({
+        id: "血钻锭",
+        name: "血钻锭", 
+        description: "血钻听起来不像是能熔炼成锭的金属的样子。但是，有什么斥力，和云霄级大锤子说去吧！", 
+        value: 333e15,
+        material_type: "metal",
+        image: "image/item/blomond_ingot.png",
+    });
 })();
-
 //矿石
 (function(){
     item_templates["紫铜矿"] = new OtherItem({
@@ -4342,6 +5451,25 @@ item_templates["Twist liek a snek"] = new Book({
         realmcap:20,
         image: "image/item/ice_fish.png",
     });
+    
+    item_templates["血莲鱼"] = new UsableItem({
+        id: "血莲鱼",
+        name: "血莲鱼", 
+        description: "青花鱼的究极形态——天空级七阶。比起只会沉浮的鱼，学会了在二维平面移动……", 
+        value: 192e12,
+        effects: [{effect: "饱食 IX", duration: 45}],
+        realmcap:31,
+        image: "image/item/red_fish.png",
+    });
+    item_templates["冰柱鱼王"] = new UsableItem({
+        id: "冰柱鱼王",
+        name: "冰柱鱼王", 
+        description: "传说有误！结界能量太充沛了，冰柱鱼王突破到天空级巅峰 +了！这里最强的不会有3+境吧……虽然没资源突破不了云霄级就是了啦。", 
+        value: 864e12,
+        effects: [{effect: "饱食 IX", duration: 360}],
+        realmcap:34,
+        image: "image/item/ice_fish_king.png",
+    });
 })();
 
 //特殊
@@ -4377,6 +5505,46 @@ item_templates["Twist liek a snek"] = new Book({
         value: 500e9,
         spec:"T8-table",
         image: "image/item/rune_workingtable.png",
+    });
+    item_templates["极寒相变引擎"] = new UsableItem({
+        id: "极寒相变引擎",
+        name: "极寒相变引擎", 
+        description: "使用多冲程压缩-膨胀来制冷的套件，附带隔热装置。<br>可用于生产万载冰髓与玄冰果实·觉醒。<br>具体使用方式详见左下角问号菜单！", 
+        value: 96e12,
+        spec:"freezing_engine",
+        image: "image/item/freezing_engine.png",
+    });
+    item_templates["冰宫商人"] = new UsableItem({
+        id: "冰宫商人",
+        name: "冰宫商人", 
+        description: "冰宫的女巫们已经把他的身上给搜干净了。当奴隶还能卖一点钱，但放走了等他对接货源收益更高！<br>PS:每血洛日0点刷新商品", 
+        value: 5.21e12,
+        spec:"saved_trader",
+        image: "image/item/icepalace_trader.png",
+    });
+    
+    item_templates["牵制-从入门到精通"] = new UsableItem({
+        id: "牵制-从入门到精通",
+        name: "牵制-从入门到精通", 
+        description: "传承水晶的知识补全了被涂黑的书！虽然自己不应该用，但可以套路心魔……<br>实际效果:【压制·伪】判定 +1%牵制比重(上限100%/加权几何平均)<br>", 
+        value: 168e12,
+        spec:"HeartDemon_nerf",
+        image: "image/item/BurnBloodPlus.png",
+    });
+
+    
+    
+    item_templates["血峰限制器"] = new OtherItem({
+        name: "血峰限制器", 
+        description: "呼……被这股气息笼罩着，感觉神智都清明了不少。(持有时每个将4-5区域光环-20%,最多生效5个)",
+        value: 2800e15,
+        image: "image/item/biohill_restricter.png",
+    });
+    item_templates["血峰增幅器"] = new OtherItem({
+        name: "血峰增幅器", 
+        description: "让暴风雨(和掉落物)来的更猛烈一些吧！。(持有时每个将4-5区域光环*(1+20%*sqrt(数量)),最多生效990025个)",
+        value: 3600e15,
+        image: "image/item/biohill_enhancer.png",
     });
 })();
 
@@ -4522,9 +5690,9 @@ item_templates["Twist liek a snek"] = new Book({
         name: "Energy Ice Smoothie",
         description: "Conceals a portion of life, thereby increasing life [capacity].",
         value: 3e12,
-        realmcap:27,
-        effects: [{effect: "Recovery B4", duration: 90}],
-        image: "image/item/B4_life_medicine.png",
+        realmcap:28,
+        effects: [{effect: "恢复 B4", duration: 90}],
+        image: "image/item/B4_medicine.png",
     });
     
     item_templates["沼泽·荒兽肉排"] = new UsableItem({
@@ -4539,42 +5707,151 @@ item_templates["Twist liek a snek"] = new Book({
 
     
     item_templates["B9·反戈药剂"] = new UsableItem({
-        name: "B9·Retaliation Potion",
-        description: "Reflects 50% of damage back to the enemy, ignoring defense! At the cost of -30% normal attack multiplier, and enemies killed by reflected damage yield no experience. (Still drop loot)",
+        name: "B9·反戈药剂", 
+        description: "反弹75%伤害，无视防御还给敌人！代价是普攻倍率-20%，且反伤不能击杀敌人(会保留1血)", 
         value: 8.4e12,
-        realmcap:27,
-        effects: [{effect: "Reversal B9", duration: 120}],
+        realmcap:28,
+        effects: [{effect: "反戈 B9", duration: 120}],
         image: "image/item/B9_reflect.png",
     });
     item_templates["B9·灵闪药剂"] = new UsableItem({
-        name: "B9·Spirit Flash Potion",
-        description: "If the enemy's attack is less than twice the character's, damage taken is reduced by half of (character's defense / enemy's defense). Otherwise, it increases by twice that ratio. This effect cannot reduce damage below 0.",
+        name: "B9·灵闪药剂", 
+        description: "如果敌人的攻击少于角色的2倍，角色受到的伤害减少(角色防御/敌人防御)的二分之一。反之，增加(角色防御/敌人防御)的两倍。该效果不会把伤害降低到0以下或提高到100倍以上。", 
         value: 8.4e12,
-        realmcap:27,
-        effects: [{effect: "Spirit Flash B9", duration: 120}],
+        realmcap:28,
+        effects: [{effect: "灵闪 B9", duration: 120}],
         image: "image/item/B9_spiritdodge.png",
     });
     item_templates["B9·散华药剂"] = new UsableItem({
         name: "B9·Sublimation Potion",
         description: "The enemy's attack is weakened by (character HP / enemy HP)^0.5 × 10 (in %), but causes 1% HP drain. This effect cannot reduce enemy base attack below 0.",
         value: 8.4e12,
-        realmcap:27,
-        effects: [{effect: "Scatter B9", duration: 120}],
+        realmcap:28,
+        effects: [{effect: "散华 B9", duration: 120}],
         image: "image/item/B9_sublimhealth.png",
     });
     item_templates["B9·异界药剂"] = new UsableItem({
-        name: "B9·Other Realm Potion",
-        description: "Base attack multiplier becomes 20%, but increases by 40%, 60%... with each hit. Choose this for long-term battles!",
+        name: "B9·异界药剂", 
+        description: "基础攻击倍率变为10%，但每次命中以20% 30%...递增。长线战斗就选它！", 
         value: 8.4e12,
-        realmcap:27,
-        effects: [{effect: "Void Gate B9", duration: 120}],
+        realmcap:28,
+        effects: [{effect: "异界之门 B9", duration: 120}],
         image: "image/item/B9_portal.png",
     });
+    item_templates["B9·??药剂"] = new UsableItem({
+        name: "B9·??药剂", 
+        description: "使用后随机获取5瓶B9级炼金药剂。", 
+        value: 50e12,
+        realmcap:28,
+        spec:"random-potion",
+        image: "image/item/B9_unknown.png",
+    });
+    
+    item_templates["幻境·恢复精华"] = new UsableItem({
+        name: "幻境·恢复精华", 
+        description: "被击碎的传承水晶·绿。是稀有的百分比恢复——别想囤几十万个！云霄级突破清buff的！", 
+        value: 100e12,
+        effects: [{effect: "恢复 B8", duration: 60}],
+        realmcap:28,
+        image: "image/item/B8_medicine.png",
+    });
+    item_templates["幻境·狂暴精华"] = new UsableItem({
+        name: "幻境·狂暴精华", 
+        description: "被击碎的传承水晶·蓝。绝对出乎意料的是，这个没有debuff！结界的一百纪元里，配方已经变得完美了呢。", 
+        value: 120e12,
+        effects: [{effect: "强化 B8", duration: 60}],
+        realmcap:28,
+        image: "image/item/B8_booster.png",
+    });
+    item_templates["草木之芯"] = new UsableItem({
+        name: "草木之芯", 
+        description: "类似于吞噬星空雾岛的那些东西，不过境界略高一筹。可以使用的同时它也是材料。", 
+        value: 9.6e15,
+        effects: [{effect: "恢复 C2", duration: 30}],
+        realmcap:34,
+        image: "image/item/wood_core.png",
+    });
+    item_templates["蘸酱烤肉"] = new UsableItem({
+        name: "蘸酱烤肉", 
+        description: "虽然是心头血做的酱料，但毕竟含有磅礴的生命能量，肯定好吃就是了~", 
+        value: 21.87e15,
+        effects: [{effect: "饱食 X", duration: 90}],
+        realmcap:34,
+        image: "image/item/C1_cooked_meat.png",
+    });
+    item_templates["灵红补给品"] = new UsableItem({
+        name: "灵红补给品", 
+        description: "其实……百分比恢复也不是那么危险的设计？", 
+        value: 36e15,
+        effects: [{effect: "恢复 C3", duration: 120}],
+        realmcap:37,
+        image: "image/item/C3_medicine.png",
+    });
+    item_templates["灵蓝补给品"] = new UsableItem({
+        name: "灵蓝补给品", 
+        description: "古人埋在秘境里的东西。并没有那么稀有，毕竟这些补给品算是制式装备。", 
+        value: 90e15,
+        effects: [{effect: "恢复 C4", duration: 60}],
+        realmcap:37,
+        image: "image/item/C4_medicine.png",
+    });
+    item_templates["燃血鲜花"] = new UsableItem({
+        name: "燃血鲜花", 
+        description: "毬毬山谷四处都是长这样的A3级普通鲜花。然而，根据吞噬星空定律，其中有0.01%的B3级爆血鲜花和亿分之一的C3级燃血鲜花……诺，就在这里啦！", 
+        value: 144e15,
+        effects: [{effect: "强化 C3", duration: 90}],
+        realmcap:37,
+        image: "image/item/blood_flower.png",
+    });
+    item_templates["焚血花王"] = new UsableItem({
+        name: "焚血花王", 
+        description: "比【燃血鲜花】高6阶的罕有天材地宝。强化效果和【燃血鲜花】不冲突，且略强一线。下区的【血峰之心】同样需要它。", 
+        value: 4608e15,
+        effects: [{effect: "强化 C3G", duration: 1080}],
+        realmcap:37,
+        image: "image/item/blood_flower_king.png",
+    });
+
+
+    item_templates["C6·吹火药剂"] = new UsableItem({
+        name: "C6·吹火药剂", 
+        description: "角色每次攻击延迟被击中敌人攻击1/2轮，但攻速*0.7.", 
+        value: 2500e15,
+        realmcap:34,
+        effects: [{effect: "吹火 C6", duration: 120}],
+        image: "image/item/C6_blowfire.png",
+    });
+    item_templates["C6·血遁药剂"] = new UsableItem({
+        name: "C6·血遁药剂", 
+        description: "角色敏捷乘以1+血量比例/40%(满血即为3.5倍),但生命流失1%.", 
+        value: 2500e15,
+        realmcap:34,
+        effects: [{effect: "血遁 C6", duration: 120}],
+        image: "image/item/C6_bloododge.png",
+    });
+    item_templates["C6·硬化药剂"] = new UsableItem({
+        name: "C6·硬化药剂", 
+        description: "角色无视敌人攻击力超出防御力部分的50%，但普攻倍率*0.4.", 
+        value: 2500e15,
+        realmcap:34,
+        effects: [{effect: "硬化 C6", duration: 120}],
+        image: "image/item/C6_harden.png",
+    });
+    item_templates["C6·压制药剂"] = new UsableItem({
+        name: "C6·压制药剂", 
+        description: "角色对敌人造成的伤害乘以1.25*(角色攻防和)/(敌人攻防和).加强的原因是你攻防和都超出敌人了还需要这个buff吗!", 
+        value: 2500e15,
+        realmcap:34,
+        effects: [{effect: "压制 C6", duration: 120}],
+        image: "image/item/C6_overwhelm.png",
+    });
+
     /*
-
-
-
-    */
+加入C6级炼金药剂！
+吹火(攻击可以延迟敌人攻击1/2轮，但攻速*0.7)
+血遁(有效敏捷乘以血量/40%，附带1%掉血效果)
+硬化(无视敌人超出防御部分攻击的一半，但普攻倍率*0.5)
+压制(百分百效果，但你的攻防和都超过对面了还要喝药？) */
 })();
 //炼金
 (function(){
@@ -4608,6 +5885,26 @@ item_templates["Twist liek a snek"] = new Book({
         value: 240e6,
         image: "image/item/mixed_comp03.png",
     });
+    
+    item_templates["幻符织料"] = new OtherItem({
+        name: "幻符织料", 
+        description: "幻境符文/绝音蕨的两层吸收使得它几乎完成了光学隐身。什么叫外甲可以被看见？不要在意那些细节！",
+        value: 666e12,
+        image: "image/item/mixed_comp06.png",
+    });
+    item_templates["绝音蕨"] = new OtherItem({
+        name: "绝音蕨", 
+        description: "本身价值不算高昂，但却是第三幕最佳内甲的必备材料！", 
+        value: 24811e9,
+        image: "image/item/slient_fern.png",
+    });
+    item_templates["噬芒兰"] = new OtherItem({
+        name: "噬芒兰", 
+        description: "它暗到似乎可以吸收周围的光。幻境阵法中多余的暗元素全数汇入了四重幻境，它就是受益者。", 
+        value: 4.5e15,
+        image: "image/item/light_absorb_flower.png",
+    });
+
 })();
 
 //宝石
@@ -4669,108 +5966,180 @@ item_templates["Twist liek a snek"] = new Book({
         gem_value: 100,
     });
     item_templates["高级绿宝石"] = new UsableItem({
-        name: "Advanced Green Gem",
-        description: "A higher-tier crystal. When used, randomly adds 200 ATK/DEF/AGI or 10,000 HP.",
+        name: "高级绿宝石", 
+        description: "高阶的晶体，使用时随机增加攻击/防御/敏捷200点或生命1万", 
         value: 200,
         image: "image/item/gem24_200.png",
         effects: [],
         gem_value: 200,
     });
     item_templates["极品黄宝石"] = new UsableItem({
-        name: "Superior Yellow Gem",
-        description: "An extremely precious crystal. When used, randomly adds 500 ATK/DEF/AGI or 25,000 HP.",
+        name: "极品黄宝石", 
+        description: "极为珍贵的晶体，使用时随机增加攻击/防御/敏捷500点或生命2.5万", 
         value: 500,
         image: "image/item/gem31_500.png",
         effects: [],
         gem_value: 500,
     });
     item_templates["极品蓝宝石"] = new UsableItem({
-        name: "Superior Blue Gem",
-        description: "An extremely precious crystal. When used, randomly adds 1,000 ATK/DEF/AGI or 50,000 HP.",
+        name: "极品蓝宝石", 
+        description: "极为珍贵的晶体，使用时随机增加攻击/防御/敏捷1000点或生命5万", 
         value: 1000,
         image: "image/item/gem32_1k.png",
         effects: [],
         gem_value: 1000,
     });
     item_templates["极品红宝石"] = new UsableItem({
-        name: "Superior Red Gem",
-        description: "An extremely precious crystal. When used, randomly adds 2,000 ATK/DEF/AGI or 100,000 HP.",
+        name: "极品红宝石", 
+        description: "极为珍贵的晶体，使用时随机增加攻击/防御/敏捷2000点或生命10万", 
         value: 2000,
         image: "image/item/gem33_2k.png",
         effects: [],
         gem_value: 2000,
     });
     item_templates["极品绿宝石"] = new UsableItem({
-        name: "Superior Green Gem",
-        description: "An extremely precious crystal. When used, randomly adds 5,000 ATK/DEF/AGI or 250,000 HP.",
+        name: "极品绿宝石", 
+        description: "极为珍贵的晶体，使用时随机增加攻击/防御/敏捷5000点或生命25万", 
         value: 5000,
         image: "image/item/gem34_5k.png",
         effects: [],
         gem_value: 5000,
     });
     item_templates["殿堂黄宝石"] = new UsableItem({
-        name: "Hall Yellow Gem",
-        description: "A crystal rarely seen in an ordinary person's lifetime. When used, randomly adds 10,000 ATK/DEF/AGI or 1,000,000 HP.",
+        name: "殿堂黄宝石", 
+        description: "普通人一生难得一见的晶体，使用时随机增加攻击/防御/敏捷1万或生命100万", 
         value: 10000,
         image: "image/item/gem41_10k.png",
         effects: [],
         gem_value: 10000,
     });
     item_templates["殿堂蓝宝石"] = new UsableItem({
-        name: "Hall Blue Gem",
-        description: "A crystal rarely seen in an ordinary person's lifetime. When used, randomly adds 20,000 ATK/DEF/AGI or 2,000,000 HP.",
+        name: "殿堂蓝宝石", 
+        description: "普通人一生难得一见的晶体，使用时随机增加攻击/防御/敏捷2万或生命200万", 
         value: 20000,
         image: "image/item/gem42_20k.png",
         effects: [],
         gem_value: 20000,
     });
     item_templates["殿堂红宝石"] = new UsableItem({
-        name: "Hall Red Gem",
-        description: "A crystal rarely seen in an ordinary person's lifetime. When used, randomly adds 50,000 ATK/DEF/AGI or 5,000,000 HP.",
+        name: "殿堂红宝石", 
+        description: "普通人一生难得一见的晶体，使用时随机增加攻击/防御/敏捷5万或生命500万", 
         value: 50000,
         image: "image/item/gem43_50k.png",
         effects: [],
         gem_value: 50000,
     });
     item_templates["殿堂绿宝石"] = new UsableItem({
-        name: "Hall Green Gem",
-        description: "A crystal rarely seen in an ordinary person's lifetime. When used, randomly adds 100,000 ATK/DEF/AGI or 10,000,000 HP.",
+        name: "殿堂绿宝石", 
+        description: "普通人一生难得一见的晶体，使用时随机增加攻击/防御/敏捷10万或生命1000万", 
         value: 100000,
         image: "image/item/gem44_100k.png",
         effects: [],
         gem_value: 100000,
     });
     item_templates["史诗黄宝石"] = new UsableItem({
-        name: "Epic Yellow Gem",
-        description: "An extremely rare crystal. When used, randomly adds 200,000 ATK/DEF/AGI or 20,000,000 HP.",
+        name: "史诗黄宝石", 
+        description: "极端稀有的晶体，使用时随机增加攻击/防御/敏捷20万或生命2000万", 
         value: 200000,
         image: "image/item/gem51_200k.png",
         effects: [],
         gem_value: 200000,
     });
     item_templates["史诗蓝宝石"] = new UsableItem({
-        name: "Epic Blue Gem",
-        description: "An extremely rare crystal. When used, randomly adds 500,000 ATK/DEF/AGI or 50,000,000 HP.",
+        name: "史诗蓝宝石", 
+        description: "极端稀有的晶体，使用时随机增加攻击/防御/敏捷50万或生命5000万", 
         value: 500000,
         image: "image/item/gem52_500k.png",
         effects: [],
         gem_value: 500000,
     });
     item_templates["史诗红宝石"] = new UsableItem({
-        name: "Epic Red Gem",
-        description: "An extremely rare crystal. When used, randomly adds 1,000,000 ATK/DEF/AGI or 100,000,000 HP.",
+        name: "史诗红宝石", 
+        description: "极端稀有的晶体，使用时随机增加攻击/防御/敏捷100万或生命1亿", 
         value: 1000000,
         image: "image/item/gem53_1M.png",
         effects: [],
         gem_value: 1000000,
     });
     item_templates["史诗绿宝石"] = new UsableItem({
-        name: "Epic Green Gem",
-        description: "An extremely rare crystal. When used, randomly adds 2,000,000 ATK/DEF/AGI or 200,000,000 HP.",
+        name: "史诗绿宝石", 
+        description: "极端稀有的晶体，使用时随机增加攻击/防御/敏捷200万或生命2亿", 
         value: 2000000,
         image: "image/item/gem54_2M.png",
         effects: [],
         gem_value: 2000000,
+    });
+    item_templates["传说黄宝石"] = new UsableItem({
+        name: "传说黄宝石", 
+        description: "能引发天空级强者厮杀的宝物，使用时随机增加攻击/防御/敏捷500万或生命5亿", 
+        value: 5000000,
+        image: "image/item/gem61_5M.png",
+        effects: [],
+        gem_value: 5000000,
+    });
+    item_templates["传说蓝宝石"] = new UsableItem({
+        name: "传说蓝宝石", 
+        description: "能引发天空级强者厮杀的宝物，使用时随机增加攻击/防御/敏捷1000万或生命10亿", 
+        value: 10000000,
+        image: "image/item/gem62_10M.png",
+        effects: [],
+        gem_value: 10000000,
+    });
+    item_templates["传说红宝石"] = new UsableItem({
+        name: "传说红宝石", 
+        description: "能引发天空级强者厮杀的宝物，使用时随机增加攻击/防御/敏捷2000万或生命20亿", 
+        value: 20000000,
+        image: "image/item/gem63_20M.png",
+        effects: [],
+        gem_value: 20000000,
+    });
+    item_templates["传说绿宝石"] = new UsableItem({
+        name: "传说绿宝石", 
+        description: "能引发天空级强者厮杀的宝物，使用时随机增加攻击/防御/敏捷5000万或生命50亿", 
+        value: 50000000,
+        image: "image/item/gem64_50M.png",
+        effects: [],
+        gem_value: 50000000,
+    });
+    item_templates["血杀剑"] = new UsableItem({
+        name: "血杀剑", 
+        description: "虽然看起来是剑，但其实是血洛晶的一丝碎片，蕴含着强烈的杀戮能量！使用时必定增加攻击1亿。", 
+        value: 1e15,
+        image: "image/item/bloodkill_sword.png",
+        effects: [],
+        gem_value: 100e6,
+    });
+    item_templates["神话黄宝石"] = new UsableItem({
+        name: "神话黄宝石", 
+        description: "仅仅一颗就可以掀起小范围的腥风血雨，使用时随机增加攻击/防御/敏捷1亿或生命200亿", 
+        value: 100e6,
+        image: "image/item/gem71_100M.png",
+        effects: [],
+        gem_value: 100e6,
+    });
+    item_templates["神话蓝宝石"] = new UsableItem({
+        name: "神话蓝宝石", 
+        description: "仅仅一颗就可以掀起小范围的腥风血雨，使用时随机增加攻击/防御/敏捷2亿或生命400亿", 
+        value: 200e6,
+        image: "image/item/gem72_200M.png",
+        effects: [],
+        gem_value: 200e6,
+    });
+    item_templates["神话红宝石"] = new UsableItem({
+        name: "神话红宝石", 
+        description: "仅仅一颗就可以掀起小范围的腥风血雨，使用时随机增加攻击/防御/敏捷5亿或生命1000亿", 
+        value: 500e6,
+        image: "image/item/gem73_500M.png",
+        effects: [],
+        gem_value: 500e6,
+    });
+    item_templates["神话绿宝石"] = new UsableItem({
+        name: "神话绿宝石", 
+        description: "仅仅一颗就可以掀起小范围的腥风血雨，使用时随机增加攻击/防御/敏捷10亿或生命2000亿", 
+        value: 1e9,
+        image: "image/item/gem74_1B.png",
+        effects: [],
+        gem_value: 1e9,
     });
 })();
 
@@ -5073,6 +6442,25 @@ item_templates["Twist liek a snek"] = new Book({
         C_value: 2,
         image: "image/item/evolve_1e11.png",
     });
+    item_templates["中等进化结晶"] = new  UsableItem({
+        name: "中等进化结晶", 
+        description: "稀有且常常破碎的能量晶体，纳可借助狗王之腹方才凝聚成一颗完整的。增加10京经验值，可用于突破【云霄级】。(Tips:即必须在已有90京以上经验时使用才能突破)", 
+        value: 488e15,
+        E_value: 10e16,
+        effects:[],
+        C_value: 3,
+        image: "image/item/evolve_1e17.png",
+    });
+    item_templates["中等进化结晶碎片"] = new  UsableItem({
+        name: "中等进化结晶碎片", 
+        description: "天地间充沛的能量滋养诞生的晶体碎片，接触后能够化作海量的经验为人所用。增加1000兆经验值，或等待【第四幕】合成【中等进化结晶】突破云霄级。", 
+        value: 3e15,
+        E_value: 1000e12,
+        effects:[],
+        C_value: 2,
+        realmcap:28,
+        image: "image/item/evolve_1e16_shard.png",
+    });
     item_templates["一捆高能凝胶"] = new Loot({
         name: "Bundle of High-Energy Gel",
         description: "Coolant for the spaceship core machinery. Can be split into 100 ordinary high-energy gels.",
@@ -5155,21 +6543,244 @@ item_templates["Twist liek a snek"] = new Book({
         image: "image/item/iceland_superfiuld.png",
     });
     item_templates["玄冰果实"] = new Loot({
-        name: "Mystic Ice Fruit",
-        description: "When cooled to a sufficiently low temperature, a frost core will condense.<br>Must dissipate heat to [Arctic Superfluid] in the [Extreme Cold Phase Engine]! (WIP)",
+        name: "玄冰果实", 
+        description: "冷却到足够低温后会凝结出一颗冰霜核心。<br>需要在【极寒相变引擎】中散热给【冰原超流体】！", 
         value: 28.8e12,
         image: "image/item/ice_fruit.png",
     });
+    //3-4
+    item_templates["镶晶盾牌"] = new Loot({
+        name: "镶晶盾牌", 
+        description: "冰宫中的高级盾牌，镶嵌着特殊的晶体。可以用于和万载冰髓锭形成合金！", 
+        value: 2.4e12,
+        image: "image/item/crystal_shield.png",
+    });
+    item_templates["冰宫鳞片"] = new Loot({
+        name: "冰宫鳞片", 
+        description: "并不全是龙鳞，只要可以剥皮的敌人身上都会有。没有它的话会被万载冰髓冻死的……", 
+        value: 3.0e12,
+        image: "image/item/icepalace_shard.png",
+    });
+    item_templates["光环杖芯"] = new Loot({
+        name: "光环杖芯", 
+        description: "女巫构建的稳定微型能量回路。可以持续向外转化光环能量，也可用于调和不同性质的力量。", 
+        value: 3.6e12,
+        image: "image/item/halo_ending.png",
+    });
+    //3-5
+    item_templates["B7·能量核心"] = new Loot({
+        name: "B7·能量核心", 
+        description: "颜色更加深邃而内敛了。或许云霄级的核心会有一个惊喜？", 
+        value: 8.8e12,
+        image: "image/item/B7_crystal.png",
+    });
+    item_templates["虹彩凝胶"] = new Loot({
+        name: "虹彩凝胶", 
+        description: "和那个只值几十个铜板的兄弟不同，它的彩色来源于多种元素的力量，因此价值不菲。", 
+        value: 10.4e12,
+        image: "image/item/rainbow_rubber.png",
+    });
+    item_templates["水素晶体"] = new Loot({
+        name: "水素晶体", 
+        description: "这个水素不是hydro-gen，而是水元素啦……或者你也可以当它是无人深空那个二氢晶体？", 
+        value: 12.4e12,
+        image: "image/item/aqua_element.png",
+    });
+    //3-6
+    item_templates["传承水晶·橙"] = new Loot({
+        name: "传承水晶·橙", 
+        description: "左阿传承的一部分。一种与幻境阵法核心相连的水晶，能量输出比能量核心稳定许多。", 
+        value: 40e12,
+        image: "image/item/inherit_orange.png",
+    });
+    item_templates["传承水晶·白"] = new Loot({
+        name: "传承水晶·白", 
+        description: "左阿传承的一部分。单纯锋利而闪光的水晶。", 
+        value: 50e12,
+        image: "image/item/inherit_white.png",
+    });
+    item_templates["传承水晶·绿"] = new Loot({
+        name: "传承水晶·绿", 
+        description: "左阿传承的一部分。蕴含大量生机的水晶，加强热以提取能量。", 
+        value: 60e12,
+        image: "image/item/inherit_green.png",
+    });
+    item_templates["传承水晶·蓝"] = new Loot({
+        name: "传承水晶·蓝", 
+        description: "左阿传承的一部分。蕴含大量虚浮力量的水晶。", 
+        value: 75e12,
+        image: "image/item/inherit_blue.png",
+    });
+    item_templates["传承水晶·粉"] = new Loot({
+        name: "传承水晶·粉", 
+        description: "左阿传承的一部分。看似杂乱无章，实际上却含有大量能量回路的水晶。", 
+        value: 125e12,
+        image: "image/item/inherit_pink.png",
+    });
+    //3-7
+    item_templates["天空级魂魄"] = new Loot({
+        name: "天空级魂魄", 
+        description: "保留完整能量回路，自动吸收天地间能量的魂魄。放置数年也不会丢失记忆。", 
+        value: 210e12,
+        image: "image/item/B9_soul.png",
+    });
+    item_templates["紫晶碎片"] = new Loot({
+        name: "紫晶碎片", 
+        description: "蓝金的上位金属。晶莹剔透，具有容纳灵魂的潜质。", 
+        value: 325e12,
+        image: "image/item/violet_fragment.png",
+    });
+    item_templates["幻境符文"] = new Loot({
+        name: "幻境符文", 
+        description: "由纳可的水火领域外溢的能量衍生的符文。巨型结界的作用可不是盖的！", 
+        value: 369e12,
+        image: "image/item/fantasy_rune.png",
+    });
+    item_templates["引力反常"] = new Loot({
+        name: "引力反常", 
+        description: "天外飞船到底是怎么飞进血洛的？这就是答案了！", 
+        value: 416e12,
+        image: "image/item/gravi_error.png",
+    });
+    //4-1
+    item_templates["城门之星"] = new Loot({
+        name: "城门之星", 
+        description: "城门战的参与令牌。天空级小队也有一人一颗，所以爆的更多！", 
+        value: 2.4e15,
+        image: "image/item/C1_star.png",
+    });
+    item_templates["C1·能量核心"] = new Loot({
+        name: "C1·能量核心", 
+        description: "好吧。看起来只是变得更加大只和鲜艳了。总感觉它已经开始不稳定了……", 
+        value: 3.2e15,
+        image: "image/item/C1_crystal.png",
+    });
+    item_templates["力场发生器"] = new Loot({
+        name: "力场发生器", 
+        description: "怎么GregTech也干了啊！言归正传……死线的5倍伤害太op了。削弱之道，就在其中~", 
+        value: 4.4e15,
+        image: "image/item/C1_generator.png",
+    });
+    //4-2
+    item_templates["远古碎片"] = new Loot({
+        name: "远古碎片", 
+        description: "本是被击碎的B5级普通金属，但在数纪元前的古战场中吸收了海量斗战气息，得到了巨大的强化。", 
+        value: 6.4e15,
+        image: "image/item/ancient_shard.png",
+    });
+    item_templates["血灵液"] = new Loot({
+        name: "血灵液", 
+        description: "云霄级敌人的精血。治疗效果很强，当然当酱料蘸也是可以的。", 
+        value: 8.0e15,
+        image: "image/item/blood_aura_drop.png",
+    });
+    item_templates["云霄宝肉"] = new Loot({
+        name: "云霄宝肉", 
+        description: "为什么只有荒兽不能杀了吃肉呢？好吧可以吃的。之所以掉率那么低是因为只有核心的一小块有云霄级别能量……", 
+        value: 11.1e15,
+        image: "image/item/C1_meat.png",
+    });
+    //4-3
+    item_templates["云霄级魂魄"] = new Loot({
+        name: "云霄级魂魄", 
+        description: "比起天空级的，多出了双层结构，存续时间大大提升。当然，古墓都几个纪元了，再怎么坚韧最初的那些魂魄也消散了，这些都是探险者的魂魄。", 
+        value: 21.1e15,
+        image: "image/item/C3_soul.png",
+    });
+    item_templates["琥珀金骨"] = new Loot({
+        name: "琥珀金骨", 
+        description: "正在从银骨向金骨转化的云霄级荒兽骨头，目前转化进度72.2%。这绝对不是舞萌rating后三位之类的数字！", 
+        value: 27.22e15,
+        image: "image/item/gold_bone.png",
+    });
+    item_templates["爆燃粉末"] = new Loot({
+        name: "爆燃粉末", 
+        description: "瞬间的高温可以升华琥珀金骨，在膨胀冷凝后，生成物又可以辅助琥珀金骨凝为纤维状……", 
+        value: 13.4e15,
+        image: "image/item/explode_powder.png",
+    });
+    //4-4
+    item_templates["残破兽铠"] = new Loot({
+        name: "残破兽铠", 
+        description: "极致坚硬的云霄级荒兽皮肤。呈红色是因为融入了部分精血，因此也成为了上等的炼器材料。", 
+        value: 48e15,
+        image: "image/item/beast_armor.png",
+    });
+    item_templates["魔力布匹"] = new Loot({
+        name: "魔力布匹", 
+        description: "刻录许多自增幅符文的布匹，对基因原能和精神念力都有一定比例的增幅作用……至少在它饱和之前。", 
+        value: 60e15,
+        image: "image/item/magic_wool.png",
+    });
+    item_templates["极冰骨髓"] = new Loot({
+        name: "极冰骨髓", 
+        description: "按照冰元素密度来看，已经达到了【万载冰髓精】的级别。也不知道山谷里是怎么出现的这些冰属性荒兽——难道还有其他秘境？", 
+        value: 72e15,
+        image: "image/item/ice_bone.png",
+    });
+    //4-5 价格max=144.
+    item_templates["C4·能量核心"] = new Loot({
+        name: "C4·能量核心", 
+        description: "红温了……看起来距离爆炸不远了哇。领域级之后经过坍缩，意识和能量并入原核，就无法再获取这些能量核心了。", 
+        value: 54e15,
+        image: "image/item/C4_crystal.png",
+    });
+    item_templates["灰暗军魂"] = new Loot({
+        name: "灰暗军魂", 
+        description: "灰暗领的小队在长期作战中凝结的军魂，即使小队因减员解散，军魂也可维持大半纪元不灭。", 
+        value: 104e15,
+        image: "image/item/darkness_soul.png",
+    });
+    item_templates["血凝晶"] = new Loot({
+        name: "血凝晶", 
+        description: "海量精血经过特殊手法淬炼出的精华，蕴含着血洛晶同源的能量。分量大约在0.0001Δ，但因驳杂价值远低于此。", 
+        value: 144e15,
+        image: "image/item/soild_blood.png",
+    });
+    item_templates["亮青碎片"] = new Loot({
+        name: "亮青碎片", 
+        description: "散发着温和的气息，仿佛能让狂暴的荒兽都平静下来。", 
+        value: 88e15,
+        image: "image/item/cyan_fragment.png",
+    });
+    item_templates["鲜红碎片"] = new Loot({
+        name: "鲜红碎片", 
+        description: "散发着暴戾的气息，仿佛能让荒兽突破极限，二次进化。", 
+        value: 128e15,
+        image: "image/item/pink_fragment.png",
+    });
+
     
+
+
+
+
+    /*
+C1·能量核心(还是你啊)
+爆燃粉末(返场！)
+残破兽铠(就那些红的东西的掉落物)
+燃血之花(山谷中的天然暴走灵药，效果低下但可以合成红钨锭)
+魔力布匹(就那些蓝的东西的掉落物)
+极冰骨髓(设定上与冰髓精差不多冰元素密度了)
+ */
+
+
+    
+
+
+
+
     item_templates["玄冰果实·觉醒"] = new  UsableItem({
-        name: "Mystic Ice Fruit · Awakened",
-        description: "A Mystic Ice Fruit with a condensed [Frost Core]. Can be used to craft [Heart of the Tundra] (evolvable equipment), or eaten directly for 1 trillion EXP.",
-        value: 43.2e12,
-        E_value: 1e12,
+        name: "玄冰果实·觉醒", 
+        description: "已经凝聚【冰霜核心】的玄冰果实。可用于合成【冰原之心】(可进化装备)，也可直接食用获取10兆经验。", 
+        value: 57.6e12,
+        E_value: 10e12,
         effects:[],
-        C_value: 3,
+        C_value: 2,
         image: "image/item/ice_fruit_awaken.png",
     });
+    
+    
 
 
     //以下为打钱的东西
@@ -5227,6 +6838,24 @@ item_templates["Twist liek a snek"] = new Book({
         value: 1e12,
         image: "image/item/1B.png",
     });
+    item_templates["宇宙币"] = new Loot({
+        name: "宇宙币", 
+        description: "全宇宙通用的货币。1U=1000B。界主强者在突破时会凝聚海量宇宙晶，切成小块即为富含能量的宇宙币。", 
+        value: 1e15,
+        image: "image/item/1U.png",
+    });
+    item_templates["宇宙币堆"] = new Loot({
+        name: "宇宙币堆", 
+        description: "一大堆宇宙币，共计1000U(或记为1kU)", 
+        value: 1000e15,
+        image: "image/item/1000U.png",
+    });
+    item_templates["宇宙币山"] = new Loot({
+        name: "宇宙币山", 
+        description: "堆成小山的宇宙币，共计1000000U(或记为1MU).<br>对了，按1000U=1m^3和30°堆积休止角，它们可以堆成高4.73m半径8.20m的圆锥。<br>实际上宇宙币不可能无缝堆积，所以堆起来更大……", 
+        value: 1000000e15,
+        image: "image/item/1MU.png",
+    });
 })();
 
 
@@ -5241,5 +6870,5 @@ export {
     WeaponComponent, ArmorComponent, ShieldComponent,
     getItem, setLootSoldCount, recoverItemPrices, round_item_price, getArmorSlot, getEquipmentValue,
     book_stats, loot_sold_count,
-    rarity_multipliers, getItemRarity
+    rarity_multipliers, getItemRarity , ScaledQualityMultiplier
 };

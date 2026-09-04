@@ -85,15 +85,31 @@
 
 
 .sky_root {
-    --active_background: #4c9baf;  /* 清新中绿 */
+    --active_background: #4c9baf; 
 	--background_gradient: linear-gradient(to bottom right, #1e373a, #14292a);
 
-    /* 选项/面板半透明叠加层：降低透明度、调亮一点，层次更清楚，不脏 */
     --options_gradient: linear-gradient(to bottom right, rgba(40, 74, 80, 0.65), rgba(30, 58, 60, 0.65));
 
-    /* 激活按钮/高亮色：清新的森林绿，饱和但不刺眼 */
     --active_button_color: #3d828b;
 }
+.cloudy_root_proto {
+    --active_background: #984caf;  
+	--background_gradient: #000000;
+
+    --options_gradient: linear-gradient(to bottom right, rgba(67, 40, 80, 0.65), rgba(50, 30, 60, 0.65));
+
+    --active_button_color: #723d8b;
+}
+
+.cloudy_root {
+    --active_background: #984caf;  
+	--background_gradient: linear-gradient(to bottom right, #331e3a, #24142a);
+
+    --options_gradient: linear-gradient(to bottom right, rgba(67, 40, 80, 0.65), rgba(50, 30, 60, 0.65));
+
+    --active_button_color: #723d8b;
+}
+
 
 
 body {
@@ -185,6 +201,9 @@ body {
 
  .message_hero_attacked {
 	 color: crimson;
+ }
+ .message_hero_regened {
+	 color: lightgreen;
  }
  .message_hero_attacked_critically, .message_critical {
 	 color: crimson;
@@ -499,6 +518,13 @@ body {
 
 #stance_list_div {
 	display: none;
+	height:395px;
+	overflow-y: scroll;
+}
+#family_div {
+	display: none;
+	height:395px;
+	overflow-y: scroll;
 }
 
 .skill_stance_control_button {
@@ -864,6 +890,9 @@ body {
 		.crafting_subpage_button_5 {
 			width: 79px;
 		}
+		.crafting_subpage_button_6 {
+			width: 65.5px;
+		}
 
 .crafting_recipe_list {
 	height: 333px;
@@ -954,6 +983,10 @@ body {
 }
 
 .recipe_div:hover .items3_recipe_tooltip.recipe_tooltip{
+	display: block;
+}
+
+.recipe_div:hover .items4_recipe_tooltip.recipe_tooltip{
 	display: block;
 }
 
@@ -1201,6 +1234,18 @@ i {
 	cursor: pointer;
 }
 
+.influ_consume_button {
+	float:left;
+	padding: 3px 0px 3px 0px;
+	width: 98px;
+	background:radial-gradient(circle at center, blue 0, cyan, lightblue 100%);
+	text-align: center;
+	outline: 1px solid white;
+	font-weight:bold;
+	margin: 2px 1px;
+	cursor: pointer;
+}
+
 .realm{
 	font-weight: bold;
 }
@@ -1225,7 +1270,7 @@ i {
 	font-weight: bold;
 }
 
-.realm_realm{
+.realm_domain{
 	color:#E06BBB;
 	font-weight: bold;
 }
@@ -1296,7 +1341,7 @@ i {
 
 #accept_trade_button, #cancel_trade_button, .trader_sorting_button {
     float:left;
-	width: 198px;
+	width: 197px;
 	text-align: center;
 	outline: 1px solid white;
 	margin: -1px 1px;
@@ -1365,6 +1410,130 @@ i {
 	left: 410px;
 	top: var(--actions_div_top);
 }
+#engine_div {
+	width: 810px;
+	height: var(--actions_div_height);
+	left: 410px;
+	top: var(--actions_div_top);
+	display:none;
+}
+#engine_piston{
+	position:absolute;
+}
+#piston_change {
+	background-color: rgb(83, 184, 0);
+	width:90px;
+	height:24px;
+	font-weight:bold;
+	position:absolute;
+	top:12px;
+	left:280px;
+	border:2px solid lightgreen;
+}
+#leave_engine{
+	background-color: rgb(184, 98, 0);
+	width:155px;
+	height:24px;
+	font-weight:bold;
+	position:absolute;
+	top:12px;
+	left:400px;
+	border:2px solid rgb(238, 194, 144);
+}
+#engine_container_stats{
+	position:absolute;
+	top:256px;
+	left:0px;
+}
+#engine_result_stats{
+	position:absolute;
+	top:256px;
+	left:448px;
+}
+#container_circle {
+      position: absolute;
+      width: 192px;                  /* 圆的大小，根据需要改 */
+      height: 192px;
+	  top:128px;
+	  left:128px;
+      background-color: #ffffff;    /* 初始颜色，可被 JS 改 */
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;         /* 防止圆挡住图片的点击事件（可选） */
+    }
+
+#container_square {
+      position: absolute;
+      width: 100px;                  /* 圆的大小，根据需要改 */
+      height: 100px;
+	  top:9.6px;
+	  left:9.6px;
+      background-color: rgba(255,255,255,0.5);    /* 初始颜色，可被 JS 改 */
+      pointer-events: none;         /* 防止圆挡住图片的点击事件（可选） */
+    }
+#engine_piston{
+	top:64px;
+	left:64px;
+	width:240px;
+	height:128px;
+	position:absolute;
+}
+#piston_pt2{
+	top:9px;
+	left:110px;
+	height:110px;
+	width:120px;
+	position:absolute;
+}
+#piston_stats{
+	top:36px;
+	left:240px;
+	height:160px;
+	width:264px;
+	position:absolute;
+}
+#piston_buttons{
+	top:8px;
+	left:240px;
+	height:40px;
+	width:264px;
+	position:absolute;
+}
+#piston_compress,#piston_expand,#piston_fill,#piston_defill{
+	height:22px;
+	width:40px;
+	position:absolute;
+	font-weight:bold;
+	text-align: center;         /* 可选：文字内部也水平居中 */
+}
+#piston_compress{
+	top:0px;
+	left:0px;
+	background-color: rgb(255, 171, 61);
+	border:2px solid rgb(255, 200, 128);
+}
+#piston_expand{
+	top:0px;
+	left:45px;
+	background-color: rgb(36, 186, 255);
+	border:2px solid rgb(128, 247, 255);
+}
+#piston_fill{
+	top:0px;
+	left:90px;
+	background-color: rgb(255, 36, 36);
+	border:2px solid rgb(255, 128, 128);
+}
+#piston_defill{
+	top:0px;
+	left:135px;
+	background-color: rgb(204, 36, 255);
+	border:2px solid rgb(225, 128, 255);
+}
+
+
+
+
 
 #basic_character_info_div {
     width: 400px;
@@ -1531,6 +1700,18 @@ i {
 			left: 100px;
 		}
 
+#engine_element_bar_max {
+	outline: 2px solid #2495ff;
+	background-color: #befbff;
+	margin: auto;
+	width: 99%;
+	height: 16px;
+	margin-top: 10px;
+}
+#engine_element_bar_current {
+	background-color: #00c3ff;
+	height: 100%;
+}
 
 #reactor_B1_bar_max {
 	outline: 2px solid #98bda9;
@@ -1614,6 +1795,17 @@ i {
 	height: 100%;
 	width:150px;
 	float:right;
+}
+
+
+#baby_born_num {
+	text-align: center;
+	width: 80px;
+	margin: auto;
+	background-color: var(--background_gradient);
+	border: 2px solid gray;
+	color: white;
+	font-size: 16px;
 }
 
 
@@ -1754,6 +1946,14 @@ i {
 			border: 1px solid gray;
 			text-align: center;
 		}
+		#character_attack_bar_cnt {
+			padding: 3px;
+			margin-top: 2px;
+			margin-bottom: 2px;
+			width: 244px;
+			border: 1px solid gray;
+			text-align: center;
+		}
 			#character_stance_selection {
 				display: none;
 				position: absolute;
@@ -1803,6 +2003,7 @@ i {
 	height: 300px;
 	overflow-y: scroll;
 }
+
 
 #inventory_control_div {
 	font-size: 20px;
@@ -1854,21 +2055,21 @@ i {
 
 			#quests_box_div, #data_box_div{
 				width: 100%;
-				height: 255px;
+				height: 300px;
 				display: none;
 				overflow-y: scroll;
 			}
 
 			#bestiary_box_div{
 				width: 100%;
-				height: 255px;
+				height: 300px;
 				display: block;
 				overflow-y: scroll;
 
 			}
 			#levelary_box_div{
 				width: 100%;
-				height: 255px;
+				height: 300px;
 				display: block;
 				overflow-y: scroll;
 
@@ -1925,7 +2126,7 @@ i {
 }
 
 #skill_list_div, #stance_list_div {
-	height: 386px;
+	height: 395px;
 }
 		#skill_list {
 			overflow-y: scroll;
@@ -1985,6 +2186,25 @@ i {
 	border-bottom: 2px dotted gray;
 }
 
+.member_list_realm{
+	width: 60px;
+	border: 1px solid white;
+}
+.member_list_num, .member_list_change , .member_list_alti{
+	width: 75px;
+	border: 1px solid white;
+}
+
+.member_list_header{
+
+	border: 2px solid white;
+}
+.member_list{
+	
+	text-align: center;
+}
+
+
 .stances_name, .stance_list_header_name {
 	width: 300px;
 	padding-left: 10px;
@@ -2010,6 +2230,11 @@ i {
 			height: 113px;
 			font-style: italic;
 			color: rgb(224, 224, 224);
+			padding: 5px;
+		}
+		#S3_current_div {
+			height: 113px;
+			font-style: italic;
 			padding: 5px;
 		}
 
@@ -2302,6 +2527,55 @@ i {
 }
 
 
+#cloudy_effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* 不阻挡鼠标事件，让游戏正常交互 */
+    transform: scale(1);   /* 初始正常大小 */
+    opacity: 0;            /* 初始隐藏 */
+	z-index: 999;
+	transform-origin: center;
+	background: 
+        radial-gradient(circle at center, 
+
+            rgb(180, 116, 233) 0.1%, 
+            rgb(160, 128, 248) 0.2%, 
+            rgb(116, 177, 233) 0.5%, 
+            rgb(116, 229, 233,1.0) 1%, 
+            rgb(116, 233, 214,0.8) 2%, 
+            rgb(116, 233, 175,0.5) 5%, 
+            rgba(116,233,125,0.4) 10%, 
+            rgba(116,233,125,0.3) 25%, 
+            rgba(116,233,125,0.2) 50%, 
+            rgba(116,233,125,0.1) 75%, 
+            rgba(0, 150, 0, 0) 100%);
+		
+}
+@keyframes cloudy-effect {
+    0%   { transform: scale(0); opacity: 1; }
+    10%   { transform: scale(100); opacity: 1; }
+    100% { transform: scale(1000); opacity: 0; }
+}
+
+#cloudy_effect.cloudy-break {
+    animation: cloudy-effect 8s ease-in-out forwards;
+}
+
+
+@keyframes main-effect {
+    0%   { transform: scale(1); opacity: 1; }
+    10%   { transform: scale(0); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+#global_content.cloudy-break{
+    animation: main-effect 8s ease-in-out forwards;
+}
+
+
 
 #message_log_div {
 	top: 0px;
@@ -2380,20 +2654,87 @@ i {
     display: none;
 }
 
+#reactor_div , #grass_div {
+    display: none;
+    height: 411px;
+	width: 100%;
+	flex-direction:row;
+}
+#digging_div{
+
+    display: none;
+    height: 411px;
+	width: 100%;
+	flex-direction:row;
+}
+#claw_line{
+	background-color: #562C19;
+	transform-origin:left ;
+	position:absolute;
+	top:89px;
+	left:200px;
+	height:2px;
+	z-index:2;
+}
+#grassfield_div{
+    height: 321px;
+	width: 96%;
+	background: green;
+	position:relative;
+	left: 2%;
+	outline: 2px solid gray; 
+	display: flex; 
+}
+#digging_neko_div{
+	left:188px;
+	top:51px;
+	position:absolute;
+}
+#digging_claw{
+	left:200px;
+	top:91px;
+	z-index:20;
+	position:absolute;
+}
+#digging_field_div{
+
+    height: 321px;
+	width: 96%;
+	background: linear-gradient(to bottom ,lime,lightyellow,lightpink);
+	position:absolute;
+	left: 2%;
+	bottom:2%;
+	outline: 2px solid gray; 
+	display: flex; 
+	overflow:hidden;
+}
+.digging_fish{
+	z-index:1;
+}
 #fish_div {
     display: none;
     height: 411px;
 	width: 100%;
 	flex-direction:row;
 }
-
-#reactor_div {
+#fish_changed_div {
     display: none;
     height: 411px;
 	width: 100%;
 	flex-direction:row;
 }
+
 #fish_progress_div{
+    height: 321px;
+	width: 12px;
+	background: black;
+	position:relative;
+	left: 6px;
+	outline: 2px solid gray; 
+	display: flex; 
+    flex-direction: column-reverse;
+}
+#fish_progress_changed_div{
     height: 321px;
 	width: 12px;
 	background: black;
@@ -2407,7 +2748,28 @@ i {
 	z-index: 99;
 	vertical-align: bottom;
 }
+#fish_progress_changed_bar{
+	z-index: 99;
+	vertical-align: bottom;
+}
+#fish_progress_changeddiv{
+    height: 321px;
+	width: 12px;
+	background: black;
+	position:relative;
+	left: 6px;
+	outline: 2px solid gray; 
+	display: flex; 
+    flex-direction: column-reverse;
+}
+#fish_progress_changed_bar{
+	z-index: 99;
+	vertical-align: bottom;
+}
 #neko_fish_div{
+	width:50px;
+}
+#neko_fish_changed_div{
 	width:50px;
 }
 #fish_mark_div{
@@ -2415,9 +2777,26 @@ i {
 	left:2px;
 	top:3px;
 }
+#fish_mark_changed_div{
+	position:relative;
+	left:2px;
+	top:3px;
+}
 #fish_minigame_div{
     height: 321px;
 	width: 28px;
+	top:52px;
+	background: linear-gradient(to bottom ,#DDDDFF,#80D0FF,#20A0FF);
+	position:relative;
+	left: 6px;
+	outline: 2px solid gray; 
+	display: flex; 
+    flex-direction: column-reverse;
+}
+
+#fish_minigame_changed_div{
+    height: 321px;
+	width: 321px;
 	top:52px;
 	background: linear-gradient(to bottom ,#DDDDFF,#80D0FF,#20A0FF);
 	position:relative;
@@ -2437,11 +2816,36 @@ i {
 	background:linear-gradient(to bottom right,#00D000,#00FF00,#00D000);
 	z-index:1;
 }
+#fish_rod_changed_div{
+	
+	position:absolute;
+	left:1px;
+    height: 40px;
+	width: 40px;
+	outline: 2px solid darkgreen; 
+	background:linear-gradient(to bottom right,#00D000,#00FF00,#00D000);
+	z-index:2;
+}
+#fish_rod_2nd_div{
+	
+	position:absolute;
+	left:1px;
+    height: 60px;
+	width: 60px;
+	outline: 2px solid rgba(0, 255, 128, 0.5); 
+	background:linear-gradient(to bottom right,#00D0A080,#00FFA080,#00D0A080);
+	z-index:1;
+}
 
 #fish_game_div{
 	position:absolute;
 	left:2px;
 	z-index:2;
+}
+#fish_game_changed_div{
+	position:absolute;
+	left:2px;
+	z-index:3;
 }
 #fish_font_div{
 	position:absolute;
@@ -2464,6 +2868,14 @@ i {
 	background: linear-gradient(to bottom right,orange,yellow,orange);
 	outline: 2px solid gray;
 }
+#fish_background_changed_div{
+  flex-direction: row;
+  display: flex;
+    height: 411px;
+	width: 100%;
+	background: linear-gradient(to bottom right,orange,yellow,orange);
+	outline: 2px solid gray;
+}
 
 #trader_inventory_div {
     height: 311px;
@@ -2475,13 +2887,23 @@ i {
 	color: white;
 	outline: 1px solid white;
 	padding: 2px 1px 2px 1px;
-	width: 261px;
+	width: 200px;
 	float: left;
 	margin: 1px;
 }
+#trade_time_div {
+	color: white;
+	outline: 1px solid white;
+	padding: 2px 1px 2px 1px;
+	width: 94px;
+	float: left;
+	margin: 1px;
+	color: lightblue;
+	font-weight: bold;
+}
 
 #trader_cost_mult {
-	width: 131px;
+	width: 94px;
 	color: white;
 	outline: 1px solid white;
 	padding: 2px 1px 2px 1px;
@@ -2492,26 +2914,41 @@ i {
 }
 
 #trader_cost_mult_text {
-	width: 60px;
+	width: 42px;
 	float: left;
-	padding-left: 5px;
+	padding-left: 2px;
 }
 
 #trader_cost_mult_value {
-	width: 60px;
+	width: 48px;
 	float: left;
 	text-align: right;
-	padding-right: 5px;
+	padding-right: 2px;
+	padding-top: 5px;
 }
 
 #trade_price_text {
 	display: inline-block;
-	width: 80px;
-	padding-left: 5px;
+	width: 38px;
+	padding-left: 2px;
+	color: lightyellow;
+	font-weight: bold;
+}
+#trade_time_text {
+	display: inline-block;
+	width: 38px;
+	padding-left: 2px;
+}
+
+#trade_time_value {
+	display: inline-block;
+	width: 42px;
+	padding-left: 2px;
+	text-align: right;
 }
 
 #trade_price_value {
-	width: 164px;
+	width: 144px;
 	display: inline-block;
 	text-align: right;
 	padding-right: 5px;

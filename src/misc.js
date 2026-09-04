@@ -30,6 +30,7 @@ const stat_names = {"strength": "str",
                     "health_regeneration_flat": "HP Regen", //same as for "health"
                     "agility": "agility",
                     "dexterity": "dex",
+                    "defense": "防御",
                     "UK1": "UK1",
                     "attack_speed": "Attack Speed",
                     "attack_power": "Attack",
@@ -43,6 +44,7 @@ const stat_names = {"strength": "str",
                     "evasion": "EP",
                     "evasion_points": "EP",
                     "attack_points": "AP",
+                    "SCGV": "宝石耐性",
                 };
 
 function get_hit_chance(attack_agi, evasion_agi) {
@@ -51,6 +53,8 @@ function get_hit_chance(attack_agi, evasion_agi) {
     result = 0.63661977*Math.atan(result**1.5)// 2 / pi
     return result;
 }
+
+
 
 /**
  * 

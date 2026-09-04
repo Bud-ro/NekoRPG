@@ -1419,12 +1419,12 @@ class Textline {
     });
 
     dialogues["结界湖转化器"] = new Dialogue({
-        name: "Barrier Lake Converter",
-        starting_text: "Exchange Wild Beast vouchers for items (including the converter)",
+        name: "结界湖转化器",
+        starting_text: "使用<img src='image/item/B3_ear.png'>荒兽凭证兑换物品(包括转化器)",
         textlines: {
             "jjh": new Textline({ 
                 is_unlocked: true,
-                name: "Convert Barrier Lake Core (requires Barrier Lake Core in equipment slot)",
+                name: "转化<img src='image/item/barrierlake_heart.png'>结界湖之心(需要结界湖之心位于装备栏)",
                 text: "",
                 unlocks: {
                     spec:"jjhzx",
@@ -1432,7 +1432,7 @@ class Textline {
             }),
             "pz-my": new Textline({ 
                 is_unlocked: true,
-                name: "Exchange for Mithril Ingot (30:1)",
+                name: "兑换<img src='image/item/mythril_ingot.png'>秘银锭(30:1)",
                 text: "",
                 unlocks: {
                     spec:"pz-my",
@@ -1440,7 +1440,7 @@ class Textline {
             }),
             "pz-bs": new Textline({ 
                 is_unlocked: true,
-                name: "Exchange for Epic Topaz (80:1)",
+                name: "兑换<img src='image/item/gem51_200k.png'>史诗黄宝石(80:1)",
                 text: "",
                 unlocks: {
                     spec:"pz-bs",
@@ -1448,7 +1448,7 @@ class Textline {
             }),
             "pz-Bq": new Textline({ 
                 is_unlocked: true,
-                name: "Exchange for Purple Dao Coin (250:1)",
+                name: "兑换<img src='image/item/1B.png'>紫色刀币(250:1)",
                 text: "",
                 unlocks: {
                     spec:"pz-Bq",
@@ -1663,24 +1663,1576 @@ class Textline {
     });
 
 
+    dialogues["极寒相变引擎"] = new Dialogue({
+        name: "极寒相变引擎",
+        starting_text: "使用 [极寒相变引擎]",
+        textlines: {
+            "engine": new Textline({ 
+                is_unlocked: false,
+                name: "使用 [极寒相变引擎]",
+                text: "...",
+                unlocks: {
+                    spec:"freezing-engine",
+                },
+            }),
+        }
+    });
+
+    dialogues["冰霜门户"] = new Dialogue({
+        name: "冰霜门户",
+        textlines: {
+            "bs1": new Textline({ 
+                is_unlocked:false,
+                name: "咦，这是什么。(触摸)",
+                text: "纳可的手触碰上了这冰雪门户。<br>霎时间，刺骨的寒冷触感，<br>从手掌传来，让少女不禁打了个哆嗦。<br>在纳可的眼前，出现了一条长长的甬道，<br>一直通向前方。<br>甬道两侧都是高耸透明的冰壁。",
+
+                unlocks: {
+                    textlines: [{dialogue: "冰霜门户", lines: ["bs2"]}],
+                },
+                locks_lines: ["bs1"],
+            }),
+            "bs2": new Textline({ 
+                is_unlocked:false,
+                name: "(继续向前)",
+                text: "她本能地迈步向甬道的尽头走去，<br>很快看到了一扇冰门，<br>这扇冰门看上去朴实无华，散发着淡蓝色的光芒。<br>冰寒的力量犹如实质，弥漫在空气中，<br>逐渐汇聚成一种陌生而又熟悉的景象，<br>那是——水蓝色的庞大六芒星阵！",
+
+                unlocks: {
+                    textlines: [{dialogue: "冰霜门户", lines: ["bs3"]}],
+                },
+                locks_lines: ["bs2"],
+            }),
+            "bs3": new Textline({ 
+                is_unlocked:false,
+                name: "领域……冰元素的领域！",
+                text: "纳可不受控制地抬起手，火焰的能量席卷，<br>在她的身周蔓延，<br>转瞬与硕大的冰蓝六芒星碰撞！<br>剧烈的爆炸声响彻四周，<br>整个甬道都剧烈地晃动起来。<br>冲击波席卷四周，<br>冰墙出现一道道裂痕，旋即迅速愈合。<br>那水蓝色的六芒星，同样出现一道道缺口，<br>炽热的火焰能量，便趁虚而入，<br>融合进了六芒星的缝隙当中，最终消失不见。",
+
+                unlocks: {
+                    textlines: [{dialogue: "冰霜门户", lines: ["bs4"]}],
+                },
+                locks_lines: ["bs3"],
+            }),
+            "bs4": new Textline({ 
+                is_unlocked:false,
+                name: "水，滋润万物……火，照耀一切……",
+                text: "",
+
+                unlocks: {
+                    spec:"realm-II",
+                    textlines: [{dialogue: "冰霜门户", lines: ["bs5"]}],
+                },
+                locks_lines: ["bs4"],
+            }),
+            "bs5": new Textline({ 
+                is_unlocked:false,
+                name: "……",
+                text: "[纳娜米]可可，你快醒醒啊……<br>别吓姐姐。<br>纳可睁开迷离的双眼，<br>身边姐姐焦急的声音传来。<br>[纳娜米]可可！<br>你刚才突然晕倒了，我还以为你……<br>你还记得发生了什么？",
+
+                unlocks: {
+                    textlines: [{dialogue: "冰霜门户", lines: ["bs6"]}],
+                },
+                locks_lines: ["bs5"],
+            }),
+            "bs6": new Textline({ 
+                is_unlocked:false,
+                name: "(构造微型法阵)你怎么知道我的领域突破了？",
+                text: "[纳娜米]诶诶？什么时候……<br>原来如此，刚才的冰霜门户吗。<br>不愧是你可可，总能给姐姐带来惊吓。<br>说起来，刚刚在里面还发现了这个……<br><br>获取了 [万载冰髓锭] !",
+
+                unlocks: {
+                    items: [{item_name: "万载冰髓锭"}],
+                },
+                locks_lines: ["bs6"],
+            }),
+        }
+    });
+
+
+    dialogues["溪月"] = new Dialogue({
+        name: "溪月",
+        starting_text: "和突然出现的神秘少女交流",
+        textlines: {
+            "xy1": new Textline({ 
+                is_unlocked: false,
+                name: "有点奇怪，姐姐。",
+                text: "[纳可]之前的战斗中，那些家伙在死亡后，<br>他们的“族人”非但没有害怕，<br>反倒更疯狂地扑上来。<br>简直不像是正常人嘛……<br>打个比方的话，更像是我们曾经遇到的,<br>那些没有感情的【科技造物】。<br><br>[纳娜米]诶，不可能吧？<br>你的意思是说，<br>这些家伙都不是真正的人类？<br>[纳可]真正的人类里，怎么会像这样，<br>成千上万地冲锋上来呢？",
+                unlocks: {
+                    textlines: [{dialogue: "溪月", lines: ["xy2"]}],
+                },
+                
+                locks_lines: ["xy1"],
+            }),
+            "xy2": new Textline({ 
+                is_unlocked: false,
+                name: "……",
+                text: "[???]恭喜恭喜。外来者，<br>你们破译了这里的秘密！<br>作为奖励，送你们去一个好玩的地方，<br>【水牢】。<br>[纳娜米]你是……之前看到的那个女孩子！<br>果然，是你刻意把我们引导到这里的。<br>[纳可](双眼放光)感觉是，不得了的地方！",
+                unlocks: {
+                    textlines: [{dialogue: "溪月", lines: ["xy3"]}],
+                    locations: ["时封水牢"],
+                },
+                
+                locks_lines: ["xy2"],
+            }),
+            "xy3": new Textline({ 
+                is_unlocked: false,
+                name: "姐姐，姐姐，醒醒……",
+                text: "[纳娜米]唔，可可……？！<br>太好了，你还在就好……<br>[纳可]我没事，……那个女孩，并没有杀我们，<br>而是把我们扔在了这里……<br>[溪月]欢迎两位可爱的小姑娘。<br>咯咯，我还在哦。比起【那个女孩】,<br>你们称呼我为【溪月】更好些。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月", lines: ["xy4"]}],
+                },
+                locks_lines: ["xy3"],
+            }),
+            "xy4": new Textline({ 
+                is_unlocked: false,
+                name: "是你在引导我们吗？为什么要这么做。",
+                text: "[溪月]这都是主人的安排。<br>不过怎么也没想到，<br>这次的外来者，竟然这么可爱，咯咯。<br>两位，这水牢之中，<br>关押着数百名天空级强者，<br>实力从天空级一二阶，到五六阶不等。<br>想要出去，办法很简单——<br>杀死这座水牢中所有的强者！<br>出口，会向最后的胜利者开启。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月", lines: ["xy5"]}],
+                },
+                locks_lines: ["xy4"],
+            }),
+            "xy5": new Textline({ 
+                is_unlocked: false,
+                name: "(愣住)",
+                text: "[纳可]才数百名?<br>突破到天空级六阶都需要1120兆经验耶。<br>这么点哪里够啦！<br><br>[溪月]咯咯，这里还有主人布下的结界。<br>丰沛的水元素孕育下，<br>这里会产生，最高天空级七阶的水【灵】。<br>简而言之，<br>战斗经验绝对管够！<br>虽然这里你们想跑随便跑，<br>但是天空级七阶的敌人可不是哪里都有的哦！<br>好啦，我的任务已经完成啦，<br>祝你们好运，拜拜咯。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月", lines: ["xy6"]}],
+                },
+                locks_lines: ["xy5"],
+            }),
+            "xy6": new Textline({ 
+                is_unlocked: false,
+                name: "喂，喂！",
+                text: "[纳娜米]看样子人真的走了。<br>[纳可]现在该怎么办，姐姐……<br>这里一只【灵】都没有呢。<br>[纳娜米]不一定。<br>也许，可以主动去找水牢中的强者，<br>尝试沟通一番。<br>[纳可]诶，要去找他们吗？<br>[纳娜米]他们或许也因为【灵】的袭击而感到困扰吧。<br>去帮忙解决【灵】，似乎是双赢的事呢。",
+                unlocks: {
+                    textlines: [{dialogue: "竺虎", lines: ["zh1"]}],
+                },
+                locks_lines: ["xy6"],
+            }),
+        }
+    });
+
+    
+
+    dialogues["竺虎"] = new Dialogue({
+        name: "竺虎",
+        
+        textlines: {
+            "zh1": new Textline({ 
+                is_unlocked: false,
+                name: "…",
+                text: "[竺虎]哦呦，生面孔？<br>呵呵，这水牢有段时间没有新人了。<br><br>[纳娜米]你好，<br>你也是被关押进来的强者？<br><br>[竺虎]是啊，早先几百年就被关押在这里了。<br>哦，那边那个小姑娘，<br>你手里拿的那把武器，不错嘛。",
+                unlocks: {
+                    textlines: [{dialogue: "竺虎", lines: ["zh2"]}],
+                },
+                
+                locks_lines: ["zh1"],
+            }),
+            "zh2": new Textline({ 
+                is_unlocked: false,
+                name: "在叫我吗……？",
+                text: "[竺虎]没错，啧啧，<br>看起来是品质很高的念力兵器。<br>那么，我就不客气的收下了。",
+                unlocks: {
+                    textlines: [{dialogue: "竺虎", lines: ["zh3"]}],
+                },
+                
+                locks_lines: ["zh2"],
+            }),
+            "zh3": new Textline({ 
+                is_unlocked: false,
+                name: "这，这可不能随便给你！",
+                text: "[竺虎]哈哈哈，真是太幼稚了。<br>新人，你们还不懂这里的规则吧。<br>在这里强者为尊，杀人更是家常便饭。<br>两个天空级初……哈？！<br>现在求饶还来得及吗？",
+                unlocks: {
+                    textlines: [{dialogue: "竺虎", lines: ["zh4"]}],
+                },
+                
+                locks_lines: ["zh3"],
+            }),
+            "zh4": new Textline({ 
+                is_unlocked: false,
+                name: "想打架就直说嘛……",
+                text: "[纳娜米]既然如此，<br>不再废话——你就死在这里好了。<br>(可可，拿下这家伙就交给你了！)",
+                unlocks: {
+                    locations: ["时封水牢 - I"],
+                },
+                
+                locks_lines: ["zh4"],
+            }),
+            "zh5": new Textline({ 
+                is_unlocked: false,
+                name: "现在呢，到底是谁要死在这里呀。",
+                text: "[竺虎]天真！就算你们再能打，<br>在境界所限………………<br><br>(死一般的寂静)",
+                unlocks: {
+                    textlines: [{dialogue: "竺虎", lines: ["zh6-1"]},{dialogue: "竺虎", lines: ["zh6-2"]}],
+                },
+                
+                locks_lines: ["zh5"],
+            }),
+            "zh6-1": new Textline({ 
+                is_unlocked: false,
+                name: "饶恕",
+                text: "[纳可]看在本小姐今天心情不错的份上，<br>你可以走了~<br><br>[竺虎]那就告辞了，两位大人——",
+                unlocks: {
+                    textlines: [{dialogue: "竺虎", lines: ["zh7"]}],
+                },
+                
+                locks_lines: ["zh6-1","zh6-2"],
+            }),
+            "zh6-2": new Textline({ 
+                is_unlocked: false,
+                name: "<span style='color:red'><b>杀害</b></span>",
+                text: "[竺虎]饶命啊——<br><br>(月轮切割声)<br><br>[纳可]好了，差不多就这样埋了吧。<br>[纳娜米]长大了啊……<br><br>获取了 沼泽·荒兽肉块 * 5!<br>获取了 晶化 剑(品质 239%)!<br>获取了 <span class='coin coin_moneyT'>259B</span> <span class='coin coin_moneyB'>346D</span> <span class='coin coin_moneyM'>107Z</span> <span class='coin coin_moneyK'>197X</span> <span class='coin coin_copper'>56C</span>!",
+                unlocks: {
+                    spec:"kill-zh",
+                    textlines: [{dialogue: "竺虎", lines: ["zh7"]}],
+                },
+                
+                locks_lines: ["zh6-1","zh6-2"],
+            }),
+            "zh7": new Textline({ 
+                is_unlocked: false,
+                name: "真是的，明明自己技不如人，还要放狠话。",
+                text: "[纳娜米](此处省去水牢的强度判断)<br>还记得你之前，<br>在那天外来客的飞船中说过的话吗？<br>[纳可]是指什么话呢。<br>[纳娜米]你说，只要在飞船内成为天空级九阶，<br>麻烦便会迎刃而解！<br><br>仿佛醍醐灌顶一般，纳可似乎意识到了什么，顿时眼前一亮。",
+                unlocks: {
+                    textlines: [{dialogue: "竺虎", lines: ["zh8"]}],
+                },
+                
+                locks_lines: ["zh7"],
+            }),
+            "zh8": new Textline({ 
+                is_unlocked: false,
+                name: "可是姐姐，压级要扣80%经验耶。",
+                text: "[纳娜米]只有当实力超出了所有人，<br>才会受到这样的惩罚。<br>而已经超越了所有人，<br>危机不就不复存在了吗？<br><br>[纳可]有道理诶。",
+                unlocks: {
+                    locations: ["时封水牢 - 1"],
+                },
+                
+                locks_lines: ["zh8"],
+            }),
+        }
+    });
+    
+    dialogues["莫尔"] = new Dialogue({
+        name: "莫尔",
+        textlines: {
+            "mr1": new Textline({ 
+                is_unlocked: false,
+                name: "你找上我们，有什么事吗？",
+                text: "放心吧，我无意对付你们。<br>我只是想讨教一下，能压制竺虎的【领域】，<br>到底有多神奇。",
+                unlocks: {
+                    textlines: [{dialogue: "莫尔", lines: ["mr2"]}],
+                },
+                locks_lines: ["mr1"],
+            }),
+            "mr2": new Textline({ 
+                is_unlocked: false,
+                name: "没兴趣啊，而且很奇怪啊。",
+                text: "[纳可]明明身处牢笼之中，朝不保夕的处境下，<br>还在想着与人切磋较量吗……<br><br>[莫尔]这里的凶险，我当然知道的比你们多。<br>可比起变强，这有算得了什么呢。<br>我可以告诉你们，<br>这水牢中的几个最强者，<br>脾气可都很古怪。<br>像强榜发布者【蓝柒】，落叶刀【秋兴】等，<br>每一个实力都数十倍于我。",
+                unlocks: {
+                    textlines: [{dialogue: "莫尔", lines: ["mr3"]}],
+                },
+                locks_lines: ["mr2"],
+            }),
+            "mr3": new Textline({ 
+                is_unlocked: false,
+                name: "…",
+                text: "[纳娜米]所以，你觉得我们会答应吗？<br>在这里战斗，对我们也没有任何好处吧，<br>还可能会吸引来其他强者。<br><br>[莫尔]嗯，这也确实，<br>在下料定两位不会轻易答应，不过——<br>这不是轻率的冒犯，而是一次交易。",
+                unlocks: {
+                    textlines: [{dialogue: "莫尔", lines: ["mr4"]}],
+                },
+                locks_lines: ["mr3"],
+            }),
+            "mr4": new Textline({ 
+                is_unlocked: false,
+                name: "诶诶？什么交易，你在说什么啊。",
+                text: "[莫尔]可爱的小家伙，你手里的武器，很强。<br>我曾长时间研究过念力兵器，<br>你这月轮的构架，起码是巅峰灵宝级。<br>即使云霄级强者，也会趋之若鹜。<br>可是你暂时无法发挥它的威力。<br>而我，或许可以帮到你。<br>[纳可]你的意思是！<br><br>[莫尔]如果我赢了，我什么都不会做。<br>只求能够学习你的领悟，<br>或是听听你对领域一道的见解。",
+                unlocks: {
+                    textlines: [{dialogue: "莫尔", lines: ["mr5"]}],
+                },
+                locks_lines: ["mr4"],
+            }),
+            "mr5": new Textline({ 
+                is_unlocked: false,
+                name: "(他真的值得信任吗……)",
+                text: "[莫尔]我知道你在担心什么，<br>以强榜强者的声誉起誓，<br>我绝不会随意做什么手脚。<br>况且，做出见不得人的勾当，<br>一旦消息从这传出去，<br>恐怕便是身败名裂，招致灾祸吧。<br><br>[纳可]好……我答应你。既然如此，请吧。",
+                unlocks: {
+                    locations: ["时封水牢 - II"],
+                },
+                locks_lines: ["mr5"],
+            }),
+            "mr6": new Textline({ 
+                is_unlocked: false,
+                name: "(……)",
+                text: "依照约定，莫尔将自己关于念力兵器的领悟，<br>毫无保留地教给了纳可。<br>到了此时，她才发现，<br>在这水牢之中，也并非只有你死我活，<br>如莫尔这般一心为修炼的强者也有不少。<br>交谈之中，她感受得到莫尔对于变强的渴望，<br>这份渴望的价值甚至是超越了生存。<br>很快，由216颗白水晶构造成的月轮，<br></br>在少女的手上，绽放出更华丽的光彩……<br>【银霜月轮】获取2.99垓经验！",
+                unlocks: {
+                    spec:"moonwheel-lv40",
+                },
+                locks_lines: ["mr6"],
+            }),
+        }
+    });
+
+    dialogues["秋兴"] = new Dialogue({
+        name: "秋兴",
+        textlines: {
+            "qx1": new Textline({ 
+                is_unlocked: false,
+                name: "(落叶刀……！排名第三的落叶刀！)",
+                text: "[秋兴]啊哈，我知道你们想说什么。<br>其实我早就发现你们的藏身之处了。<br>只不过，我在等你们成长，<br>直到足以与我对抗。",
+                unlocks: {
+                    textlines: [{dialogue: "秋兴", lines: ["qx2"]}],
+                },
+                locks_lines: ["qx1"],
+            }),
+            "qx2": new Textline({ 
+                is_unlocked: false,
+                name: "想要更强的对手，为什么盯着我们不放啊。",
+                text: "[秋兴]哈哈哈，<br>小姑娘，你看到一个好玩的玩具，<br>会忍心放着不玩吗？",
+                unlocks: {
+                    textlines: [{dialogue: "秋兴", lines: ["qx3-1"]},{dialogue: "秋兴", lines: ["qx3-2"]}],
+                },
+                locks_lines: ["qx2"],
+            }),
+            "qx3-1": new Textline({ 
+                is_unlocked: false,
+                name: "……所谓好玩的玩具，是指我们？",
+                text: "[秋兴]聪明！没错，我只是单纯觉得好玩，<br>所以想和你们玩而已。<br>自然，如果你们能让我满意，<br>我会放你们离开。<br>哎呀，真是漂亮的小东西呢……<br>让我看看。<br><br>秋兴伸出手来，<br>作势想要触碰纳可的脸颊。",
+                unlocks: {
+                    textlines: [{dialogue: "秋兴", lines: ["qx4"]}],
+                },
+                locks_lines: ["qx3-1","qx3-2"],
+            }),
+            "qx3-2": new Textline({ 
+                is_unlocked: false,
+                name: "(拿出极寒相变引擎)这个我可是放着没管！",
+                text: "[秋兴]哈？(推，拉，推，拉)<br>这根本不是什么玩具啊！<br>比起这个，还是你们更好玩一点。<br>哎呀，真是漂亮的小东西呢……<br>让我看看。<br><br>秋兴伸出手来，<br>作势想要触碰纳可的脸颊。",
+                unlocks: {
+                    textlines: [{dialogue: "秋兴", lines: ["qx4"]}],
+                },
+                locks_lines: ["qx3-1","qx3-2"],
+            }),
+            "qx4": new Textline({ 
+                is_unlocked: false,
+                name: "啪——",
+                text: "[纳娜米]呸，无耻败类，别碰可可，<br>否则你最好祈祷你不会出事。<br><br>[秋兴]哦呀，小姐脾气倒挺大。<br>只不过，你的实力能不能配得上你的脾气呢?",
+                unlocks: {
+                    locations: ["时封水牢 - III"],
+                },
+                locks_lines: ["qx4"],
+            }),
+            "qx5": new Textline({ 
+                is_unlocked: false,
+                name: "你这家伙……为什么要留手？",
+                text: "[秋兴]怎么？这么可爱的小妹妹，<br>难道一定要打生打死不成？哈哈哈……<br>(省略了部分关于水牢势力分布的剧情)<br>(蓝柒没有碾压的实力，<br>但因为反抗者内部矛盾，<br>反抗蓝柒从未成功)<br><br>从秋兴的身上学到了领域之道！<br>【水元素亲和】获取了3997万经验！",
+                unlocks: {
+                    spec:"realm-III",
+                    locations: ["时封水牢 - 5"],
+                    textlines: [{dialogue: "秋兴", lines: ["qx6-1"]},{dialogue: "秋兴", lines: ["qx6-2"]},{dialogue: "秋兴", lines: ["qx6-3"]}],
+                },
+                locks_lines: ["qx5"],
+            }),
+            
+            "qx6-1": new Textline({ 
+                is_unlocked: false,
+                name: "<span style='color:red'><b>杀害</b></span>",
+                text: "[秋兴]不要……求你了……我什么都会做的！<br><br>(月轮切割声)<br><br>[纳可]呜，为什么我要这么做……<br>[纳娜米]……可可，你让我感到陌生。<br><br><br>获取了 <span class='coin coin_moneyT'>923B</span> <span class='coin coin_moneyB'>124D</span> <span class='coin coin_moneyM'>981Z</span> <span class='coin coin_moneyK'>247X</span> <span class='coin coin_copper'>561C</span>!<br><span style='color:aqua'>冰家</span>对纳可的好感大幅降低了！",
+                unlocks: {
+                    spec:"qx-kill",
+                },
+                locks_lines: ["qx6-1","qx6-2","qx6-3"],
+            }),
+            "qx6-2": new Textline({ 
+                is_unlocked: false,
+                name: "<span style='color:red'><b>侵犯</b></span>",
+                text: "(纳可蹲下,挑起秋兴的下巴)<br>现在谁才是可爱的小妹妹哇？<br>领域三重·焰海霜天·焰海，开！<br>伴随着1280K的高温，<br>以及伴生的强劲环流，<br>秋兴的衣物瞬间被撕开几条巨型裂口。<br>3颗从哥布林身上提取的【冰封术】水晶，<br>被轮番催动，冰冻秋兴。在对方无力反抗的条件下，<br>3颗水晶恰好连续控制。<br>……<br>……<br>如此一整血洛日后，<br>纳可方才击杀哥布林，<br>将秋兴带回了洞府。<br><br>秋兴对纳可产生了特殊的情感！",
+                unlocks: {
+                    spec:"qx-sox",
+                },
+                locks_lines: ["qx6-1","qx6-2","qx6-3"],
+            }),
+            "qx6-3": new Textline({ 
+                is_unlocked: false,
+                name: "<b>离开</b>",
+                text: "[纳可]你可以走了哦~<br>以后有空再来交流领域之道哇？<br><br>[秋兴]",
+                unlocks: {
+                },
+                locks_lines: ["qx6-1","qx6-2","qx6-3"],
+            }),
+        }
+    });
+
+
+    dialogues["蓝柒"] = new Dialogue({
+        name: "蓝柒",
+        textlines: {
+            "lq1": new Textline({ 
+                is_unlocked: false,
+                name: "(强者的气息……她果然来了吗？)",
+                text: "[蓝柒]……<br><br>[纳娜米]你一直在看着吧，<br>我们和秋兴的那一场战斗。<br>不然，也不会把可可的实力，<br>评定为强榜第三——<br>不如说，水牢里的很多次战斗，<br>你都在背后看着？<br><br>[蓝柒]……",
+                unlocks: {
+                    textlines: [{dialogue: "蓝柒", lines: ["lq2"]}],
+                },
+                locks_lines: ["lq1"],
+            }),"lq2": new Textline({ 
+                is_unlocked: false,
+                name: "姐姐，先停一下……",
+                text: "[纳娜米]可可，这种时候打断姐姐很烦诶……<br><br>[蓝柒]……<br>不要再继续成长了。<br>会有可怕的事情发生的。",
+                unlocks: {
+                    textlines: [{dialogue: "蓝柒", lines: ["lq3"]}],
+                },
+                locks_lines: ["lq2"],
+            }),"lq3": new Textline({ 
+                is_unlocked: false,
+                name: "什么意思……？",
+                text: "[蓝柒]有特殊的原因。<br>总之，不要再继续了，这是警告——",
+                unlocks: {
+                    locations: ["时封水牢 - IV"],
+                },
+                locks_lines: ["lq3"],
+            }),"lq4": new Textline({ 
+                is_unlocked: false,
+                name: "……",
+                text: "[蓝柒]到此为止吧，这是最后的劝告。<br>这里的破局方法，和你们想的不一样。<br>再见。<br><br>[纳娜米]这样就走了吗？<br>似乎是我们预想之外的情况。",
+                unlocks: {
+                    textlines: [{dialogue: "蓝柒", lines: ["lq5"]}],
+                },
+                locks_lines: ["lq4"],
+            }),"lq5": new Textline({ 
+                is_unlocked: false,
+                name: "搞不懂呢，之前的秋兴也不像在说话的样子。",
+                text: "[纳可]这个女孩，真的是蓝柒吗？<br>实力确实很强，但和说话的不一样呀。<br>甚至……没有在她的身上感受到什么恶意。<br><br>[纳娜米]疑点越来越多了。<br>她的意思是，这座水牢中，<br>还存在着不同的，能够逃出去的方法吗？<br>[纳可]回去吧，姐姐。<br>稍晚一点再做打算。",
+                unlocks: {
+                    
+                    items: [{item_name: "传说红宝石"}],
+                },
+                locks_lines: ["lq5"],
+            }),"lq6": new Textline({ 
+                is_unlocked: false,
+                name: "……",
+                text: "[蓝柒]你们很强……<br>但是，想要破局，<br>还不够……",
+                unlocks: {
+                    textlines: [{dialogue: "蓝柒", lines: ["lq7"]}],
+                },
+                locks_lines: ["lq6"],
+            }),"lq7": new Textline({ 
+                is_unlocked: false,
+                name: "可以问一下吗？",
+                text: "[纳娜米]你看到我们来到这里，<br>为什么会表现得这么失态。<br><br>[蓝柒]这个问题，不是很想回答……<br>可能……很快，你们就会明白的吧。<br>可我已经帮不了你们什么了。<br>",
+                unlocks: {
+                    locations: ["水牢走廊"],
+                    textlines: [{dialogue: "蓝柒", lines: ["lq8-1"]},{dialogue: "蓝柒", lines: ["lq8-2"]},{dialogue: "蓝柒", lines: ["lq8-3"]}],
+                },
+                locks_lines: ["lq7"],
+            }),
+            "lq8-1": new Textline({ 
+                is_unlocked: false,
+                name: "<span style='color:red'><b>杀害</b></span>",
+                text: "[蓝柒]如果……这就是你们心中的水牢……<br><br>(月轮切割声)<br><br>[纳可]重要的人……靠谱的前辈……<br>我是从什么时候开始变成这样的呢？<br>[纳娜米]……可可，别杀我，我害怕……<br><br><br>获取了 <span class='coin coin_moneyQa'>5U</span> <span class='coin coin_moneyT'>810B</span> <span class='coin coin_moneyB'>358D</span> <span class='coin coin_moneyM'>643Z</span> <span class='coin coin_moneyK'>364X</span> <span class='coin coin_copper'>656C</span>!<br><span style='color:aqua'>冰家</span>对纳可的好感大幅降低了！",
+                unlocks: {
+                    spec:"lq-kill",
+                },
+                locks_lines: ["lq8-1","lq8-2","lq8-3"],
+            }),
+            "lq8-2": new Textline({ 
+                is_unlocked: false,
+                name: "<span style='color:red'><b>侵犯</b></span>",
+                text: "蓝柒在纳可心中早已是谜团重重的强者。<br>借此机会，她决定把蓝柒带回洞府，<br>严加“审问”，以便探出个究竟。<br>[纳可]地宫狂暴药剂~废墟狂暴药剂~<br>永远别想恢复体力，反抗我了哦~<br>[蓝柒]你很强……但是……还不够……<br>[纳可]差不多得了，领域四重才够嘛？<br>(纳可取出一桶异界药剂，一饮而尽！)<br><br>在每回合不断加码的倍率下，<br>蓝柒终究还是没能抵挡住纳可的“攻击”。<br><br>蓝柒对纳可产生了特殊的情感！",
+                unlocks: {
+                    spec:"lq-sox",
+                },
+                locks_lines: ["lq8-1","lq8-2","lq8-3"],
+            }),
+            "lq8-3": new Textline({ 
+                is_unlocked: false,
+                name: "<b>离开</b>",
+                text: "想要前进的话，就过去吧，<br>愿伟大的不朽神灵保佑你们。",
+                unlocks: {
+                },
+                locks_lines: ["lq8-1","lq8-2","lq8-3"],
+            }),
+        }
+    });
+
+
+    dialogues["溪月 II"] = new Dialogue({
+        name: "溪月 II",
+        starting_text: "和走廊中的粉发少女交流",
+        textlines: {
+            "xy7": new Textline({ 
+                is_unlocked: true,
+                name: "…",
+                text: "恭喜恭喜，你们过关了！",
+                unlocks: {
+                    textlines: [{dialogue: "溪月 II", lines: ["xy8"]}],
+                },
+                
+                locks_lines: ["xy7"],
+            }),
+            "xy8": new Textline({ 
+                is_unlocked: false,
+                name: "过关……你是，之前冰原上的那个女孩子。",
+                text: "[纳娜米]这样也算我们过关了吗。<br>我们可并没有杀光水牢的强者。<br><br>[溪月]过关的办法——并非只有自相残杀，<br>如果你到达领域三重，这条通道自然会为你敞开。<br>是不是觉得很混乱呀？<br>没关系，你们很快会明白的。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月 II", lines: ["xy9"]}],
+                },
+                
+                locks_lines: ["xy8"],
+            }),
+            "xy9": new Textline({ 
+                is_unlocked: false,
+                name: "能告诉我们这里究竟是什么地方吗。。",
+                text: "[溪月]唔姆，这个嘛，当然没问题。<br>这里是主人构建的结界，<br>据说有百万年历史呢，可厉害啦。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月 II", lines: ["xy10"]}],
+                },
+                
+                locks_lines: ["xy9"],
+            }),
+            "xy10": new Textline({ 
+                is_unlocked: false,
+                name: "等等，主人？",
+                text: "[溪月]你也知道，被关在这里的这些强者，<br>虽然都被困住出不去的……<br>可只要他们不破坏这里的规矩，<br>就能安全地活上许多年，<br>令实力提升到惊人的程度。<br><br>当然，水牢中缺乏修炼资源。<br>原本可能已经突破天空级九阶的强者，<br>在这里只能打磨到天空级六阶[IV]，<br>具有抗衡初入天空级八阶的实力。<br><br>[PS/设定补充]<br>无特殊说明下，2+对应1个小境界。<br>为避免境界过于冗长，<br>3+以上会以罗马数字的形式展示。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月 II", lines: ["xy11"]}],
+                },
+                
+                locks_lines: ["xy10"],
+            }),
+            "xy11": new Textline({ 
+                is_unlocked: false,
+                name: "可是……在这期间，你知道有多少人死去了吗？",
+                text: "[溪月]啊呀，真是单纯的孩子。<br>虽然不忍心，可还是给你讲讲吧。<br>为培养强者，这些都是必然的牺牲。<br>在几百名天空级的厮杀中，<br>一旦诞生了一名云霄级——<br>这云霄级强者的价值，<br>可就要超过，嗯……我算算……<br>根据阶位不同，<br>10万~31亿天空级一阶的总和！<br><br>说到底这里百万年来就死了三万天空级！<br>你看看右上角的击杀统计，<br>有什么资格在这里评价主人啊！",
+                unlocks: {
+                    textlines: [{dialogue: "溪月 II", lines: ["xy12"]}],
+                },
+                
+                locks_lines: ["xy11"],
+            }),
+            "xy12": new Textline({ 
+                is_unlocked: false,
+                name: "那，已经获得胜利的我们要做什么？",
+                text: "[溪月]你们已经有了接受传承的资格！<br>接下来嘛，就让我带你们去见主人。<br>进入传承幻境，能得到多少领悟经验和修炼心得，<br>就看你们自己啦。<br><br>[纳可]我……无法接受。<br>[纳娜米]……可可，我们跟上去吧。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月 II", lines: ["xy13"]}],
+                },
+                
+                locks_lines: ["xy12"],
+            }),
+            "xy13": new Textline({ 
+                is_unlocked: false,
+                name: "不，我说的不是这个……",
+                text: "[纳可]10万~31亿天空级一阶的总和！<br>如果可以培养出一些云霄级强者，<br>肯定可以有源源不断的<span class='coin coin_moneyT'>宝钱</span>和<span class='coin coin_moneyQa'>宇宙币</span>涌来吧……<br>等接收完传承，是时候整合家族了！<br>现在的我，感觉已经具备了挑战父亲大人的能力呢。<br>(天空级巅峰 [-4]的老东西！<br>你的时代结束了！)",
+                unlocks: {
+                    textlines: [{dialogue: "溪月 II", lines: ["xy14"]}],
+                },
+                
+                locks_lines: ["xy13"],
+            }),
+            "xy14": new Textline({ 
+                is_unlocked: false,
+                name: "(抖了抖)收拾收拾心情……",
+                text: "[???]小姑娘，能来到这里，<br>勇气可嘉，胆识可嘉。<br>[左阿]首先，自我介绍一下。<br>原燕岗领混元门，少门主左阿。<br>[纳娜米]左阿？！您是……<br>燕岗领史书上记载的那位前辈？<br>[左阿]哈哈，不错。这么多年过去了，<br>还有小辈记得我的名字，<br>看来我还没被世人忘个干净。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月 II", lines: ["xy15"]}],
+                },
+                
+                locks_lines: ["xy14"],
+            }),
+            "xy15": new Textline({ 
+                is_unlocked: false,
+                name: "(姐姐……我没看过史书诶。他是谁？）",
+                text: "[纳娜米]距今约十万年历史的前辈高人……<br>因为和门主的冲突毁灭了昔日如日中天的【混元门】。<br>[左阿]呵呵，在这里传音可瞒不住我的感知。<br>当年，我出身于外门弟子之家，<br>天资平平，不受人重视。<br>后来，觉醒了天生元神体，<br>才突飞猛进，称为宗门高层。<br><br>[纳可]诶？天生元神体怎么会后天觉醒的哇。<br>[左阿]咳咳……总之门主要夺舍我！<br>我以云霄级巅峰之身，<br>与他同归于尽。<br>但是在我死亡的瞬间，我迈入了领域级层次。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月 II", lines: ["xy16"]}],
+                },
+                
+                locks_lines: ["xy15"],
+            }),
+            "xy16": new Textline({ 
+                is_unlocked: false,
+                name: "呼……",
+                text: "[左阿]最终就成了现在这样，<br>以一个扭曲的姿态活在这结界里。<br>既然你们冒着巨大风险来到这里，<br>又通过了我设下的重重关卡，<br>自然是不能让你们白来一趟。<br>[左阿]现在，开放你们的身心，<br>进入传承幻境，接受我的传承吧。<br>我只负责送你们进入幻境，<br>能有多少领悟，就看你们的造化了。<br>切记，传承只赠有缘人……<br>我占了溪月的对话框那么久，<br>也该歇歇了。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月 II", lines: ["xy17"]}],
+                },
+                
+                locks_lines: ["xy16"],
+            }),
+            "xy17": new Textline({ 
+                is_unlocked: false,
+                name: "（眼前一亮）",
+                text: "随着左阿话音落下，<br>纳可和纳娜米眼前浮现白光，<br>似乎要将身体里的灵魂拉扯出来。<br>白光持续了片刻，而后，在这片空间中央，<br>形成了一个巨大的漩涡，<br><br>隐约之间，旋涡中映出了彩色的光华。<br>随着漩涡中的光线越来越亮，<br>纳可终于能够看清周围的一切，<br>她缓缓地睁开了眼睛。<br><br>进入传承幻境，纳娜米……算了，这个不收了啦。<br>反正估计你也有冰原之心了的说……",
+                unlocks: {
+                    locations: ["传承幻境"],
+                },
+                
+                locks_lines: ["xy17"],
+            }),
+
+            
+        }
+    });
+
+    dialogues["传承水晶"] = new Dialogue({
+        name: "传承水晶",
+        starting_text: "触摸散发着光亮的水晶",
+        textlines: {
+            "sj1": new Textline({ 
+                is_unlocked: false,
+                name: "(摸)",
+                text: "[纳可]果然，这些水晶中，<br>蕴含着左阿前辈的感悟！<br>好强大的力量……<br>可却夹杂着强烈的暴戾气息。<br>左阿前辈，过去到底经历了什么呢？<br>一定要静心凝神……<br>算了，我也不好说人家啦。",
+                unlocks: {
+                    textlines: [{dialogue: "传承水晶", lines: ["sj2"]}],
+                },
+                
+                locks_lines: ["sj1"],
+            }),
+            "sj2": new Textline({ 
+                is_unlocked: false,
+                name: "(闭眼)",
+                text: "[纳可]……只是稍一接触，<br>秘法之中，许多尚未融汇贯通的部分，<br>一下就豁然开朗。<br>这是峰大哥赐予我的秘法，<br>它真正的潜力果然不同凡响。<br>(内心OS:毕竟上限可是50级！)<br>有些期待，不知道蜕变成功后会有多强呢？<br><br>领悟了新的秘法<span style='color:aqua'> 【映星紫华】</span>！<br>请在装备栏中进行装备。",
+                unlocks: {
+                    items: [{item_name: "映星紫华",quality:200}],
+                },
+                
+                locks_lines: ["sj2"],
+            }),
+
+        }
+    });
+
+    dialogues["纳娜米?"] = new Dialogue({
+        name: "纳娜米?",
+        starting_text: "和地宫的姐姐……真的是姐姐吗？",
+        textlines: {
+            "hx1": new Textline({ 
+                is_unlocked: false,
+                name: "诶，姐姐，……你说什么？",
+                text: "[纳娜米]可可！你终于醒了！<br>你之前和地宫的怪物厮杀，<br>消耗了太多体力，晕过去了。<br>不过放心吧，这一片区域的怪物，<br>刚才已经被姐姐清理干净了，<br>姐姐会保护你的。",
+                unlocks: {
+                    textlines: [{dialogue: "纳娜米?", lines: ["hx2"]}],
+                },
+                
+                locks_lines: ["hx1"],
+            }),
+            "hx2": new Textline({ 
+                is_unlocked: false,
+                name: "姐姐，方才我晕倒的时候",
+                text: "[纳可]你在……清理这片区域的怪物对吧。<br><br>[纳娜米?]是啊，你就不要担心了。<br>有姐姐在，这些都是小问题……",
+                unlocks: {
+                    textlines: [{dialogue: "纳娜米?", lines: ["hx3"]}],
+                },
+                
+                locks_lines: ["hx2"],
+            }),
+            "hx3": new Textline({ 
+                is_unlocked: false,
+                name: "你……你不是姐姐！",
+                text: "[纳可]在进幻境之前，<br>姐姐还只有天空级六阶！<br>怎么可能打得过八九阶的敌人哇。<br><br>[纳娜米?]………………<br><br>[纳可]你在听吗？我终于明白了，<br>我现在看到的一切都是幻觉，<br>而不是什么时间倒流。<br>你到底是谁？",
+                unlocks: {
+                    textlines: [{dialogue: "纳娜米?", lines: ["hx4"]}],
+                },
+                
+                locks_lines: ["hx3"],
+            }),
+            "hx4": new Textline({ 
+                is_unlocked: false,
+                name: "你到底是谁？",
+                text: "[纳可]你是我内心的心魔！对不对！<br><br><del>[纳娜米?]</del>[喵咕啦]<br>恭喜，答错啦！我是，<br>和你姐姐衣服颜色一样的茸茸！<br>我可不像心魔那个笨蛋一样会去用牵制！",
+                unlocks: {
+                    locations: ["幻境核心 - I"],
+                },
+                
+                locks_lines: ["hx4"],
+            }),
+
+        }
+    });
+    
+    dialogues["纳鹰?"] = new Dialogue({
+        name: "纳鹰?",
+        starting_text: "和结界湖里的老祖……肯定是假的！",
+        textlines: {
+            "hx5": new Textline({ 
+                is_unlocked: false,
+                name: "纳鹰前辈……不，你不是前辈!",
+                text: "[纳鹰?]哦呵呵，看来出了一点意外。<br>小丫头，先不要着急。<br>你一次性接受了很多知识，<br>必然会导致你的神识出现短暂的活跃期，<br>甚至勾勒出许多不存在的幻象。<br>",
+                unlocks: {
+                    textlines: [{dialogue: "纳鹰?", lines: ["hx6"]}],
+                },
+                
+                locks_lines: ["hx5"],
+            }),
+            "hx6": new Textline({ 
+                is_unlocked: false,
+                name: "幻象？你，你在说什么啊……",
+                text: "[纳鹰?]听着，小丫头，<br>抛却你脑海中那些杂乱的念头。<br>我将自己关于领域的领悟传授给你，<br>这或许会影响到你之后的路。<br>在未来，你甚至可能拥有领域——",
+                unlocks: {
+                    textlines: [{dialogue: "纳鹰?", lines: ["hx7"]}],
+                },
+                
+                locks_lines: ["hx6"],
+            }),
+            "hx7": new Textline({ 
+                is_unlocked: false,
+                name: "我……我的领域？",
+                text: "[纳可]听着，老登！我的确拥有领域，<br>，而且是——领域三重巅峰！<br>[纳鹰?]……(消散)<br>[纳可]呼……这一只的本体就是心魔，<br>倒免去一番苦战。<br>感觉对它的理解又深了一层。<br>这样下去的话，<br>不知道能否更进一步呢……",
+                unlocks: {
+                    locations: ["幻境核心·战场"],
+                },
+                
+                locks_lines: ["hx7"],
+            }),
+        }
+    });
+    
+
+
+    dialogues["烈日神像"] = new Dialogue({
+        name: "烈日神像",
+        starting_text: "参拜幻境·战场中的烈日之神像",
+        textlines: {
+            "lr1": new Textline({ 
+                is_unlocked: true,
+                name: "(不算恭敬地稍微拜一拜)",
+                text: "[烈日投影]<br>咳咳……听我弟弟皎月讲过你的事了。<br>总之，这座神像的材质更好！<br>虽然需要的不只是刀币，还多了些宇宙币……<br>作为回报，你可以得到烈日的祝福！<br>它们比原来的buff更强大！<br><br>对了，生命力和加钱的规矩还是老样子。<br><br><span class='realm_cloudy'>云霄级四阶</span>以上的修者也算了，<br>这个中档神像承载不了太强的力量投影。<br>此外，提醒一下——每22.5h祝福内容就会切换。<br>鉴于<span class='realm_cloudy'>云霄级</span>4.8h/s的时间流速，<br>不建议当场查看祝福，而是查表。",
+                unlocks: {
+                    textlines: [{dialogue: "烈日神像", lines: ["lr2"]},{dialogue: "烈日神像", lines: ["lr3"]}],
+                },
+                
+                locks_lines: ["lr1"],
+            }), 
+            "lr2": new Textline({ 
+                is_unlocked: false,
+                name: "(查询目前赐福与消耗信息)",
+                text: "",
+                unlocks: {
+                    spec: "LR-check",
+                },
+            }), 
+            "lr3": new Textline({ 
+                is_unlocked: false,
+                name: "(上供刀币获取赐福)",
+                text: "",
+                unlocks: {
+                    spec: "LR-sacrifice",
+                },
+            }), 
+        }
+    });
+
+    dialogues["末世天骄"] = new Dialogue({
+        name: "末世天骄",
+        starting_text: "和怨念集合体对话",
+        textlines: {
+            "hx8": new Textline({ 
+                is_unlocked: true,
+                name: "(来到面前)",
+                text: "[？？？]我不甘心！不甘心！<br>本天才英明一世，历尽坎坷闯过天才战，<br>却栽在了一场区区试炼任务中！<br><br>[纳可]好强烈的怨念，而且是之前没有见过的人。<br>难道是……这艘飞船的主人吗？<br>也就是，那位陨落在这里的，<br>天外来客。",
+                unlocks: {
+                    textlines: [{dialogue: "末世天骄", lines: ["hx9"]}],
+                },
+                
+                locks_lines: ["hx8"],
+            }), 
+            "hx9": new Textline({ 
+                is_unlocked: false,
+                name: "原来如此……",
+                text: "[纳可]就在我被封锁在飞船内的那段时间，<br>他的怨念便已经附着在我内心深处，<br>许久以来，我竟然未曾察觉……<br>[？？？]杀，杀了你们！<br>敢挡本天才的强者路，<br>不过是一群愚昧的土著罢了——<br>[纳可]看来……你真的是很不甘心呢。<br>被你称之为土著的，<br>那些死在你手上的血洛大陆居民，<br>他们何尝又不想活着？<br>你肆意屠杀低阶血洛居民，<br>分明于你毫无益处，<br>只是发泄愤恨的手段！<br><br>你觉得，真正的天才面临陨落……",
+                unlocks: {
+                    textlines: [{dialogue: "末世天骄", lines: ["hx10"]}],
+                },
+                locks_lines: ["hx9"],
+            }), 
+            "hx10": new Textline({ 
+                is_unlocked: false,
+                name: "会像你一样歇斯底里吗？",
+                text: "[？？？]你……我……<br>谔谔啊啊啊啊——<br><br>天外来客，突然间不再说话，<br>似是彻底冷静下来。<br>他的眼神变得平静无波。<br>突然之间，周遭散逸的怨念沸腾起来，<br>天外来客桀笑出声。<br><br>[？？？]呵呵呵……<br>你在反应堆熔毁时，<br>可曾怀疑过为何辐射如此短暂？<br>那都是因为——本天才！<br>本天才已经恢复到半步云霄级！",
+                unlocks: {
+                    locations: ["幻境核心 - 歧路"],
+                },
+                locks_lines: ["hx10"],
+            }), 
+        }
+    });
+
+    dialogues["十连扭蛋机"] = new Dialogue({
+        name: "十连扭蛋机",
+        starting_text: "使用 [十连扭蛋机]",
+        textlines: {
+            "nd1": new Textline({ 
+                is_unlocked: false,
+                name: "扭蛋机介绍",
+                text: "使用 <img src='image/item/inherit_pink.png'>传承水晶·粉 抽奖！<br>10块一抽，90块十连！",
+                unlocks: {
+                    textlines: [{dialogue: "十连扭蛋机", lines: ["nd2"]},{dialogue: "十连扭蛋机", lines: ["nd3"]}],
+                },
+                
+                locks_lines: ["nd1"],
+            }), 
+            "nd2": new Textline({ 
+                is_unlocked: false,
+                name: "单抽(10 x <img src='image/item/inherit_pink.png'>传承水晶·粉)",
+                text: "",
+                unlocks: {
+                    spec:"gacha-1",
+                },
+            }), 
+            "nd3": new Textline({ 
+                is_unlocked: false,
+                name: "十连(90 x <img src='image/item/inherit_pink.png'>传承水晶·粉)",
+                text: "",
+                unlocks: {
+                    spec:"gacha-10",
+                    textlines: [{dialogue: "十连扭蛋机", lines: ["nd4"]}],
+                },
+            }), 
+            "nd4": new Textline({ 
+                is_unlocked: false,
+                name: "五十连(450 x <img src='image/item/inherit_pink.png'>传承水晶·粉)",
+                text: "",
+                unlocks: {
+                    spec:"gacha-50",
+                },
+            }), 
+            
+            "by": new Textline({ 
+                is_unlocked: true,
+                name: "转化<img src='image/item/iceland_heart.png'>冰原之心(需要冰原之心位于装备栏)",
+                text: "",
+                unlocks: {
+                    spec:"byzx",
+                },
+            }),
+        }
+    });
+
+
+    dialogues["心魔之主"] = new Dialogue({
+        name: "心魔之主",
+        starting_text: "和峰大哥(?)对话",
+        textlines: {
+            "xm1": new Textline({ 
+                is_unlocked: false,
+                name: "峰……峰大哥。",
+                text: "[峰]可可。<br>我很惊讶，你能够连闯四重幻境，<br>来到这里。不过，就到此为止了。",
+                unlocks: {
+                    textlines: [{dialogue: "心魔之主", lines: ["xm2"]}],
+                },
+                locks_lines: ["xm1"],
+            }), 
+            "xm2": new Textline({ 
+                is_unlocked: false,
+                name: "诶……？",
+                text: "[峰]事实上，这些年以来，<br>我看着你接连闯过，<br>冰原、水牢、四重幻境。<br>我一直在注视着你的成长。<br><br>我甚至躲在那台扭蛋机里——<br>不过如果不是万亿分之一的奇迹，<br>你应该是不会发现的啦。<br><br>你的表现让我很满意，<br>所以你有资格——<br>称为我的灵魂奴仆。",
+                unlocks: {
+                    textlines: [{dialogue: "心魔之主", lines: ["xm3"]}],
+                },
+                locks_lines: ["xm2"],
+            }), 
+            "xm3": new Textline({ 
+                is_unlocked: false,
+                name: "我……我听不明白。",
+                text: "[峰]话说到这里，还没有明白吗？<br>事实上，我很早就在留意你，<br>留意你身上的某种特质。<br>我知道百家和十三斧的一切计划，<br>因此借着他们来接近你，<br>并在你心中，悄无声息留下深刻的烙印。",
+                unlocks: {
+                    textlines: [{dialogue: "心魔之主", lines: ["xm4"]}],
+                },
+                locks_lines: ["xm3"],
+            }), 
+            "xm4": new Textline({ 
+                is_unlocked: false,
+                name: "烙印？我只记得……<span class='coin coin_moneySp'>1.21Δ</span>.",
+                text: "[峰]……都现在了就别想着钱了！<br>来吧，放开你的身心。<br>我会庇护你，让你成为强者，<br>追随我去遍历广袤的世界。<br><br>[纳可]如果我说，不呢？<br>你在说谎——各种意义上的。<br>峰大哥带着我的时候，<br>我偷看过他的面板。<br>你以为就凭你这点水平，<br>就能模拟出<b><span style='color:#00fa9a'>百线流</span> <span style='color:#edec9f'>金空法则</span><br><span style='color:lime'>4.489垓</span> <span style='color:red'>167.24京</span> <span style='color:blue'>86.49京</span></b>的压迫感？",
+                unlocks: {
+                    textlines: [{dialogue: "心魔之主", lines: ["xm5"]}],
+                },
+                locks_lines: ["xm4"],
+            }), 
+            "xm5": new Textline({ 
+                is_unlocked: false,
+                name: "编造的理由未免太幼稚了吧？.",
+                text: "(峰的身形变为了???)<br>[???]简直是一派胡言！<br>编属性都不编一下敏捷的吗！<br>这里可是RPG位面！<br><br><span class='message_sayuki'>[纱雪]诶诶？<br>意外想起了之前忘记的事情呢。<br>这可要多谢你。</span><br>[纳可]即使见过城主和左阿前辈，<br>这两位领域级高手，站在他们面前，<br>给人的感觉也没有峰那样的高深莫测……<br>所以，在见过真正的强者眼界之后……",
+                unlocks: {
+                    textlines: [{dialogue: "心魔之主", lines: ["xm6"]}],
+                },
+                locks_lines: ["xm5"],
+            }), 
+            "xm6": new Textline({ 
+                is_unlocked: false,
+                name: "仅仅你这番话，是不会让我动摇的哦。",
+                text: "[心魔之主]你有资格知道我的身份，<br>我乃——心魔之主。<br>是你内心一切恐惧的事物、<br>一切负面情绪的源头。",
+                unlocks: {
+                    textlines: [{dialogue: "心魔之主", lines: ["xm7"]}],
+                },
+                locks_lines: ["xm6"],
+            }), 
+            "xm7": new Textline({ 
+                is_unlocked: false,
+                name: "一切的恐惧？你看看你的技能栏呢？",
+                text: "[心魔之主]你有资格知道我的身份，<br>我乃——心魔之主。<br>是你内心一切恐惧的事物、<br>一切负面情绪的源头。<br>技能？看就看！<br>",
+                unlocks: {
+                    spec:"heartdemon-lord",
+                    locations:["幻境核心 - IV"]
+                },
+                locks_lines: ["xm7"],
+            }), 
+        }
+    });
+
+
+    dialogues["溪月(核心)"] = new Dialogue({
+        name: "溪月(核心)",
+        starting_text: "和粉发少女[溪月]对话",
+        textlines: {
+            "hx11_1": new Textline({ 
+                is_unlocked: true,
+                name: "(睁眼)",
+                text: "[溪月]欢迎来到，幻境核心的最深层——<br>幻境核心·现世。<br>不要东张西望啦，你找不到我的。<br>我在你的识海深处，通过意念来传递讯息。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx12"]}],
+                },
+                locks_lines: ["hx11_1"],
+            }), 
+            "hx12": new Textline({ 
+                is_unlocked: false,
+                name: "溪月小姐，为什么你会在这里？",
+                text: "[纳可]还有，这幻境到底是怎么回事，<br>左阿前辈他——<br><br>[溪月]在这里就不要再叫那个家伙前辈了，呸。<br>他此刻正试图抹去你身上的灵魂印记，<br>无暇他顾，才让我找到机会溜了进来。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx13"]}],
+                },
+                locks_lines: ["hx12"],
+            }), 
+            "hx13": new Textline({ 
+                is_unlocked: false,
+                name: "诶？",
+                text: "[溪月]长话短说吧——<br>也无所谓，意识传讯是很快的。<br>不会耽误你多少时间。<br>首先，还记得水牢中的“强榜”吗？<br>嗯，我是说，那个空缺着的第一位。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx14"]}],
+                },
+                locks_lines: ["hx13"],
+            }), 
+            "hx14": new Textline({ 
+                is_unlocked: false,
+                name: "为什么突然提起这个。",
+                text: "[纳可]情报说，从数百年前开始，<br>第一的位置，就一直被蓝柒留空着。<br><br>[溪月]咯咯……当然是空着，<br>因为第一名已经离开了水牢，<br>并投靠了结界的主人。<br>说是投靠，可也不过是潜伏在左阿身边，<br>正好又对他有点利用价值，<br>便被他所接纳了——<br>同时，也得知了大量的情报。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx15"]}],
+                },
+                locks_lines: ["hx14"],
+            }), 
+            "hx15": new Textline({ 
+                is_unlocked: false,
+                name: "强榜曾经的第一位……是你？！",
+                text: "[溪月]聪明聪明！果然，<br>和聪明的孩子说话就是享受啊。<br>虽然小蓝也和你一样聪明，<br>可惜她不喜欢讲话的。<br>以前在水牢里的时候，她……啊，跑题了。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx16"]}],
+                },
+                locks_lines: ["hx15"],
+            }), 
+            "hx16": new Textline({ 
+                is_unlocked: false,
+                name: "是说【蓝柒】吗。",
+                text: "[纳可]……在我离开水牢时，<br>她曾对我说过一些让人半懂不懂的话。<br><br>[溪月]啊嘞，我大概能猜出那话是什么。<br>之所以她不把话说明白，<br>不是不想，而是不能。<br>整座水牢，都在那【左阿】的监视之中。<br>在传达一些消息时，一旦稍有不慎，<br>被他所怀疑，便可能遭致抹杀！",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx17"]}],
+                },
+                locks_lines: ["hx16"],
+            }), 
+            "hx17": new Textline({ 
+                is_unlocked: false,
+                name: "左阿，到底是一个什么样的人？。",
+                text: "[溪月]他是<span class='realm_domain'>领域级</span>强者，<br>也是一个不折不扣的……疯子。<br><br>[纳可]那，那些珍贵的传承……<br>难不成？<br><br>[溪月]都是假象，看似他筛选天才接受传承，<br>而实际上，他只不过是想借此重塑自己的身体，<br>锤炼出能够容纳他灵魂的“容器”！<br>据我所知，水牢中的强者，<br>无论通过何种途径离开那里，<br>最后几乎无一例外，<br>都成为了那容器的一部分。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx18"]}],
+                },
+                locks_lines: ["hx17"],
+            }), 
+            "hx18": new Textline({ 
+                is_unlocked: false,
+                name: "什么——！",
+                text: "[溪月]成为容器，最低标准便是……<br>鲜活的生命，天空级高阶实力。<br>如果你拥有三重领域，<br>毫无疑问也达到了这一点。<br>水牢的出口，会在你达到标准的时候，<br>召唤强者们走出去——<br>然后顺理成章，变成容器的一部分。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx19"]}],
+                },
+                locks_lines: ["hx18"],
+            }), 
+            "hx19": new Textline({ 
+                is_unlocked: false,
+                name: "那杀死其他所有强者是怎么回事？",
+                text: "[溪月]那只是个幌子而已……<br>生死厮杀，永远是强者的催化剂。<br>历史上并没有人击杀过水牢中所有强者。<br>因为……误闯这片秘境的外来者，<br>会几乎源源不断地补充进来。<br>强者们的归宿只有被别人杀死，<br>老死，或是成为容器。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx20"]}],
+                },
+                locks_lines: ["hx19"],
+            }), 
+            "hx20": new Textline({ 
+                is_unlocked: false,
+                name: "“生死厮杀，永远是强者的催化剂”",
+                text: "[纳可]“只要万千弱者中诞生一个强者，<br>对族群的价值便远大于万千弱者”<br>……好，我知道了。<br>你的血条什么时候亮？<br>(眼中闪烁着红蓝二色光华)<br><br>[溪月]咯咯……<br>小姑娘这种反应，<br>还是遇过的疯子太多了呢。<br>可惜纱雪没给我补属性，<br>所以我只能把我知道的情报都给你了！",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx21"]}],
+                },
+                locks_lines: ["hx20"],
+            }), 
+            "hx21": new Textline({ 
+                is_unlocked: false,
+                name: "(接受情报 pt1)",
+                text: "左阿，一个微不足道的小人物。<br>强手如云的混元门之中，<br>资质平平的他不受重视，<br>被同门排挤，受尽白眼。<br>在这个充满了竞争、杀伐的世界里，<br>弱者，永远只能活在最底层。<br>他拼命努力，无奈修炼天赋太差，无法改变什么。<br>直到有一次，他遇上了自己的天才师兄弟。<br>两人相谈甚欢，一时高兴，就多喝了几杯。<br>这一醉，就再也醒不过来。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx22"]}],
+                },
+                locks_lines: ["hx21"],
+            }), 
+            "hx22": new Textline({ 
+                is_unlocked: false,
+                name: "(接受情报 pt2)",
+                text: "在众人眼中，他放弃了自己的抱负，<br>整日呼朋引伴，饮酒作乐。<br>久而久之，也结交了几个贵人。<br>他终于能够在同门面前抬得起头来，<br>可任谁都没想到的是，<br>这只是他庞大计划的第一步。<br>那一日，宗门高层在荒兽森林里，<br>发现了他同门师兄弟的尸骸。<br>尸骸旁边是几头天空级的凶兽。<br>他显然刚经历了一番激烈的厮杀，<br>浑身浴血，脸上也沾染着泥土与灰尘。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx23"]}],
+                },
+                locks_lines: ["hx22"],
+            }), 
+            "hx23": new Textline({ 
+                is_unlocked: false,
+                name: "(接受情报 pt3)",
+                text: "在那之后左阿变得郁郁寡欢，<br>似乎师兄弟的死，对他影响很大。<br>他不再饮酒作乐，而是整日沉浸在练功房中修炼。<br>他的修为，自那之后，开始节节攀升。<br>众人以为他受到刺激突然开窍了，<br>纷纷对他刮目相看。<br>门主更是大喜过望，<br>甚至当即封他做少门主，<br>也就是未来混元门的接班人！<br><br>[溪月]嗯。就是这样。<br>这本该是一个励志的故事耶……<br>但是，小姑娘，你发现疑点了吗？",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx24"]}],
+                },
+                locks_lines: ["hx23"],
+            }), 
+            "hx24": new Textline({ 
+                is_unlocked: false,
+                name: "那位师兄弟的死因，有些蹊跷——",
+                text: "[溪月]正确！后来，<br>混元门的门主也发现了事情的不对劲之处，<br>于是下令仔细追查这件事情——<br>",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx25"]}],
+                },
+                locks_lines: ["hx24"],
+            }), 
+            "hx25": new Textline({ 
+                is_unlocked: false,
+                name: "(接受情报 pt4)",
+                text: "在左阿身居高位之后，<br>他的性情变得更加肆无忌惮，毫不掩饰。<br>由于德不配位，仇视他的人越来越多。<br>纸是包不住火的——<br>那位师兄弟陨落的事情被重新提起，<br>许多门人向左阿发难，<br>分析事情的种种蹊跷之处。<br>门主乃是领域级强者，<br>一般人无法堪破的假象，<br>在他眼中却是无所遁形，<br>很快线索便被不断收集。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx26"]}],
+                },
+                locks_lines: ["hx25"],
+            }), 
+            "hx26": new Textline({ 
+                is_unlocked: false,
+                name: "(接受情报 pt5)",
+                text: "当真相大白，所有人醒悟过来，<br>那位同门师兄弟果真是被左阿所杀，<br>其天生元神体也为左阿所夺舍时，<br>为时已晚。众人惊恐地发现，<br>左阿利用少门主的职务之便，<br>多年之内，一直待在镇门之宝——<br>【时光殿】中修炼。<br>其修为早已超越表面上不知何几！<br>当虚伪的面具被撕开时，<br>不过百余年时间，<br>他竟已修成云霄级九阶！",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx27"]}],
+                },
+                locks_lines: ["hx26"],
+            }), 
+            "hx27": new Textline({ 
+                is_unlocked: false,
+                name: "(接受情报 pt6)",
+                text: "左阿冷眼扫视众人，<br>心狠手辣的他，主动出击，<br>门主欲要阻拦，却发现眼前的左阿不过是一个幻身。<br>而他的真身，早已以少门主的身份，<br>畅通无阻地前往一个又一个山门，<br>展开了一场一边倒的屠杀。<br>他是云霄级九阶，又夺舍了天生元神体，<br>那些大地、天空级的弟子，<br>甚至连云霄级的宗门长老都毫无还手之力！",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx28"]}],
+                },
+                locks_lines: ["hx27"],
+            }), 
+            "hx28": new Textline({ 
+                is_unlocked: false,
+                name: "(接受情报 pt7)",
+                text: "整个混元门，只剩下门主能与之一战。<br>而那位门主，没有丝毫犹豫，<br>以自身生命为代价，与左阿拼死一搏。<br>但即使如此，混元门的损失依旧极为惨重。<br>这一幕落在其他几派眼中，<br>引得轩然大波。<br>门主身死。左阿肉体被毁，<br>却临阵突破，灵魂得以远遁而去。<br>镇门之宝【时光殿】，也被他带走。<br>不久，混元门被众多势力瓜分。曾经不可一世的最庞大势力……",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx29"]}],
+                },
+                locks_lines: ["hx28"],
+            }), 
+            "hx29": new Textline({ 
+                is_unlocked: false,
+                name: "就此消失在燕岗领的历史长河中。",
+                text: "[溪月]后面的这一段，你已经知道啦。<br>就不需要再重复一遍了。<br>事情，就是如此。<br>混元门门主的家族，本来是燕岗领的名门望族。<br>在那场惊天动地的战争过后，<br>混元门消失，家族力量折损无数，家道中落。<br>那位门主是一个值得尊敬的人，<br>他以一己之力令整个门派免于被灭满门的下场。<br>另外，他也是——<br>我，还有蓝柒，我们的先祖。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx30"]}],
+                },
+                locks_lines: ["hx29"],
+            }), 
+            "hx30": new Textline({ 
+                is_unlocked: false,
+                name: "这样的感觉真的很不好受呢。",
+                text: "[纳可]听着别人轻描淡写地讲述自己沉重的事情。<br><br>[溪月]啊，没关系的。<br>我现在很开心，因为看到了希望——<br>能够改写这段命运的希望。<br>我们家族世代隐忍，<br>足足十纪元之久过去，<br>期间不间断地搜集情报，<br>打听到了那左阿的下落，<br>以及他这些年的所作所为。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx31"]}],
+                },
+                locks_lines: ["hx30"],
+            }), 
+            "hx31": new Textline({ 
+                is_unlocked: false,
+                name: "…",
+                text: "[溪月]我与蓝柒二人，<br>便是在这等条件下，<br>悄然伪装成寻常的冒险者，<br>潜伏在左阿的身侧，并……<br>伺机而动！<br>蓝柒她在水牢中的所为，<br>不是维护自己的地位，<br>而是在保护水牢里的强者，<br>避免他们变得更强，<br>达到成为“容器”的标准。<br><br>[纳可]呼……真是曲折的故事……<br>你们在等待吗？",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx32"]}],
+                },
+                locks_lines: ["hx31"],
+            }), 
+            "hx32": new Textline({ 
+                is_unlocked: false,
+                name: "等待能够逆转乾坤的力量出现？",
+                text: "[溪月]是呀。我知道我们的计划很危险，<br>甚至可以说没有任何把握。<br>因为现在的左阿，<br>已经快要恢复曾经的状态。<br>这是杀死他的唯一机会，<br>我们只能孤注一掷。<br>哪怕付出牺牲，也都认了。<br>我和蓝柒——我们的家族已等了十纪元，<br>不想继续等待下去了。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx33"]}],
+                },
+                locks_lines: ["hx32"],
+            }), 
+            "hx33": new Textline({ 
+                is_unlocked: false,
+                name: "我相信你。",
+                text: "[纳可]原来左阿囤积了那么多宝物……<br>这就解释得通了。<br>等等，这么说来姐姐岂不是很危险！<br><br>[溪月]唔唔，不用担心。<br>你的姐姐不是放在箱子里吗！<br>只要赶在左阿翻箱倒柜，<br>把她抓出来之前，<br>摧毁这里，她就不会有什么事。<br>我会尽我所能，保护你姐姐完好无缺地离开。",
+                unlocks: {
+                    textlines: [{dialogue: "溪月(核心)", lines: ["hx34"]}],
+                },
+                locks_lines: ["hx33"],
+            }), 
+            "hx34": new Textline({ 
+                is_unlocked: false,
+                name: "我也会全力以赴的！",
+                text: "[纳可]那么，溪月小姐，合作愉快。<br><br>[溪月]……谢谢，拜托了……<br><br>",
+                unlocks: {
+                    locations:["幻境核心 - 6"],
+                },
+                locks_lines: ["hx34"],
+            }), 
+            "hx35": new Textline({ 
+                is_unlocked: false,
+                name: "那么，帮我开启最终决战之地吧！",
+                text: "[溪月]嗯……准备好了！<br><br>",
+                unlocks: {
+                    locations:["幻境核心·决战"],
+                    spec:'save',
+                },
+                locks_lines: ["hx35"],
+            }), 
+        }
+    })
+    dialogues["草场"] = new Dialogue({
+        name: "草场",
+        starting_text: "前往收割[绝音蕨]",
+        textlines: {
+            "grass": new Textline({ 
+                is_unlocked: true,
+                name: "...",
+                text: "...",
+                unlocks: {
+                    spec:"grass-field",
+                },
+                
+            }),
+        }
+    });
+    dialogues["左阿(决战)"] = new Dialogue({
+        name: "左阿(决战)",
+        starting_text: "和左阿“前辈”对话",
+        textlines: {
+            "za1": new Textline({ 
+                is_unlocked: true,
+                name: "终于到了，支撑整片幻境的力量源泉……",
+                text: "[左阿]恭喜你，小丫头。<br>活着走到这里，<br>代表你有资格获得我【左阿】的传承。<br>只不过——",
+                unlocks: {
+                    textlines: [{dialogue: "左阿(决战)", lines: ["za2"]}],
+                },
+                locks_lines: ["za1"],
+            }),
+            "za2": new Textline({ 
+                is_unlocked: false,
+                name: "不用你揭开谜底，我已经知道了。",
+                text: "[纳可]你编造了很多谎言，<br>真是让人失望，左阿前辈。<br><br>[左阿]啊哈哈哈哈哈，很好，有趣有趣。<br>看来事情，稍微有了那么一点点，<br>出乎意料的变化。",
+                unlocks: {
+                    textlines: [{dialogue: "左阿(决战)", lines: ["za3"]}],
+                },
+                locks_lines: ["za2"],
+            }),
+            "za3": new Textline({ 
+                is_unlocked: false,
+                name: "你的时代已经过去了，前辈。",
+                text: "[纳可]没有必要再在这里兴风作浪了。<br><br>[左阿]别废话了，如今我十万年的大计，<br>只差最后一步，<br>又岂会因为一个小丫头而放弃。<br>你知道我有多恨那个老不死的门主吧。<br>如果不是因为他，<br>我这等枭雄又岂会屈居这结界内十万年。",
+                unlocks: {
+                    textlines: [{dialogue: "左阿(决战)", lines: ["za4"]}],
+                },
+                locks_lines: ["za3"],
+            }),
+            "za4": new Textline({ 
+                is_unlocked: false,
+                name: "做了这么多的事情，你还没有意识到自己的平平无奇吗？",
+                text: "[纳可]你的路从最开始，就已经走错了。<br>十万年间，总共有二十三万余冒险者，<br>闯入了这里。<br>他们中未到天空级的二十万，<br>在踏入的一瞬间便化为了结界的养分。<br>你甚至没考虑去舔个包——<br>要是里面有人带着B6镭射枪这种宝物，<br>你也不要了？",
+                unlocks: {
+                    textlines: [{dialogue: "左阿(决战)", lines: ["za5"]}],
+                },
+                locks_lines: ["za4"],
+            }),
+            "za5": new Textline({ 
+                is_unlocked: false,
+                name: "三万天空级，在水牢的时间加速下，",
+                text: "[纳可]历经五十万年，无数场屠杀，<br>仅剩如今的几百人存活。<br>考虑到天空级的寿命仅为一万年……<br>如今存活者仍有数百人，<br>说明绝大部分都是自然死亡！<br>水牢里的氛围应该互相猜忌，<br>而不是和如今一样充满秩序！",
+                unlocks: {
+                    textlines: [{dialogue: "左阿(决战)", lines: ["za6"]}],
+                },
+                locks_lines: ["za5"],
+            }),
+            "za6": new Textline({ 
+                is_unlocked: false,
+                name: "另外，还有二十五位云霄级强者，",
+                text: "[纳可]由于已经足够作为容器，<br>因此被你毫不留情地直接杀死……<br>这就是你把灵魂放着不管的借口？<br><br>[左阿]小丫头，<br>不知道你从哪来的勇气，<br>开始说教我的水牢管理太烂了。<br>可你的修为对我来说，还是太嫩了。",
+                unlocks: {
+                    textlines: [{dialogue: "左阿(决战)", lines: ["za7"]}],
+                },
+                locks_lines: ["za6"],
+            }),
+            "za7": new Textline({ 
+                is_unlocked: false,
+                name: "[左阿]开什么玩笑？",
+                text: "[纳可]时间到了。<br>是时候蜕变了，领域力量。",
+                unlocks: {
+                    textlines: [{dialogue: "左阿(决战)", lines: ["za8"]}],
+                    spec:"realm-IV",
+                },
+                locks_lines: ["za7"],
+            }),
+            "za8": new Textline({ 
+                is_unlocked: false,
+                name: "(警告⚠️:触发该剧情后快速返回将被禁用)",
+                text: "[左阿]你的底牌只是如此吗？<br>[纳可]离结束还早呢。<br><br>【第三幕BOSS战已开始！】",
+                unlocks: {
+                    textlines: [{dialogue: "决战木牌", lines: ["S31"]},{dialogue: "决战木牌", lines: ["S32"]},{dialogue: "决战木牌", lines: ["S33"]}],
+                    spec:"S3-start",
+                },
+                locks_lines: ["za8"],
+            }),
+        }
+    });
+    dialogues["决战木牌"] = new Dialogue({
+        name: "决战木牌",
+        starting_text: "查看boss战规则",
+        textlines: {
+            "S31": new Textline({ 
+                is_unlocked: false,
+                name: "【心之灵】和【灵魂之力】",
+                text: "每击败一只【心之灵】，<br>都能获得1点【灵魂之力】！<br>当灵魂之力累计到5、10点后，你的生命上限增加20%！<br>累计到15、20点后，你的攻防敏上升1亿！<br>累计到25点后，封印将会完成！<br>封印完成后，<br>左阿的实力将被削弱<span style='color:aqua'>10081</span>倍，与纳可进入最终的决战！",
+                unlocks: {
+                },
+                
+            }),
+            "S32": new Textline({ 
+                is_unlocked: false,
+                name: "仪表盘显示",
+                text: "<img src='image/item/violet_ingot.png'>魂晶锭 代表着【灵魂之力】！，<br><img src='image/boss/B3706.png'><img src='image/boss/B3707.png'><img src='image/boss/B3708.png'>心之灵 代表场上此种心之灵剩余量！",
+                unlocks: {
+                },
+                
+            }),
+            "S33": new Textline({ 
+                is_unlocked: false,
+                name: "我怎么回不去了",
+                text: "最终决战一旦开始，就无法回头！<br>读档吧……我想我应该在外面就警告过你了。<br>当然，打完了还是可以回去的就是了。",
+                unlocks: {
+                },
+                
+            }),
+        }
+    });
+
+    dialogues["冰溪月"] = new Dialogue({
+        name: "冰溪月",
+        starting_text: "和溪月对话",
+        textlines: {
+            "bx1": new Textline({ 
+                is_unlocked: true,
+                name: "(残留的水元素结界仍在水牢中流淌，)",
+                text: "但那若隐若现的窒息感已然消散。<br>十几道身影，正围站在天光洒落的平台上。<br><br>[纳可]诶，诶？<br>所以说，这里的所有人，<br>都是来自溪月小姐……的家族？<br><br>[冰溪月]溪月只是暂时的名字，<br>重新自我介绍一下吧。<br>在下，冰家，<span style='color:aqua'>冰溪月</span>。<br>",
+                unlocks: {
+                    spec:"P3-1",
+                    textlines: [{dialogue: "冰溪月", lines: ["bx2"]}],
+                },
+                
+                locks_lines: ["bx1"],
+            }),
+            "bx2": new Textline({ 
+                is_unlocked: false,
+                name: "那……其他人呢？",
+                text: "[冰溪月]嘻嘻，很抱歉到现在才告诉你。<br>不过也是没有办法的事情。<br>另外，强榜这二十个人，不能说全部，<br>但大多数都是被我们陆续安排进来，<br>作为死士一样潜伏的哦。<br>",
+                unlocks: {
+                    spec:"P3-2",
+                    textlines: [{dialogue: "冰溪月", lines: ["bx3"]}],
+                },
+                
+                locks_lines: ["bx2"],
+            }),
+            "bx3": new Textline({ 
+                is_unlocked: false,
+                name: "原来是这样，怪不得……",
+                text: "[纳娜米]那么多拥有领域的强者聚集在这里。<br><br>[冰溪月]唔，事实上还不仅如此。<br>为了得到水牢的信息，<br>家族先后付出了几位，<br>云霄级前辈的性命为代价。",
+                unlocks: {
+                    textlines: [{dialogue: "冰溪月", lines: ["bx4"]}],
+                },
+                
+                locks_lines: ["bx3"],
+            }),
+            "bx4": new Textline({ 
+                is_unlocked: false,
+                name: "是那些魂灵吗……",
+                text: "",
+                unlocks: {
+                    textlines: [{dialogue: "冰溪月", lines: ["bx5"]}],
+                    spec:"P3-3",
+                },
+                
+                locks_lines: ["bx4"],
+            }),
+            "bx5": new Textline({ 
+                is_unlocked: false,
+                name: "所以，这些都在你们的计算之中吗？",
+                text: "[纳娜米]那，那我和可可——<br><br>纳娜米的情绪突然有些激动，<br>虽然纳可最终成功破局，<br>但她本不想自己妹妹被牵扯进这种事情之中。<br><br>[纳可]姐姐，没关系的。<br>经历了这一切之后，<br>我感觉自己现在强的可怕。<br>回家后，也该和老爹谈谈了……<br>家主之位，自古能者居之！",
+                unlocks: {
+                    textlines: [{dialogue: "冰溪月", lines: ["bx6"]}],
+                },
+                
+                locks_lines: ["bx5"],
+            }),
+            "bx6": new Textline({ 
+                is_unlocked: false,
+                name: "…",
+                text: "",
+                unlocks: {
+                    spec:"P3-4",
+                    textlines: [{dialogue: "冰溪月", lines: ["bx7"]}],
+                },
+                
+                locks_lines: ["bx6"],
+            }),
+            "bx7": new Textline({ 
+                is_unlocked: false,
+                name: "唔，要走了吗？……",
+                text: "[纳娜米]虽然还有很多想问的，<br>但你们背负的东西比想象的要沉重呢。<br>好好休息一下吧。<br><br>[莫尔]走吧，族中前辈早就等得着急了。<br>那么，就此别过，保重。<br>",
+                unlocks: {
+                    textlines: [{dialogue: "冰溪月", lines: ["bx8"]}],
+                },
+                locks_lines: ["bx7"],
+            }),
+            "bx8": new Textline({ 
+                is_unlocked: false,
+                name: "姐姐……刚才你说的，",
+                text: "[纳可]在幻境里看到了前所未见的东西，<br>是真的吗？<br><br>[纳娜米]是啊，那片景象……真的很奇怪。<br>可可，你说你闯过的幻境是根据你的记忆，<br>生成与信念相背离的事物，试图让你堕入黑暗。<br>可我不记得我的记忆里有——<br>或者我曾去过那幻境中的地方。<br>一片金辉交映的天空，<br>巨兽翻腾衔云而舞，仙乐回荡震彻云霄。",
+                unlocks: {
+                    textlines: [{dialogue: "冰溪月", lines: ["bx9"]}],
+                },
+                locks_lines: ["bx8"],
+            }),
+            "bx9": new Textline({ 
+                is_unlocked: false,
+                name: "哇，听起来挺神奇的……",
+                text: "[纳娜米]可是……<br>每当我试图看清那些兽影，听清那仙乐，<br>意识就好像被震得眩晕起来。",
+                unlocks: {
+                    textlines: [{dialogue: "冰溪月", lines: ["bx10"]}],
+                },
+                locks_lines: ["bx9"],
+            }),
+            "bx10": new Textline({ 
+                is_unlocked: false,
+                name: "每个人的幻境都有所不同……吗？",
+                text: "[纳可]那姐姐，你有没有什么头绪呀。<br><br>[纳娜米]不知道，但我想回家族之后，<br>先闭关一段时间。<br>虽然怪异无比，但我走出来时，<br>却觉得领悟繁多。<br>就像那个地方藏着什么突破的契机一样。<br>",
+                unlocks: {
+                    textlines: [{dialogue: "冰溪月", lines: ["bx11"]}],
+                },
+                locks_lines: ["bx10"],
+            }),
+            "bx11": new Textline({ 
+                is_unlocked: false,
+                name: "太好了姐姐，我们快回去，",
+                text: "[纳可]把消息告诉峰大哥和父亲他们……<br><br>[纳娜米]呼——好，此间事已了，是时候离开了。<br>",
+                unlocks: {
+                    locations:["纳家宝库"],
+                },
+                locks_lines: ["bx11"],
+            }),
+        }
+    });
+
+    dialogues["纳布(宝库)"] = new Dialogue({
+        name: "纳布(宝库)",
+        starting_text: "和 纳布(宝库) 对话",
+        textlines: {
+            "bk1": new Textline({ 
+                is_unlocked: true,
+                name: "我回来了~",
+                text: "[纳布]可可！娜娜！没事吧，<br>我找你们找了",
+                unlocks: {
+                    spec:"age-check",
+                    textlines: [{dialogue: "纳布(宝库)", lines: ["bk2"]}],
+                },
+                locks_lines: ["bk1"],
+            }),
+            "bk2": new Textline({ 
+                is_unlocked: false,
+                name: "我没关系的。",
+                text: "[纳可]父亲大人，您说过的，<br>只有危险的地方才有机遇。<br>我能有现在的实力，<br>也正是拜这串生死危机所赐。<br><br>[纳布]<span class='realm_sky'>天空级巅峰</span>?领域四重?!!<br>不愧是我纳布……说吧，<br>这次回家族是为了什么?",
+                unlocks: {
+                    textlines: [{dialogue: "纳布(宝库)", lines: ["bk3"]}],
+                },
+                locks_lines: ["bk2"],
+            }),
+            "bk3": new Textline({ 
+                is_unlocked: false,
+                name: "听说……最近有个燕岗领狩猎大赛？",
+                text: "[纳布]是啊……<span class='realm_cloudy'>云霄级</span>以下都可以参加。<br>31698纪元1372年那场兽潮后，<br>整个燕岗领的荒兽提升了一个档次。<br>狩猎大赛奖励不菲，<br>且云霄级荒兽材料支持带回家。",
+                unlocks: {
+                    textlines: [{dialogue: "纳布(宝库)", lines: ["bk4"]}],
+                },
+                locks_lines: ["bk3"],
+            }),
+            "bk4": new Textline({ 
+                is_unlocked: false,
+                name: "这样！那我要去！",
+                text: "[纳布]可可可以，娜娜就算了……<br>对了，本来要传给你们纳家奇宝【伊芙】的。<br>可是，因为满燕岗领搜寻太久，<br>我也心生感悟，一朝破入了<span class='realm_cloudy'>云霄级</span>。<br>看来这家主之位，<br>就得由我再坐几年喽！",
+                unlocks: {
+                    textlines: [{dialogue: "纳布(宝库)", lines: ["bk5"]}],
+                    locations:["狩猎大赛·城门战"],
+                },
+                locks_lines: ["bk4"],
+            }),
+            "bk5": new Textline({ 
+                is_unlocked: false,
+                name: "我不服！",
+                text: "[纳布]年轻人有勇气是好事。<br>如果可可有实力击败我，<br>那我也就放心养老去了。",
+                unlocks: {
+                    locations:["纳家宝库 - X"],
+                },
+                locks_lines: ["bk5"],
+            }),
+            "bk6": new Textline({ 
+                is_unlocked: false,
+                name: "这下可以了吧？",
+                text: "[纳布]好好好。<br>这是你要的东西。<br>呵，长大了……<br><br>[提醒]<br>获取了纳家奇宝【伊芙】！<br>家族系统 现已激活!",
+                unlocks: {
+                    flags: ["is_family_enabled"],
+                },
+                locks_lines: ["bk6"],
+            }),
+        },
+    });
 
 
 
 
+    dialogues["枫杏红"] = new Dialogue({
+        name: "枫杏红",
+        starting_text: "和 枫杏红 对话",
+        textlines: {
 
+            "fxh1": new Textline({ 
+                is_unlocked: false,
+                name: "什么办法可以融合<img src='image/item/evolve_1e17.png'>中等进化结晶",
+                text: "[枫杏红]这片古墓之中，<br>游荡着许多亡灵生物，相信你也有所了解。<br>它们体内无法凝结能量核心，<br>炼化能量速度相当缓慢。<br>如果可以找到一只<span class='realm_cloudy'>云霄级三阶 +</span>，<br>饥不择食的亡灵生物，<br>投喂10个<img src='image/item/evolve_1e16_shard.png'>中等进化结晶碎片，<br>就有希望在它突破后气息不稳时斩杀当场，<br>取出初步炼化的<img src='image/item/evolve_1e17.png'>中等进化结晶。",
+                unlocks: {
+                    textlines: [{dialogue: "枫杏红", lines: ["fxh2"]}],
+                },
+                locks_lines: ["fxh1"],
+            }),
+            "fxh2": new Textline({ 
+                is_unlocked: false,
+                name: "怎样的亡灵生物适合狩猎？",
+                text: "[枫杏红]即使刚刚突破到<span class='realm_cloudy'>云霄级四阶</span>，气息不稳，<br>目标也至少拥有接近<span class='realm_cloudy'>云霄级三阶 +</span>的实力。<br>所幸，古墓亡灵的实力很大程度上依赖于精血存量。<br>敏捷型狗类亡灵可能最佳，<br>因为它们十分脆弱，只要设法削减它们的生命，<br>即可轻易跨境逆伐。",
+                unlocks: {
+                    textlines: [{dialogue: "枫杏红", lines: ["fxh3"]}],
+                },
+                locks_lines: ["fxh2"],
+            }),
+            "fxh3": new Textline({ 
+                is_unlocked: false,
+                name: "说这么多你咋不帮我打？",
+                text: "[枫杏红]燕岗领狩猎大赛有年龄限制的。<br>我这种3个纪元前的古人，<br>能混进来实属不易。<br>要是出手相助，恐怕顷刻即会被城主府押送回城。<br>因此，我也只能帮你把“饵料”布下了……",
+                unlocks: {
+                    textlines: [{dialogue: "枫杏红", lines: ["fxh4"]}],
+                },
+                locks_lines: ["fxh3"],
+            }),
+            "fxh4": new Textline({ 
+                is_unlocked: false,
+                name: "(提供10个<img src='image/item/evolve_1e16_shard.png'>中等进化结晶碎片)",
+                text: "[枫杏红]",
+                unlocks: {
+                    spec: "C1-dog",
+                },
+            }),
+        },
+    });
 
-
-
-
-
-
-
-
-
-
-
-
-
+    dialogues["石风雄"] = new Dialogue({
+        name: "石风雄",
+        starting_text: "和 石风雄 对话",
+        textlines: {
+            "sfx1": new Textline({ 
+                is_unlocked: false,
+                name: "城主大人……？你怎么在这里？",
+                text: "[纳可]这里……不应该是，狩猎大赛的终点线吗？<br><br>[石风雄]本来确实是如此的，<br>我等误以为此地的最大机缘<br>就是一大块强度C6级的【冰髓精】，用作大赛奖励。<br>谁知那【冰髓精】居然只有外围一层，<br>它的内部包裹着一大块D6级【冰髓母】！<br>原有的优胜者把握不住这份机缘，<br>只能由我担下这因果了。",
+                unlocks: {
+                    textlines: [{dialogue: "石风雄", lines: ["sfx2"]}],
+                },
+                locks_lines: ["sfx1"],
+            }),
+            "sfx2": new Textline({ 
+                is_unlocked: false,
+                name: "……要不你赔我几千宇宙币吧。",
+                text: "[石风雄]此言差矣……<br>不过小友你作为燕岗领新秀，<br>我若是在此将你镇压反倒落了那些老家伙的口实。<br>这样，我且为你指明一处历练之所，<br>权当补偿了。",
+                unlocks: {
+                    textlines: [{dialogue: "石风雄", lines: ["sfx3"]}],
+                },
+                locks_lines: ["sfx2"],
+            }),
+            "sfx3": new Textline({ 
+                is_unlocked: false,
+                name: "另外，请教一下，这【燕岗领排名】到底有啥用？",
+                text: "[石风雄]这里面的数据都是，<br>1350纪元的一次战力普查查出来的。<br>所以即使小友你越阶杀敌，<br>数字也不会变就是了。<br>另外，每当有人抵达前1000时，<br>会进行全城广播……<br>但是自从触发了几次这个机制以来，<br>燕岗城隔音阵法的销量增加了26800%。<br>所以这广播也没什么意义就是了。<br>",
+                unlocks: {
+                    textlines: [{dialogue: "石风雄", lines: ["sfx4"]}],
+                },
+                locks_lines: ["sfx3"],
+            }),
+            "sfx4": new Textline({ 
+                is_unlocked: false,
+                name: "好了，该说历练之所地点了……",
+                text: "[石风雄]燕岗城出发，面向北方，<br>7点23分40秒方向向前819.5万公里，<br>就是燕岗领与【清波领】的交界地带——<br>【毬毬山谷】，<br>也是燕岗领附近，为数不多的，<br>有云霄级中期强者活跃的区域。",
+                unlocks: {
+                    locations:["毬毬山谷"],
+                },
+                locks_lines: ["sfx4"],
+            }),
+        },
+    });
+    dialogues["玄铁方尖碑"] = new Dialogue({
+        name: "玄铁方尖碑",
+        starting_text: "感悟方尖碑上的痕迹",
+        textlines: {
+            "yxtc": new Textline({ 
+                is_unlocked: false,
+                name: "升华【映星花】",
+                text: "【映星花】已经升格为【映星天彩】！<br>解锁技能【映星天彩】(经验~50级映星花)，<br>姿态【映星天彩·纯色】(初始~40级映星花·巨星)，<br>【映星天彩·虹彩】(~40级映星花·繁星)，<br>【映星天彩·双虹】(2连击,总dps略低于虹彩)，<br>【映星天彩·血杀】(吸血,总dps略低于虹彩)<br><br>注：【映星花·花海】无法升华。它已经达到了完美。",
+                unlocks: {
+                    stances: ["SR_Power","SR_Multi","SR_Double","SR_Blood"],
+                },
+                
+                locks_lines: ["yxtc"],
+            }),
+        }
+    });
+    dialogues["地层钻探"] = new Dialogue({
+        name: "地层钻探",
+        starting_text: "【地层钻探】",
+        textlines: {
+            "dczt": new Textline({ 
+                is_unlocked: false,
+                name: "进行【地层钻探】",
+                text: "...",
+                unlocks: {
+                    spec:"ground-digging",
+                },
+            }),
+        }
+    });
 
     dialogues["心之石像"] = new Dialogue({
         name: "Heart Stone Idol",

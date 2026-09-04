@@ -10,12 +10,15 @@ import { current_enemies, options,
     get_current_book, last_location_with_bed, 
     last_combat_location, faved_stances, 
     selected_stance, unlock_location,
-    global_flags,
+    global_flags, get_enemy_killcount,
+    total_crafting_successes,total_crafting_attempts,
+    get_time_passed,family_data,init_family,
+    realm_rate, get_baby_cost,
     inf_combat} from "./main.js";
 import { dialogues } from "./dialogues.js";
 import { activities } from "./activities.js";
 import { format_time, current_game_time } from "./game_time.js";
-import { book_stats, item_templates, Weapon, Armor, Shield , rarity_multipliers , getItemRarity } from "./items.js";
+import { book_stats, item_templates, Weapon, Armor, Shield , rarity_multipliers , getItemRarity , ScaledQualityMultiplier} from "./items.js";
 import { get_location_type_penalty, location_types, locations } from "./locations.js";
 import { enemy_killcount, enemy_templates } from "./enemies.js";
 import { expo, format_reading_time, stat_names, get_hit_chance, round_item_price } from "./misc.js"
@@ -83,6 +86,9 @@ const inventory_switch = document.getElementById("switch_to_inventory")
 const data_entry_divs = {
                             character: document.getElementById("character_xp_multiplier"),
                             skills: document.getElementById("skills_xp_multiplier"),
+                            kills: document.getElementById("character_killcount"),
+                            crafts: document.getElementById("character_craftcount"),
+                            craft: document.getElementById("character_craftcounts"),
                         };
 
 let skill_sorting = "name";
@@ -111,6 +117,7 @@ const stats_divs = {agility: document.getElementById("agility_slot"),
                     health_regeneration_flat: document.getElementById("intuition_slot"),
                     attack_mul: document.getElementById("dexterity_slot"),
                     luck: document.getElementById("UK1_slot"),
+                    SCGV: document.getElementById("hit_chance_slot"),
                     //A_mul_slot: document.getElementById("A_mul_slot"),
                     //A_mul_tooltip: document.getElementById("A_mul_tooltip"),
                     };
@@ -119,6 +126,7 @@ const stats_divs = {agility: document.getElementById("agility_slot"),
 let effect_divs = {};
 
 const character_attack_bar = document.getElementById("character_attack_bar");
+const character_attack_bar_cnt = document.getElementById("character_attack_bar_cnt");
 
 //equipment slots
 const equipment_slots_divs = {head: document.getElementById("head_slot"), torso: document.getElementById("torso_slot"),
@@ -158,6 +166,7 @@ const crafting_pages = {
         items: document.querySelector(`[data-crafting_category="crafting"] [data-crafting_subcategory="items"]`),
         items2: document.querySelector(`[data-crafting_category="crafting"] [data-crafting_subcategory="items2"]`),
         items3: document.querySelector(`[data-crafting_category="crafting"] [data-crafting_subcategory="items3"]`),
+        items4: document.querySelector(`[data-crafting_category="crafting"] [data-crafting_subcategory="items4"]`),
         components: document.querySelector(`[data-crafting_category="crafting"] [data-crafting_subcategory="components"]`),
         equipment: document.querySelector(`[data-crafting_category="crafting"] [data-crafting_subcategory="equipment"]`),
     },
@@ -165,11 +174,13 @@ const crafting_pages = {
         items: document.querySelector(`[data-crafting_category="cooking"] [data-crafting_subcategory="items"]`),
         items2: document.querySelector(`[data-crafting_category="cooking"] [data-crafting_subcategory="items2"]`),
         items3: document.querySelector(`[data-crafting_category="cooking"] [data-crafting_subcategory="items3"]`),
+        items4: document.querySelector(`[data-crafting_category="cooking"] [data-crafting_subcategory="items4"]`),
     },
     smelting: {
         items: document.querySelector(`[data-crafting_category="smelting"] [data-crafting_subcategory="items"]`),
         items2: document.querySelector(`[data-crafting_category="smelting"] [data-crafting_subcategory="items2"]`),
         items3: document.querySelector(`[data-crafting_category="smelting"] [data-crafting_subcategory="items3"]`),
+        items4: document.querySelector(`[data-crafting_category="smelting"] [data-crafting_subcategory="items4"]`),
     },
     forging: {
         items: document.querySelector(`[data-crafting_category="forging"] [data-crafting_subcategory="items"]`),
@@ -181,6 +192,7 @@ const crafting_pages = {
         items: document.querySelector(`[data-crafting_category="alchemy"] [data-crafting_subcategory="items"]`),
         items2: document.querySelector(`[data-crafting_category="alchemy"] [data-crafting_subcategory="items2"]`),
         items3: document.querySelector(`[data-crafting_category="alchemy"] [data-crafting_subcategory="items3"]`),
+        items4: document.querySelector(`[data-crafting_category="alchemy"] [data-crafting_subcategory="items4"]`),
     }
 }
 
@@ -200,6 +212,14 @@ function format_number(some_number)
     if(some_number <= 1e-8) return '0';
     let len=Math.floor(Math.log10(some_number)) + 1;//位数！
     if(some_number<1e-4) f_result += '0';
+    if(options.option_format_change && some_number > 1e6){
+        len--;//exp
+        some_number *= 0.1 ** len;
+        f_result += some_number.toFixed(2);
+        f_result += 'e';
+        f_result += Math.round(len);
+        return f_result;
+    }
     else if(len<=4||len==6)
     {
         f_result += String(some_number).substring(0,6);
@@ -216,6 +236,7 @@ function format_number(some_number)
     }
     return f_result;
 }
+
 
 function capitalize_first_letter(some_string) {
     return some_string.charAt(0).toUpperCase() + some_string.slice(1);
@@ -263,6 +284,9 @@ function create_item_tooltip_content({item, options={}}) {
     }
 
     let quality = item.quality;
+    if(options?.quality && options.quality) {
+        quality = options.quality;
+    }
 
     //add stats if can be equipped
     if(item.item_type === "EQUIPPABLE"){ 
@@ -292,7 +316,7 @@ function create_item_tooltip_content({item, options={}}) {
             });
         }
 
-        let EquipSlotMap = {"sword":"Sword","head":"Head","trident":"Trident","moonwheel":"Moonwheel","torso":"Torso","legs":"Legs","feet":"Feet","pickaxe":"Pickaxe","axe":"Axe","props":"Prop","method":"Method","special":"Special","realm":"Realm"}
+        let EquipSlotMap = {"sword":"剑","head":"头部","trident":"三叉戟","moonwheel":"月轮","torso":"躯干","legs":"腿部","feet":"脚部","pickaxe":"镐子","axe":"斧子","sickle":"镰刀","props":"道具","method":"秘法","special":"特殊","realm":"领域"}
         if(item.equip_slot === "weapon") {
             item_tooltip += `<br>Type: <b>${EquipSlotMap[item.weapon_type]}</b>`;
         }
@@ -318,7 +342,7 @@ function create_item_tooltip_content({item, options={}}) {
         }
 
         
-        let EquipStatMap = {"Defense":"Defense","Attack power":"Attack","Attack speed":"Speed","Agility":"Agility","Crit rate":"Crit Rate","Max health":"Health","Attack mul":"Normal Atk Mul","Crit multiplier":"Crit Dmg","Health regeneration_flat":"HP Regen","Health regeneration_percent":"HP Regen [%]","Luck":"Luck"}
+        let EquipStatMap = {"Defense":"防御","Attack power":"攻击","Attack speed":"攻速","Agility":"敏捷","Crit rate":"暴率","Max health":"生命","Attack mul":"普攻倍率","Crit multiplier":"爆伤","Health regeneration_flat":"生命恢复","Health regeneration_percent":"生命恢复[%]","Luck":"幸运","SCGV":"宝石耐性"}
         if(!options.skip_quality && options?.quality?.length == 2) {
             if(item.getAttack) {
                 item_tooltip += 
@@ -427,10 +451,10 @@ function create_item_tooltip_content({item, options={}}) {
                 item_tooltip += `<br>Expected Stats: `;
             }
             if(item?.attack_value) {
-                item_tooltip += `<br>Attack: + ${format_number(item.attack_value * quality/100 * rarity_multipliers[getItemRarity(quality)]) }`;
+                item_tooltip += `<br>攻击力: + ${format_number(item.attack_value * ScaledQualityMultiplier(quality)) }`;
             }
             if(item?.defense_value) {
-                item_tooltip += `<br>Defense: + ${format_number(item.defense_value * quality/100 * rarity_multipliers[getItemRarity(quality)])}`;
+                item_tooltip += `<br>防御力: + ${format_number(item.defense_value * ScaledQualityMultiplier(quality))}`;
             }
         }
         let rarity_mul = rarity_multipliers[getItemRarity(quality)];
@@ -446,15 +470,18 @@ function create_item_tooltip_content({item, options={}}) {
                 `<br>${stat_names[effect_key]}: ${item.stats[effect_key].flat>0?"+":""}${format_number(item.stats[effect_key].flat*(item.stats[effect_key].flat>0?rarity_mul:1))}`;
             }
             if(item.stats[effect_key].multiplier != null) {
-                item_tooltip += 
+                if(item.stats[effect_key].multiplier >= 1) item_tooltip += 
                 `<br>${stat_names[effect_key]}: x${item.stats[effect_key].multiplier + (item.stats[effect_key].multiplier-1) * (rarity_mul - 1)}`;
+                else item_tooltip += 
+                `<br>${stat_names[effect_key]}: x${item.stats[effect_key].multiplier}`;
             }
         });
         item_tooltip += "<br>";
     } else {
         item_tooltip += "<br>";
     }
-    item_tooltip += `<br>Value: ${format_money(round_item_price(item.getValue(quality) * ((options && options.trader) ? traders[current_trader].getProfitMargin() : 1) || 0))}`;
+
+    item_tooltip += `<br>价值: ${format_money(round_item_price(item.getValue(quality) * ((options && options.trader) ? traders[current_trader].getProfitMargin() : 1) || 0))}`;
 
     // if(item.saturates_market) {
     //     item_tooltip += ` [初始 ${format_money(round_item_price(item.getBaseValue(quality) * ((options && options.trader) ? traders[current_trader].getProfitMargin() : 1) || 1))}]`
@@ -489,7 +516,7 @@ function create_effect_tooltip(effect_name, duration) {
         //for regeneration bonuses, it is assumed they are only flat and not multiplicative
         //${capitalize_first_letter(key.replaceAll("_", " ").replace("flat","").replace("percent",""))}
             let sign = stat_value.flat > 0? "+":"";
-            const EffectToolTipMap = {"attack_power":"Attack","defense":"Defense","agility":"Agility","crit_multiplier":"Crit Dmg","attack_mul":"Normal Atk Mul","health_regeneration_flat":"HP Regen","health_regeneration_percent":"HP Regen [%]","crit_rate":"Crit Rate","attack_speed":"Speed","max_health":"Max HP"}
+            const EffectToolTipMap = {"attack_power":"攻击","defense":"防御","agility":"敏捷","crit_multiplier":"爆伤","attack_mul":"普攻倍率","health_regeneration_flat":"生命恢复","health_regeneration_percent":"生命恢复[%]","crit_rate":"暴率","attack_speed":"攻速","max_health":"生命上限","luck":"幸运","SCGV":"宝石耐性"}
             if(stat_value.flat == undefined){
                 let sign = "";
                 tooltip.innerHTML += `${EffectToolTipMap[key]} : x${sign}${stat_value.multiplier}`;
@@ -509,6 +536,7 @@ function end_activity_animation() {
  * @param {String} message_to_add text to display
  * @param {String} message_type used for adding proper class to html element
  */
+let logs = 0;
  function log_message(message_to_add, message_type) {
     if(typeof message_to_add === 'undefined') {
         return;
@@ -569,6 +597,11 @@ function end_activity_animation() {
             group_to_add = "message_combat";
             message_count.message_combat += 1;
             break;    
+        case "hero_regened":
+            class_to_add = "message_hero_regened";
+            group_to_add = "message_combat";
+            message_count.message_combat += 1;
+            break;
         case "hero_attacked_critically":
             class_to_add = "message_hero_attacked_critically";
             group_to_add = "message_combat";
@@ -660,9 +693,11 @@ function end_activity_animation() {
     ) {
         // find first child with specified group
         // delete it
+        message_log.getElementsByClassName(group_to_add)[0].innerHTML = '';
         message_log.removeChild(message_log.getElementsByClassName(group_to_add)[0]);
+        
     }
-
+    
     message.classList.add(class_to_add, group_to_add);
 
     message.innerHTML = message_to_add + "<div class='message_border'> </>";
@@ -780,6 +815,10 @@ function update_displayed_trader() {
     action_div.style.display = "none";
     trade_div.style.display = "inherit";
     document.getElementById("trader_cost_mult_value").textContent = `${Math.round(100 * (traders[current_trader].getProfitMargin()))}%`
+
+    let R_days = traders[current_trader].refresh_time - current_game_time.day_count + traders[current_trader].last_refresh ;
+    if(R_days <= 1e12) document.getElementById("trade_time_value").textContent = `${Math.round(R_days)}d`
+    else document.getElementById("trade_time_value").textContent = 'N/A';
     update_displayed_trader_inventory();
 }
 
@@ -1302,6 +1341,12 @@ function create_inventory_item_div({key, item_count, target, is_equipped, trade_
 
     if(typeof trade_index !== "undefined") {
         item_control_div.classList.add('item_to_trade');
+        if(item_control_div.classList.contains("trader_item_control")){
+            item_value_span.innerHTML = `${format_money(round_item_price(target_item.getValue()), true)}`;
+        }
+        if(item_control_div.classList.contains("character_item_control")){
+            item_value_span.innerHTML = `${format_money(round_item_price(target_item.getValue()*traders[current_trader].getProfitMargin()), true)}`;
+        }
     }
 
     return item_control_div;
@@ -1317,16 +1362,15 @@ function update_displayed_equipment() {
         if(character.equipment[key] == null) { //no item in slot
             eq_tooltip = document.createElement("span");
             eq_tooltip.classList.add("item_tooltip");
-            let mapp={"head":"Head","torso":"Torso","legs":"Legs","feet":"Feet","weapon":"Weapon","method":"Method","realm":"Realm","law":"Law","props":"Prop","special":"Special","pickaxe":"Pickaxe","axe":"Axe","method":"Method"};
-            equipment_slots_divs[key].innerHTML = `${mapp[key]} Slot`;
+            let mapp={"head":"头部","torso":"躯干","legs":"腿部","feet":"脚部","weapon":"武器","method":"秘法","realm":"领域","law":"法则","props":"道具","special":"特殊","sickle":"镰刀","pickaxe":"镐子","axe":"斧子","method":"秘法"};
+            equipment_slots_divs[key].innerHTML = `${mapp[key]} 槽位`;
             equipment_slots_divs[key].classList.add("equipment_slot_empty");
             eq_tooltip.innerHTML = `Your ${mapp[key]} Slot`;
         }
         else 
         {
-            equipment_slots_divs[key].innerHTML = character.equipment[key].getName();
+            equipment_slots_divs[key].innerHTML = `<span class="${rarity_colors[character.equipment[key].getRarity(character.equipment[key].quality)]}">${character.equipment[key].getName()}</span>`;
             equipment_slots_divs[key].classList.remove("equipment_slot_empty");
-
             eq_tooltip = create_item_tooltip(character.equipment[key]);
         }
         equipment_slots_divs[key].appendChild(eq_tooltip);
@@ -1358,6 +1402,7 @@ function update_displayed_book(book_id) {
 function update_displayed_enemies() {
     for(let i = 0; i < 8; i++) { //go to max enemy count
         if(i < current_enemies.length) {
+            if(current_enemies[i].stats == null) continue;
             enemies_div.children[i].children[0].style.display = null;
             enemies_div.children[i].children[0].children[0].innerHTML = `<img src="${current_enemies[i].image}"><br>`/*current_enemies[i].image*/;
                     
@@ -1378,9 +1423,11 @@ function update_displayed_enemies() {
             let hero_evasion_agi_modifier = current_enemies.filter(enemy => enemy.is_alive).length**(-1/3); //more enemies will restrict neko resulted in harder evasion
 
             //it will be changed with environment or spec stat.
+            let enemy_agi_modifier = 1;
+            if(current_enemies[i].spec.includes(65)) enemy_agi_modifier = 1 + current_enemies[i].stats.health / current_enemies[i].stats.max_health * 99;
 
-            const evasion_chance = 1 - get_hit_chance(character.stats.full.agility * hero_hit_agi_modifier, current_enemies[i].stats.agility );
-            let hit_chance = get_hit_chance(current_enemies[i].stats.agility, character.stats.full.agility * hero_evasion_agi_modifier);
+            const evasion_chance = 1 - get_hit_chance(character.stats.full.agility * hero_hit_agi_modifier, current_enemies[i].stats.agility * enemy_agi_modifier);
+            let hit_chance = get_hit_chance(current_enemies[i].stats.agility * enemy_agi_modifier, character.stats.full.agility * hero_evasion_agi_modifier);
             //these are ememy data.
 
             if(character.equipment["off-hand"]?.offhand_type === "shield") { //has shield
@@ -1412,6 +1459,10 @@ function update_displayed_health_of_enemies() {
         } else {
             enemies_div.children[i].children[0].style.filter = "brightness(30%)";
             update_displayed_enemies();
+            enemies_div.children[i].children[0].children[2].children[0].children[0].style.width = 
+            "0%";
+            enemies_div.children[i].children[0].children[2].children[1].innerText = `0 hp`;
+            continue;
         }
 
         //update size of health bar
@@ -1526,7 +1577,6 @@ function update_displayed_normal_location(location) {
 
     ////////////////////////////////
     //add buttons to start gathering
-
     if(global_flags.is_gathering_unlocked) {
         const available_gatherings = Object.values(location.activities).filter(activity => activities[activity.activity_name].type === "GATHERING" 
                                                                         && activities[activity.activity_name].is_unlocked
@@ -1593,6 +1643,13 @@ function update_displayed_normal_location(location) {
 
     location_name_span.innerText = current_location.name;
     document.getElementById("location_description_div").innerText = current_location.getDescription();
+    
+    if(inf_combat.S3?.live){
+        document.getElementById("S3_current_div").display = 'inherit';
+        document.getElementById("S3_current_div").innerHTML = "<img src='image/item/violet_ingot.png'><b><span style='color:plum'>灵魂之力 : " + inf_combat.S3.sp + "</span><br>剩余敌人: </b>";
+        document.getElementById("S3_current_div").innerHTML += `<img src='image/boss/B3706.png'><b><span style='color:lightblue'> x${inf_combat.S3.b1} </span></b><img src='image/boss/B3707.png'><b><span style='color:yellow'> x${inf_combat.S3.b2} </span></b><img src='image/boss/B3708.png'><b><span style='color:orange'> x${inf_combat.S3.b3} </span></b>`;
+    }
+    else document.getElementById("S3_current_div").innerHTML = '';
 }
 
 /**
@@ -1808,10 +1865,8 @@ function create_location_choices({location, category, add_icons = true, is_comba
             choice_list.push(action);
         }
 
-        const last_bed = resolve_location_ref(last_location_with_bed);
-        if(last_bed && !location.sleeping && (!location.connected_locations || location?.connected_locations?.filter(loc => {
-            return loc.location?.id === last_bed.id || loc.location?.name === last_bed.name;
-        }).length == 0)) {
+        if((!inf_combat.S3?.live) && last_location_with_bed && !location.sleeping && (!location.connected_locations || location?.connected_locations?.filter(loc => loc.location.name === last_location_with_bed).length == 0)) {
+            const last_bed = locations[last_location_with_bed];
 
             const action = document.createElement("div");
             action.classList.add("travel_normal");
@@ -1827,6 +1882,7 @@ function create_location_choices({location, category, add_icons = true, is_comba
 
         choice_list.sort((a,b) => b.classList.contains("travel_normal") - a.classList.contains("travel_normal"));
     } else if (category === "challenge") {
+
         const available_challenges = location.connected_locations.filter(location => {if(location.location.is_challenge && location.location.is_unlocked && !location.location.is_finished) return true});
        
         for(let i = 0; i < available_challenges.length; i++) { 
@@ -1909,6 +1965,7 @@ function update_displayed_combat_location(location,disable_switch = false) {
     
     document.getElementById("location_description_div").innerText = current_location.getDescription();
     create_location_types_display(current_location);
+    document.getElementById("S3_current_div").display = 'none';
 }
 
 function create_location_types_display(current_location){
@@ -1924,12 +1981,28 @@ function create_location_types_display(current_location){
             inf_combat.B3 = inf_combat.B3 || 0;
             c_halo = inf_combat.B3 * 0.01;
         }
-        type_div.innerHTML += `Aura ${format_number(c_halo*100.0)} %`;
+        if(current_location.name.includes("鲜血峰 - ")){
+            const key_id1 = item_templates["血峰限制器"].getInventoryKey();
+            let key_cnt1 = character.inventory[key_id1]?character.inventory[key_id1].count:0;
+            key_cnt1 = Math.min(key_cnt1,5);
+            if(key_cnt1 != 0){
+                c_halo *= 1 - 0.2 * key_cnt1;
+                log_message(`[${key_cnt1}x限制器]本区光环已被降低${key_cnt1*20}%!`,"hero_regened");
+            }
+            const key_id2 = item_templates["血峰增幅器"].getInventoryKey();
+            let key_cnt2 = character.inventory[key_id2]?character.inventory[key_id2].count:0;
+            key_cnt2 = Math.min(key_cnt2,999025);
+            if(key_cnt2 != 0){
+                c_halo *= 1 + 0.2 * (key_cnt2 ** 0.5);
+                log_message(`[${key_cnt2}x增幅器]本区光环已被增幅${format_numberL(0.2*(key_cnt2**0.5))}!`,"enemy_enhanced");
+            }
+        }
+        type_div.innerHTML += `光环 ${format_number(c_halo*100.0)} %`;
         location_types_div.appendChild(type_div);
     }
     for(let i = 0; i < current_location.types?.length; i++) {
         const type_div = document.createElement("div");
-        const LocationTypesMap = {"dark":"Dark","aura":"Aura","stress":"Oppression"}
+        const LocationTypesMap = {"dark":"黑暗","aura":"光环","stress":"威压","toxic":"毒液"}
         type_div.innerHTML = LocationTypesMap[current_location.types[i].type] + (current_location.types[i].stage>1?` ${"I".repeat(current_location.types[i].stage)}`:"");
         type_div.classList.add("location_type_div");
 
@@ -1956,6 +2029,14 @@ function create_location_types_display(current_location){
             })
         } //other effects to be done when/if they are added
 
+        //毒液伤害特殊判定
+        
+        if(type == 'toxic'){
+            type_tooltip.innerHTML += `<br>毒液伤害: ${format_number(800e8*(1-skills["Toxic resistance"].current_level*0.05)*(0.99**skills["Iron skin"].current_level))}`
+        }
+
+
+
         type_div.appendChild(type_tooltip);
         location_types_div.appendChild(type_div);
     }
@@ -1973,7 +2054,7 @@ function open_crafting_window() {
     
     let elements = document.querySelectorAll(`[data-crafting_subcategory]`);
     for(let i = 0; i < elements.length; i++) {
-        if(elements[i].dataset.crafting_subcategory !== "items" && elements[i].dataset.crafting_subcategory !== "items2"  && elements[i].dataset.crafting_subcategory !== "items3") {
+        if(!elements[i].dataset.crafting_subcategory.includes("items")) {
             elements[i].style.display = "none";
         } else {
             elements[i].style.display = "";
@@ -2049,7 +2130,7 @@ function unexpand_displayed_recipes() {
 function create_displayed_crafting_recipes() {
     Object.keys(recipes).forEach(recipe_category => {
         Object.keys(recipes[recipe_category]).forEach(recipe_subcategory => {
-            if(recipe_subcategory === "items" || recipe_subcategory === "items2" || recipe_subcategory === "items3") {
+            if(recipe_subcategory.includes("items")) {
                 crafting_pages[recipe_category][recipe_subcategory].innerHTML = "";
             }
             Object.keys(recipes[recipe_category][recipe_subcategory]).forEach(recipe => {
@@ -2081,7 +2162,7 @@ function add_crafting_recipe_to_display({category, subcategory, recipe_id}) {
     recipe_div.classList.add("recipe_div");
     recipe_div.dataset.recipe_id = recipe_id;
 
-    if(subcategory === "items" || subcategory === "items2" || subcategory === "items3") {
+    if(subcategory.includes("items")) {
         
         const recipe_max = document.createElement("span");
         recipe_max.classList.add("recipe_10_button");
@@ -2262,7 +2343,7 @@ function update_displayed_crafting_recipes() {
 function update_displayed_crafting_recipe({category, subcategory, recipe_id}) {
     const recipe_div = crafting_pages[category][subcategory].querySelector(`[data-recipe_id="${recipe_id}"]`);
     const recipe = recipes[category][subcategory][recipe_id];
-    if(subcategory === "items" || subcategory === "items2" || subcategory === "items3") {
+    if(subcategory.includes("items")) {
         if(recipe.get_availability()) {
             recipe_div.classList.remove("recipe_unavailable");
         } else {
@@ -2286,15 +2367,9 @@ function create_recipe_tooltip({category, subcategory, recipe_id, material, comp
     const recipe = recipes[category][subcategory][recipe_id];
     const tooltip = document.createElement("div");
     tooltip.classList.add("recipe_tooltip");
-    if(subcategory === "items") {
+    if(subcategory.includes("items")) {
         tooltip.innerHTML = create_recipe_tooltip_content({category, subcategory, recipe_id});
-        tooltip.classList.add("items_recipe_tooltip");
-    } else if(subcategory === "items2"){
-        tooltip.innerHTML = create_recipe_tooltip_content({category, subcategory, recipe_id});
-        tooltip.classList.add("items2_recipe_tooltip");
-    }else if(subcategory === "items3"){
-        tooltip.innerHTML = create_recipe_tooltip_content({category, subcategory, recipe_id});
-        tooltip.classList.add("items3_recipe_tooltip");
+        tooltip.classList.add(`${subcategory}_recipe_tooltip`);
     }else if(subcategory === "components" || recipe.recipe_type === "component") {
         if(!material) {
             throw new Error(`Component recipes require passing a material, but recipe "${category}" -> "${subcategory}" -> "${recipe_id}" had none!`);
@@ -2313,24 +2388,10 @@ function create_recipe_tooltip({category, subcategory, recipe_id, material, comp
 function update_item_recipe_tooltips() {
     Object.keys(recipes).forEach(recipe_category => {
         Object.keys(recipes[recipe_category]).forEach(recipe_subcategory => {
-            if(recipe_subcategory === "items"  ) {
+            if(recipe_subcategory.includes("items") ) {
                 Object.keys(recipes[recipe_category][recipe_subcategory]).forEach(recipe => {
                     if(recipes[recipe_category][recipe_subcategory][recipe].is_unlocked){
-                        update_recipe_tooltip({category: recipe_category, subcategory: "items", recipe_id: recipe});
-                    }
-                });
-            }
-            if(recipe_subcategory === "items2"  ) {
-                Object.keys(recipes[recipe_category][recipe_subcategory]).forEach(recipe => {
-                    if(recipes[recipe_category][recipe_subcategory][recipe].is_unlocked){
-                        update_recipe_tooltip({category: recipe_category, subcategory: "items2", recipe_id: recipe});
-                    }
-                });
-            }
-            if(recipe_subcategory === "items3"  ) {
-                Object.keys(recipes[recipe_category][recipe_subcategory]).forEach(recipe => {
-                    if(recipes[recipe_category][recipe_subcategory][recipe].is_unlocked){
-                        update_recipe_tooltip({category: recipe_category, subcategory: "items3", recipe_id: recipe});
+                        update_recipe_tooltip({category: recipe_category, subcategory: recipe_subcategory, recipe_id: recipe});
                     }
                 });
             }
@@ -2342,7 +2403,7 @@ function update_recipe_tooltip({category, subcategory, recipe_id, components}) {
     if((crafting_pages[category][subcategory].querySelector(`[data-recipe_id="${recipe_id}"]`) == null)) return;
     const tooltip = crafting_pages[category][subcategory].querySelector(`[data-recipe_id="${recipe_id}"]`).querySelector(`.${subcategory}_recipe_tooltip`);
     const recipe = recipes[category][subcategory][recipe_id];
-    if(subcategory === "items" || subcategory === "items2" || subcategory === "items3") {
+    if(subcategory.includes("items")) {
         tooltip.innerHTML = create_recipe_tooltip_content({category, subcategory, recipe_id});
     } else if(subcategory === "components" || recipe.recipe_type === "component") {
         const material_selections_div = crafting_pages[category][subcategory].querySelector(`[data-recipe_id='${recipe_id}']`).children[1];
@@ -2366,7 +2427,7 @@ function create_recipe_tooltip_content({category, subcategory, recipe_id, materi
     const recipe = recipes[category][subcategory][recipe_id];
     const station_tier = current_location?.crafting?.tiers[category] || 0;
     let tooltip = "";
-    if(subcategory === "items" || subcategory === "items2" || subcategory === "items3") {
+    if(subcategory.includes("items")) {
         const success_chance = Math.round(100*recipe.get_success_chance(station_tier));
         tooltip += `Recipe Level:${recipe.recipe_level[1]}<br>`
         tooltip += `Success rate: <b><span style="color:${success_chance > 74?"lime":success_chance>49?"yellow":success_chance>24?"orange":"red"}">${success_chance}%</span></b><br><br>Materials:<br>`;
@@ -2378,7 +2439,10 @@ function create_recipe_tooltip_content({category, subcategory, recipe_id, materi
                 tooltip += `<span style="color:red"><b>${item_templates[recipe.materials[i].material_id].getName()} x${character.inventory[key]?.count || 0}/${recipe.materials[i].count}</b></span><br>`;
             }
         }
-        tooltip += `<br>Result:<br><div class="recipe_result">${create_item_tooltip_content({item: item_templates[recipe.getResult().result_id], options: {skip_quality: true}})}</div>`;
+        //console.log(recipe.Q_able);
+        if(recipe.Q_able > 0) tooltip += `<br>产物:<br><div class="recipe_result">${create_item_tooltip_content({item: item_templates[recipe.getResult().result_id], options: {quality:recipe.Q_able,skip_quality:false}})}</div>`;
+        else tooltip += `<br>产物:<br><div class="recipe_result">${create_item_tooltip_content({item: item_templates[recipe.getResult().result_id], options: {skip_quality: true}})}</div>`;
+
     } else if(subcategory === "components"  || recipe.recipe_type === "component") {
         tooltip += `Materials:<br>`;
         if(character.inventory[item_templates[material.material_id].getInventoryKey()]?.count >= material.count) {
@@ -2582,7 +2646,7 @@ function update_displayed_material_choice({category, subcategory, recipe_id, ref
 function update_item_recipe_visibility() {
     Object.keys(recipes).forEach(recipe_category => {
         Object.keys(recipes[recipe_category]).forEach(recipe_subcategory => {
-            if(recipe_subcategory !== "items" && recipe_subcategory !== "items2" && recipe_subcategory !== "items3") {
+            if(!recipe_subcategory.includes("items")) {
                 //no need to deal with other recipe types as they would be folded and will be reloaded on unfolding
                 return;
             }
@@ -2676,22 +2740,31 @@ function update_gathering_tooltip(current_activity) {
 
 function update_displayed_health() { //call it when using healing items, resting or getting hit
     current_health_value_div.innerText = format_number(character.stats.full.health) + "/" + format_number(character.stats.full.max_health) + " HP";
+    current_health_bar.style = 'background-color:rgb(255,46,46)';
+    
+    if(active_effects["死线"]!=undefined){
+        current_health_bar.style = 'background-color:rgb(189,46,255)';
+    }
     current_health_bar.style.width = (character.stats.full.health*100/character.stats.full.max_health).toString() +"%";
+    //死线(3/3)
 }
 
 function update_displayed_stats() { //updates displayed stats
     const A_mul = document.getElementById("A_mul_slot");
     A_mul.innerHTML = character.xp.current_level<=8?"Locked":"A.mul:";
     const A_mul_tt = document.getElementById("A_mul_tooltip");
-    A_mul_tt.innerHTML = character.xp.current_level<=8?"Not availiable":"Normal Attack Damage Multiplier";
+    A_mul_tt.innerHTML = character.xp.current_level<=8?"Not available":"普通攻击的伤害倍率";
     const Luck = document.getElementById("Luck_slot");
     Luck.innerHTML = character.xp.current_level<=18?"Locked":"Luck:";
     const Luck_tt = document.getElementById("Luck_tooltip");
-    Luck_tt.innerHTML = character.xp.current_level<=18?"Not availiable":"Luck (affects material drop rate, kill XP)";
-
+    Luck_tt.innerHTML = character.xp.current_level<=18?"Not available":"幸运(影响材料掉率,杀怪经验)";
+    const sCGV_ = document.getElementById("SCGV_slot");
+    sCGV_.innerHTML = character.xp.current_level<=28?"Locked":"SCGV:";
+    const sCGV_tt = document.getElementById("SCGV_tooltip");
+    sCGV_tt.innerHTML = character.xp.current_level<=28?"Not available":"宝石耐性，全称宝石软上限起始点倍率(SoftCappedGemValue)";
     Object.keys(stats_divs).forEach(function(key){
         if(key === "crit_rate" || key === "crit_multiplier") {
-            stats_divs[key].innerHTML = `${(character.stats.full[key]*100).toFixed(1)}%`;
+            stats_divs[key].innerHTML = `${format_numberL(character.stats.full[key])}`;
             update_stat_description(key);
         } 
         else if(key === "attack_speed") {
@@ -2707,7 +2780,7 @@ function update_displayed_stats() { //updates displayed stats
                 stats_divs[key].innerHTML = ``;
             }
             else{
-                stats_divs[key].innerHTML = `${(character.stats.full[key]*100).toFixed(1)}%`;
+                stats_divs[key].innerHTML = `${format_numberL(character.stats.full[key])}`;
                 update_stat_description(key);
             }
         }
@@ -2716,7 +2789,16 @@ function update_displayed_stats() { //updates displayed stats
                 stats_divs[key].innerHTML = ``;
             }
             else{
-                stats_divs[key].innerHTML = `${(character.stats.full[key]*100).toFixed(1)}%`;
+                stats_divs[key].innerHTML = `${format_numberL(character.stats.full[key])}`;
+                update_stat_description(key);
+            }
+        }
+        else if(key === "SCGV"){
+            if(character.xp.current_level <= 28){
+                stats_divs[key].innerHTML = ``;
+            }
+            else{
+                stats_divs[key].innerHTML = `${format_number(character.stats.full[key])}`;
                 update_stat_description(key);
             }
         }
@@ -2743,7 +2825,7 @@ function update_displayed_stats() { //updates displayed stats
     else if(lgrank < 7.903) lgresult = 15.352 - 0.77 * lgrank;
     else lgresult = 18.352 - 1.3 * lgrank + 0.019 * lgrank ** 2;
     //
-    let chara_result = Math.round(Math.pow(10,lgresult));
+    let chara_result = Math.round(Math.max(1,Math.pow(10,lgresult)));
     
     character_rank_div.innerText = `Yangang Ranking: ` + chara_result.toLocaleString('en-US');
     
@@ -2784,7 +2866,7 @@ function update_stat_description(stat) {
         <br>Base value: ${Math.round(100*character.base_stats[stat])/100}`;
     }
 
-    let BreakDownMap = {"level":"Realm","skills":"Skills","skill_milestones":"Skill Milestones","equipment":"Equipment","environment":"Environment","light_level":"Light Level","gems":"Gems","stance":"Method","active_effect":"Effect","coins":"God of Greed"};
+    let BreakDownMap = {"level":"境界","skills":"技能","skill_milestones":"技能里程碑","equipment":"装备","environment":"环境","light_level":"光照","gems":"宝石","stance":"秘法","active_effect":"效果","coins":"心之境界"};
     
     if(stat === "attack_power" && character.equipment.weapon != undefined) {
         target.innerHTML += 
@@ -2792,7 +2874,7 @@ function update_stat_description(stat) {
     } 
     Object.keys(character.stats.flat).forEach(stat_type => {
         if(character.stats.flat[stat_type][stat] && character.stats.flat[stat_type][stat] !== 0) {
-            target.innerHTML += `<br>${BreakDownMap[stat_type]}: +${format_number(character.stats.flat[stat_type][stat])}`;
+            target.innerHTML += `<br>${BreakDownMap[stat_type]}: ${character.stats.flat[stat_type][stat]>0?'+':''}${format_number(character.stats.flat[stat_type][stat])}`;
         }
     });
     Object.keys(character.stats.multiplier).forEach(stat_type => {
@@ -2830,16 +2912,27 @@ function update_displayed_effect_durations() {
         }
     });
 }
-
+let save_button = document.getElementById("save_to_file_button");
 function update_displayed_time() {
     if(current_game_time.hour >= 150 || current_game_time.hour < 30) {
-        time_field.innerHTML = current_game_time.toString() + '✨';
+        time_field.innerText = current_game_time.toString() + '✨';
     } else {
-        time_field.innerHTML = current_game_time.toString() + '☀️';
+        time_field.innerText = current_game_time.toString() + '☀️';
     }
     let cur_moon = current_game_time.moon();
     let moons="🌑🌒🌓🌔🌕🌖🌗🌘";
-    time_field.innerHTML += (moons[cur_moon*2]+moons[cur_moon*2+1]);
+    time_field.innerText += (moons[cur_moon*2]+moons[cur_moon*2+1]);
+
+    let time = (new Date()).valueOf();
+    inf_combat.ST = inf_combat.ST || 0;
+    if(time - inf_combat.ST >= 3.6e6)//1h
+    {
+        save_button.innerHTML = "<span class='rarity_antique'><b>导出(奖励)</span></b>";
+    }
+    else{
+        save_button.innerHTML = "导出";
+    }
+
 }
 
 /** 
@@ -2851,6 +2944,12 @@ function format_money(num) {
     let value=``;
     const sign = num >= 0 ? '' : '-';
     num = Math.abs(num);
+    if(num<100){
+        if((num - Math.floor(num))>0.01)
+        {
+            return  `<span class="coin coin_copper">${num.toFixed(2)}C</span> `
+        }
+    }
 
     if(num > 0) {
         let cC=Math.floor(num%1000);
@@ -2894,8 +2993,11 @@ function update_displayed_character_xp(did_level = false) {
 }
 
 function update_displayed_xp_bonuses() {
-    data_entry_divs.character.innerHTML = `<span class="data_entry_name">Base Level XP Gain:</span><span class="data_entry_value">x${format_number(get_hero_xp_gain())}</span>`;
-    data_entry_divs.skills.innerHTML = `<span class="data_entry_name">Base Skill XP Gain:</span><span class="data_entry_value">x${format_number(get_skills_overall_xp_gain())}</span>`;
+    data_entry_divs.character.innerHTML = `<span class="data_entry_name">基础等级经验获取:</span><span class="data_entry_value">x${format_number(get_hero_xp_gain())}</span>`;
+    data_entry_divs.skills.innerHTML = `<span class="data_entry_name">基础技能经验获取:</span><span class="data_entry_value">x${format_number(get_skills_overall_xp_gain())}</span>`;
+    data_entry_divs.kills.innerHTML = `<span class="data_entry_name">敌人击杀数:</span><span class="data_entry_value">${Math.round(get_enemy_killcount())}</span>`;
+    data_entry_divs.crafts.innerHTML = `<span class="data_entry_name">合成成功数:</span><span class="data_entry_value">${Math.round(total_crafting_successes)}</span>`;
+    data_entry_divs.craft.innerHTML = `<span class="data_entry_name">合成尝试数:</span><span class="data_entry_value">${Math.round(total_crafting_attempts)}</span>`;
 }
 
 
@@ -2996,7 +3098,7 @@ function start_activity_display(current_activity) {
 
 
     const action_end_text = document.createElement("div");
-    const ActivityNameMap = {"Running":"Running","Swimming":"Swimming","mining":"Excavation","woodcutting":"Woodcutting","fishing":"Fishing"};
+    const ActivityNameMap = {"Running":"跑步","Swimming":"游泳","mining":"挖掘","woodcutting":"砍伐","fishing":"钓鱼","AquaElement":"水元素感应"};
     const dev_ACNMap = false;
     action_end_text.innerText = `Stop ${dev_ACNMap?current_activity.activity_name:ActivityNameMap[current_activity.activity_name]}`;
     action_end_text.id = "action_end_text";
@@ -3528,6 +3630,103 @@ function update_displayed_faved_stances() {
     }
 }
 
+const family_locked = document.getElementById("family_locked");
+const family_unlocked = document.getElementById("family_system");
+
+function update_displayed_family() {
+    if(global_flags["is_family_enabled"]){
+        family_locked.style.display='none';
+        family_unlocked.style.display='block';
+        if(!family_data.unlocked) init_family();//初始化
+        if(family_data.mem[99].vis) init_family();//不存在的境界有人！如果真的99境了那么需要移除这一句
+        
+        //更新计时器
+        let re_time = 10800 - (current_game_time.hour * 60 + current_game_time.minute);
+        document.getElementById("family_timer_game").innerText = Math.floor(re_time / 60) + 'h' + re_time % 60 + 'm';
+        let time_speed = get_time_passed();
+        document.getElementById("family_timer_real").innerText = Math.ceil(re_time / time_speed) + 's'
+        document.getElementById("family_baby_cost").innerHTML = format_money(get_baby_cost(family_data.baby));
+        document.getElementById("baby_scale1").innerHTML = family_data.baby>1e4?"新生儿超过1万，花费受到一重软上限限制(^1.5)<br>":""
+        document.getElementById("baby_scale2").innerHTML = family_data.baby>1e8?"新生儿超过1亿，花费受到二重软上限限制(^1.75)<br>":""
+        document.getElementById("baby_scale3").innerHTML = family_data.baby>1e12?"新生儿超过1兆，花费受到三重软上限限制(^2.0)<br>":""
+    }
+    else{
+        family_locked.style.display='block';
+        family_unlocked.style.display='none';
+    }
+}//只刷新计时器和设置
+window.update_displayed_family = update_displayed_family;
+const family_member = document.getElementById("family_member_list");
+let family_mem_divs = [];
+function format_mem_change(mem_data){
+    if(mem_data > 0) return format_number(mem_data);
+    if(mem_data == 0 ) return 'N/A';
+    return mem_data + 'd';
+}//正数代表数目，负数代表时间
+function update_displayed_family_members(){
+
+    if(!global_flags['is_family_enabled']) return;
+    //init_family();
+    //console.log(family_data);
+    document.getElementById("family_re_gain").innerHTML = format_money(family_data.re_gain);
+    document.getElementById("family_re_influ").innerText = format_number(family_data.re_influ);
+    document.getElementById("family_influ").innerHTML = format_number(family_data.influ);
+
+     while(family_member.firstChild) {
+         family_member.removeChild(family_member.lastChild);
+     }
+
+            //console.log('reached');
+    family_member.innerHTML = 
+    `<tr class="stance_list_entry member_list_header">
+        <th class="member_list_header member_list_realm">境界</th>
+        <th class="member_list_header member_list_num">人数</th>
+        <th class="member_list_header member_list_change" style='color:lightgreen'>突破</th>
+        <th class="member_list_header member_list_change" style='color:lightcoral'>死亡</th>
+        <th class="member_list_header member_list_alti ">培养策略</th>
+    </tr>`;
+    family_mem_divs = [];
+    for(let r=0;r<=99;r+=1){
+        
+        if(family_data.mem[r].vis){
+            family_mem_divs[r] = document.createElement("tr");
+            family_mem_divs[r].classList.add("stance_list_entry");
+            const mem_realm = `<td class="member_list member_list_realm ${realm_rate[r][4]}">${realm_rate[r][3]}</td>`;
+            const mem_num = `<td class="member_list member_list_num ${realm_rate[r][4]}">${format_number(family_data.mem[r].num)}</td>`;
+            const mem_break = `<td class="member_list member_list_change" style='color:lightgreen'><b>${format_mem_change(family_data.mem[r].break)}</b></td>`;
+            const mem_die = `<td class="member_list member_list_change" style='color:lightcoral'><b>${format_mem_change(family_data.mem[r].die)}</b></td>`;
+            const mem_alt = `<td class="member_list member_list_change">
+            <select id="${r<=9?'0':''}${r}_family_ali" class='family_ali'>
+            <option value='1' ${family_data.mem[r].ali==1?"selected":""}>[1]常规工作</option>
+            <option value='2' ${family_data.mem[r].ali==2?"selected":""}>[2]家族试炼</option>
+            <option value='3' ${family_data.mem[r].ali==3?"selected":""}>[3]秘境探险</option>
+            <option value='4' ${family_data.mem[r].ali==4?"selected":""}>[4]战场厮杀</option>
+            <option value='5' ${family_data.mem[r].ali==5?"selected":""}>[5]九死一生</option>
+            </select></td>`;
+            //console.log((r<=9?'0':'')+String(r)+'_family_ali');
+            //console.log(document.getElementById((r<=9?'0':'')+String(r)+'_family_ali'));
+            /*
+            
+·普通工作 产出40%   , 突破率*1  死亡率*1
+·家族秘境 产出100%  , 突破率*3  死亡率*6
+·公共秘境 产出200%  , 突破率*5  死亡率*15
+·战场厮杀 产出500%  , 突破率*10 死亡率*60
+·九死一生 产出20x   , 突破率*20 死亡率*300 */
+            family_mem_divs[r].innerHTML = mem_realm + mem_num + mem_break + mem_die + mem_alt;
+            const family_mem_row = document.createElement("td");
+            family_mem_divs[r].appendChild(family_mem_row);
+            family_member.append(family_mem_divs[r]);
+            //console.log('created',r);
+        }
+    }
+
+}//刷新成员情况
+
+
+
+
+
+
 /**
  * creates a new bestiary entry;
  * called when a new enemy is killed (or, you know, loading a save)
@@ -3541,72 +3740,98 @@ Create anything needed about 'special stats' Display
 
 */
 
-let spec_stat = [[0, 'Magic Attack', '#bbb0ff','This enemy seems to have mastered magic.<br>The enemy ignores the player\'s defense.'],
-[1, "Stalwart", "#c0b088","This enemy possesses the power of earth, unbreakable.<br>Single hit damage cannot exceed <span style='color:#87CEFA'>1</span>."],
-[2, "Swift", "#ffcc33","This enemy strikes first.<br>The enemy first launches an <span style='color:yellow'>extra attack</span>."],
-[3, "Double Strike", "#ffee77", "The enemy attacks with great speed and terrifying power, but is more fragile.<br>The enemy attacks <span style='color:#87CEFA'>2 times</span> per round."],
-[4, "Dash", "#5dc44b", "This enemy is fast and agile.<br>The enemy first launches a <span style='color:#87CEFA'>triple strike</span>."],
-[5, "Suppress", "#25c1d9", "A technique to restrain the opponent — a trick or a burden.<br>Enemy damage per round * <span style='color:#87CEFA'>(enemy defense / player defense)</span>."],
-[6, "Triple Strike", "#ffee77", "The enemy attacks with great speed and terrifying power, but is more fragile.<br>The enemy attacks <span style='color:#87CEFA'>3 times</span> per round."],
-[7, "Rend", "#a52a2a", "This enemy attacks ferociously, creating a rend effect.<br>Enemy combat damage increased by <span style='color:#87CEFA'>half</span>."],
-[8, "Weaken", "#f2a4e8", function(enemy){return "Uses poison magic to weaken the opponent.<br>When fighting this enemy, the player's attack and defense are reduced by <span style='color:#87CEFA'>"+enemy.spec_value[8]+"%</span>."}],
-[9, "Reverse", "#FFC0CB", "A subtle combat insight using strange tactics, bringing a new strategic dimension.<br>In combat, the player's <span style='color:yellow'>attack and defense effectiveness are swapped</span>."],
-[10, "Whirlwind", "#8ED1A6","A two-hit asymmetric strike using wind energy.<br>The enemy attacks <span style='color:yellow'>once each</span> at <span style='color:#87CEFA'>0.8x and 1.2x</span> per round."],
-[11, "Aura", "#E6E099","Aura monsters are always surrounded by other monsters, all looking very excited. (Effect integrated in floor properties)"],
-[12, "Time Lock", "#917881","Time element insight. Briefly slows time around itself, creating opportunities at key moments.<br>Combat damage each round becomes <span style='color:#87CEFA'>turn number</span>x."],			
-[13, "Illusion", "#B20EB2","Traps the opponent in an illusion, ensnaring them.<br>For the first <span style='color:#87CEFA'>3 rounds</span>, attacks once extra for each player attack."],
-[14, "Sword Array", "#5269B7","Looks like a bluffing sword formation.<br>The enemy sets a deadly array, dealing extra <span style='color:#87CEFA'>2x, 3x, 4x</span> enemy attack damage at rounds <span style='color:#87CEFA'>2, 4, 6</span>."],
-[15, "Dimensional Gate", "#808080","Time element insight. A glimpse of fate's laws; a dark gate opening to another world.<br>Combat damage each round becomes <span style='color:#87CEFA'>2*turn-1</span>x."],
-[16, "Hurricane", "#337d3d","This enemy is swift as wind, stirring up wind elemental phenomena.<br>The enemy first launches a 4-hit attack dealing <span style='color:#87CEFA'>5x damage</span>."],
-[17, "Persistence", "#cbb2d9","Persistence grinds iron into needles.<br>Enemy attacks additionally deal 0.5% of the player's HP."],
-[18, "Greed", "#dfe650",function(enemy){return `This enemy seems very sensitive to money.<br>For every ${format_money(enemy.spec_value[18])} the player has, this enemy's damage decreases by <span style='color:#87CEFA'>1%</span>.`}],
-[19, "Synchronize", "#FF6A6A","A mysterious and threatening insight that can share attributes.<br>The enemy grows stronger as the player does, adding <span style='color:#87CEFA'>10%</span> of the player's attack and defense."],
-[20, "Heaven Sword", "#9B8AFC","Gathers heaven and earth energy into an offensive stance.<br>The enemy deals extra damage equal to (own attack x<span style='color:#87CEFA'>3</span>) minus (player defense x<span style='color:#87CEFA'>2</span>) per round."],
-[21, "Wraith", "#ff9977",function(enemy){return "Exists as a special life form.<br>The enemy deals <span style='color:#87CEFA'>" + (enemy.spec_value[21]) + " minus player agility, times 5</span> damage per round.<br>This bonus damage has a minimum of 0."}],
-[22, "Peerless", "#DEF27B","Peerless 5-hit.<br>Before battle, the enemy launches a <span style='color:#87CEFA'>5-hit combo</span> at 0.9x attack power."],
-[23, "Spirit Flash", "#F2EC41","Light element insight. Suppresses opponents with fast, powerful attacks.<br>When <span style='color:#FFFF00'>player's attack (with bonuses) is less than enemy's</span>, damage to enemy is reduced by <span style='color:#87CEFA'>half of (enemy defense / player defense)</span>."],
-[24, "Drink Blade", "#F0A078","Absorbs fierce offensive elements and converts them to power.<br>Enemy HP increases by <span style='color:#87CEFA'>0.5x</span> the player's attack."],
-[25, "Drink Shield", "#3C6794","Absorbs strong defensive elements and converts them to power.<br>Enemy HP increases by <span style='color:#87CEFA'>0.5x</span> the player's defense."],
-[26, "Split", "#8EA5D1","A combat mage with two abilities. The enemy's attack <span style='color:#87CEFA'>doubles</span> each round."],
-[27, "Yielding", "#2CBA3A","Receives attacks and converts them into another force.<br>In combat, 10% of the player's attack effectiveness is transferred to defense."],
-[28, "Skin Immunity", "#808080","Don't try to farm tough skin with this!"],
-[29, "Intercept", "#8888e6",function(enemy){return "This enemy understands fighting while retreating.<br>If the enemy evades an attack, it deals an additional <span style='color:#87CEFA'>" + (enemy.spec_value[29]) + "</span> magic damage."}],
-[30, "Purify", "#80eed6",function(enemy){return "Before battle, the enemy adds <span style='color:#87CEFA'>" + enemy.spec_value[30] + "x</span> of the player's agility to its own attack."}],
-[31, "Rejuvenate", "#ccff99","Wood element insight. A favorite ability of adventurers who master battle-recovery magic.<br>The enemy recovers <span style='color:#87CEFA'>30%</span> of its max HP with each hit."],
-[32, "Retaliate", "#d3a547","Strike back.<br>The enemy reflects <span style='color:#87CEFA'>20%</span> of the player's damage back."],
-[33, function(enemy){return enemy.spec_value[33] + "-Strike"}, "#ffee77",function(enemy){return "The enemy attacks with great speed and terrifying power, but is more fragile.<br>The enemy attacks <span style='color:#87CEFA'>" + enemy.spec_value[33] + " times</span> per round."}],
-[34, "Bully","#109996","An enemy that bullies the weak is easily countered.<br>When the player's <span style='color:#FFFF00'>defense is less than the enemy's</span>, the <span style='color:#FFFF00'>difference with enemy defense</span> is <span style='color:#87CEFA'>doubled</span> in effect."],
-[35, "Realm", "#c677dd",function(enemy){return "This enemy understands the art of projecting power outward.<br>Each time the enemy is attacked, it deals an additional <span style='color:#87CEFA'>" + (enemy.spec_value[35]) + "</span> realm damage. This damage is mitigated 1:1 by agility."}],
-[36, "Detonate", "#597a80","The last dignity of the strong in despair.<br>Triggers at round 20, HP drops to 1, deals <span style='color:#87CEFA'>remaining HP * 4</span> damage."],
-[37, "Scatter", "#d08e53","A wondrous ability that senses vitality and affects attacks.<br>Player attack effectiveness is reduced by <span style='color:#87CEFA'>1x</span> (enemy HP / player HP)<br>."],
-[38, "Ice Curse", "#6699FF", "A curse created by the legendary most powerful fairy, though her HP isn't that high.<br>At <span style='color:#FFFF00'>round 9</span>, casts Ice Curse, dealing <span style='color:#87CEFA'>20x attack power</span> magic damage."],
-[39, "Greed: Gem", "#50dfe6",function(enemy){return `This enemy seems very sensitive to gems.<br>For every ${format_number(enemy.spec_value[39])} value in [Heart's Realm - 1st Level], this enemy's damage decreases by <span style='color:#87CEFA'>1%</span>.`}],
-[40, "Chase Light", "#ecff17", "Light element insight. This enemy is as fast as a beam of light.<br>The enemy first launches a 3-hit <span style='color:#87CEFA'>50x damage</span> <span style='color:#FFFF00'>guaranteed hit</span>."],
-[41, "Summon", "#f5deb3", "The embodiment of social creatures working together. When the enemy spawns, 3 extra [Violet-Rust Fetal Men] spawn."],
-[42, "Sacred Array", "#d9964a", "Perfect virtue makes a sage; ten perfect circles make a sacred array.<br>The enemy sets a sacred array, dealing <span style='color:#87CEFA'>3x, 9x, 27x</span> of the combined player+enemy attack+defense as piercing damage at rounds <span style='color:#87CEFA'>5, 10, 20</span>."],
-[43, "Laser", "#dda0dd",function(enemy){return "On each attack, regardless of whether it hits, deals an additional <span style='color:#87CEFA'>" + (enemy.spec_value[43]) + "</span> magic damage."}],
-[44, "Summon", "#f5deb3", "The embodiment of social creatures working together. When the enemy spawns, 3 extra [Ship Weeder B1] spawn."],
-[45, "10 Rounds", "#524fdb","Survive ten rounds against this enemy! At round 10, the enemy is hit by a laser gun, <span style='color:#87CEFA'>reducing HP to 1</span>.<br><span style='color:#FF0000'><b>Prerequisite: your sister must be with you.</b></span>"],
-[46, "Drink Blade+", "#F0A078","Absorbs fierce offensive elements and converts them to power.<br>Enemy HP increases by <span style='color:#87CEFA'>2.5x</span> the player's attack."],
-[47, "Drink Shield+", "#3C6794","Absorbs strong defensive elements and converts them to power.<br>Enemy HP increases by <span style='color:#87CEFA'>2.5x</span> the player's defense."],
-[48, "Ice Ling Sword", "#87CEEB",function(enemy){return `Ice element insight. Transforms ice into a sword to pierce the opponent's defenses; only agile movement can counter it.<br>Before battle, deals guaranteed damage equal to <span style='color:#87CEFA'>20x</span> the player's combined attack+defense. This skill is mitigated by agility: every ${format_number(enemy.spec_value[48])} agility reduces damage by 1%.`}],
-[49, "Ice Seal", "#73E4D4",function(enemy){return `Ice element insight. A technique that can instantly freeze targets; only vigorous life can resist it.<br>Before battle, launches a <span style='color:#87CEFA'>5-hit ${format_number(enemy.spec_value[49].rnd / 5)}x</span> pre-emptive attack. This skill is mitigated by HP: every ${enemy.spec_value[49].hp} HP reduces the pre-emptive multiplier by 0.2x.`}],
-[50, "Frostbite", "#97C6E8",function(enemy){return `Ice element insight. Inflicts unspeakable pain in extreme cold; a strong physique is the essential painkiller.<br>Before battle, deals guaranteed damage equal to <span style='color:#87CEFA'>40x</span> the player's agility. This skill is mitigated by combined attack+defense: every ${enemy.spec_value[50]} attack+defense reduces damage by 1%.`}],
-];
+let spec_stat = [[0, '魔攻', '#bbb0ff','这个敌人似乎掌握了魔法。<br>敌人无视角色的防御。'],
+[1, "坚固", "#c0b088","这个敌人拥有土元素之力，坚不可摧。<br>单次对敌人的伤害不能超过<span style='color:#87CEFA'>1</span>。"],
+[2, "迅捷", "#ffcc33","这个敌人出手快人一步。<br>敌人首先发动一次<span style='color:yellow'>额外攻击</span>。"],
+[3, "2连击", "#ffee77", "敌人进攻速度很快，拥有更加恐怖的杀伤力，但同时也意味着生命力会较为脆弱。<br>敌人每回合攻击<span style='color:#87CEFA'>2次</span>。"],
+[4, "疾走", "#5dc44b", "这个敌人出手快而敏捷。<br>敌人首先发动一次<span style='color:#87CEFA'>3连击</span>。"],
+[5, "牵制", "#25c1d9", "牵制对手的招式可能成为窍门或是负累。<br>敌人每回合伤害*<span style='color:#87CEFA'>（敌人防御力/角色防御力）</span>。"],
+[6, "3连击", "#ffee77", "敌人进攻速度很快，拥有更加恐怖的杀伤力，但同时也意味着生命力会较为脆弱。<br>敌人每回合攻击<span style='color:#87CEFA'>3次</span>。"],
+[7, "撕裂", "#a52a2a", "这个敌人攻击非常凶猛，造成了撕裂效果。<br>敌人的战斗伤害增加<span style='color:#87CEFA'>一半</span>。"],
+[8, "衰弱", "#f2a4e8", function(enemy){return "用毒魔法弱化对手的能力。<br>与该敌人战斗时，角色的攻防效力削弱<span style='color:#87CEFA'>"+enemy.spec_value[8]+"%</span>。"}],
+[9, "反转", "#FFC0CB", "微妙的战斗领悟，使用诡异的战法，为攻守双方带来全新的策略维度。<br>战斗中，角色<span style='color:yellow'>攻击与防御效力交换</span>。"],
+[10, "回风", "#8ED1A6","借助风元素的势进行的二段不对等打击。<br>敌人每回合以<span style='color:#87CEFA'>0.8、1.2倍</span>攻击<span style='color:yellow'>各攻击一次</span>。"],
+[11, "光环", "#E6E099","光环异兽的身周总是围着一群异兽，并且个个都看起来很亢奋。(效果整合在楼层属性中)"],
+[12, "时封", "#917881","时元素领悟。短暂延缓自身周围区域内时间的流速，为某些关键时刻创造机会。<br>每一回合战斗伤害变为<span style='color:#87CEFA'>回合数</span>倍。"],			
+[13, "惑幻", "#B20EB2","制人于幻境中，受到幻境的蛊惑。<br>前<span style='color:#87CEFA'>3回合</span>，以角色攻击各额外攻击一次。"],
+[14, "斩阵", "#5269B7","看起来很像虚张声势的剑阵。<br>敌人布下诡秘的杀阵，在战斗进行到第<span style='color:#87CEFA'>二、四、六</span>回合时，分别对角色额外造成<span style='color:#87CEFA'>2倍、3倍、4倍</span>敌人攻击力的伤害。"],
+[15, "异界之门", "#808080","时元素领悟。触及了一丝命运规律的领悟，张开的黑暗之门似通向另一个世界。<br>每一回合战斗伤害变为<span style='color:#87CEFA'>2*回合数-1</span>倍。"],
+[16, "飓风", "#337d3d","这个敌人迅疾如风，引动了天地间的风元素异象。<br>敌人首先发动4段<span style='color:#87CEFA'>5倍伤害</span>的攻击。"],
+[17, "执着", "#cbb2d9","铁杵磨成针。<br>敌人的攻击额外增加角色生命的0.5%。"],
+[18, "贪婪", "#dfe650",function(enemy){return `这个敌人似乎对金钱十分敏感。<br>角色每拥有${format_money(enemy.spec_value[18])},该敌人伤害减少<span style='color:#87CEFA'>1%</span>.`}],
+[19, "同调", "#FF6A6A","玄妙且具备威胁的领悟，可以共享属性。<br>敌人会随着角色的变强而变强，其攻防敏附加<span style='color:#87CEFA'>10%</span>角色的攻防。"],
+[20, "天剑", "#9B8AFC","可将天地能量汇聚于自身的攻势进行战斗。<br>敌人每回合额外造成自身攻击<span style='color:#87CEFA'>3倍</span>与角色防御<span style='color:#87CEFA'>2倍</span>差值的伤害。"],
+[21, "灵体", "#ff9977",function(enemy){return "以特殊的生命形式而存在。<br>敌人对角色每回合造成<span style='color:#87CEFA'>" + (enemy.spec_value[21]) + "与角色敏捷之差的五倍</span>点伤害。<br>此额外伤害下限为0."}],
+[22, "绝世", "#DEF27B","五连绝世。<br>战斗前，敌人以0.9倍的攻击力发动一次<span style='color:#87CEFA'>5连击</span>。"],
+[23, "灵闪", "#F2EC41","光元素领悟。以快而强大的进攻压制对手。<br>当<span style='color:#FFFF00'>角色的攻击（计算加成）少于敌人</span>时，敌人受到的伤害比例减少<span style='color:#87CEFA'>（敌人防御/角色防御）的二分之一</span>。"],
+[24, "饮剑", "#F0A078","将炽烈的进攻元素吸收并化为自身的能力。<br>敌人的生命增加角色攻击的<span style='color:#87CEFA'>0.5倍</span>。"],
+[25, "饮盾", "#3C6794","将刚猛的防守元素吸收并化为自身的能力。<br>敌人的生命增加角色防御的<span style='color:#87CEFA'>0.5倍</span>。"],
+[26, "分裂", "#8EA5D1","拥有两种能力的战斗法师。敌人每回合的攻击<span style='color:#87CEFA'>翻倍</span>"],
+[27, "柔骨", "#2CBA3A","接下攻击，并化为另一种劲力发回。<br>战斗时，角色的攻击效力转移<span style='color:#87CEFA'>10%</span>到防御上。"],
+[28, "肤·免疫", "#808080","别想用它刷坚韧皮肤！"],
+[29, "阻击", "#8888e6",function(enemy){return "这个敌人似乎懂得且战且退的道理。<br>如果敌人闪避了攻击，则额外对角色造成<span style='color:#87CEFA'>" + (enemy.spec_value[29]) + "</span>点魔法伤害。"}],
+[30, "净化", "#80eed6",function(enemy){return "战斗前，敌人将角色敏捷的<span style='color:#87CEFA'>" + enemy.spec_value[30] + "倍</span>加到自己的攻击上。"}],
+[31, "回春", "#ccff99","木元素领悟。修习了战复魔法的冒险者钟爱的属性。<br>敌人每次命中恢复自身生命上限<span style='color:#87CEFA'>30%</span>的生命。"],
+[32, "反戈", "#d3a547","反戈一击。<br>敌人将角色伤害的<span style='color:#87CEFA'>20%</span>反弹给角色。"],
+[33, function(enemy){return enemy.spec_value[33] + "连击"}, "#ffee77",function(enemy){return "敌人进攻速度很快，拥有更加恐怖的杀伤力，但同时也意味着生命力会较为脆弱。<br>敌人每回合攻击<span style='color:#87CEFA'>" + enemy.spec_value[33] + "次</span>。"}],
+[34, "凌弱","#109996","欺凌弱小的敌人容易被防杀。<br>当角色<span style='color:#FFFF00'>防御小于敌人</span>时，其<span style='color:#FFFF00'>与敌人防御的差值</span>将拉大<span style='color:#87CEFA'>一倍</span>。"],
+[35, "领域", "#c677dd",function(enemy){return "这个敌人似乎懂得力量外放的道理。<br>敌人每次被攻击，则额外对角色造成<span style='color:#87CEFA'>" + (enemy.spec_value[35]) + "</span>点领域伤害。此伤害可被敏捷1:1减免。"}],
+[36, "自爆", "#597a80","强者在绝望之下最后的尊严。<br>第20回合触发，血量下降到1，对角色造成<span style='color:#87CEFA'>自身剩余生命*4</span>的伤害。"],
+[37, "散华", "#d08e53","奇妙的能力，感应血气并作用于攻击。<br>角色攻击的效力削弱（敌人生命/角色生命）的<span style='color:#87CEFA'>一倍</span><br>。"],
+[38, "冰符咒", "#6699FF", "由传说中的最强妖精创造的符咒，虽然她的生命力并不如何高。<br>在<span style='color:#FFFF00'>第9回合</span>施展冰符咒，额外造成<span style='color:#87CEFA'>20倍攻击力</span>的魔法伤害。"],
+[39, "贪婪·宝石", "#50dfe6",function(enemy){return `这个敌人似乎对宝石十分敏感。<br>角色每在[心之境界-一重]拥有${format_number(enemy.spec_value[39])}价值点<br>,该敌人伤害减少<span style='color:#87CEFA'>1%</span>.`}],
+[40, "追光", "#ecff17", "光元素领悟。这个敌人快得恍若一道照亮世界的光。<br>敌人首先发动一次敌人首先发动3段<span style='color:#87CEFA'>50倍伤害</span>的<span style='color:#FFFF00'>必中攻击</span>。"],
+[41, "召唤", "#f5deb3", "群居生物同心协力的体现。敌人刷新时，额外刷新3只【紫锈胎人】。"],
+[42, "圣阵", "#d9964a", "才德全尽谓之圣人，十圆无缺谓之圣阵。<br>敌人布下圣阵，在战斗进行到第<span style='color:#87CEFA'>五、十、二十</span>回合时，分别对角色造成<span style='color:#87CEFA'>3倍、9倍、27倍</span>角色与敌人攻防之和的穿透伤害。"],
+[43, "激光", "#dda0dd",function(enemy){return "攻击时，无论是否命中，都额外造成<span style='color:#87CEFA'>" + (enemy.spec_value[43]) + "</span>点魔法伤害。"}],
+[44, "召唤", "#f5deb3", "群居生物同心协力的体现。敌人刷新时，额外刷新3只【舰船除草机B1】。"],
+[45, "10回合", "#524fdb","在敌人的手中走过十回合！敌人会在第10回合被镭射枪击中，将<span style='color:#87CEFA'>血量降为1</span>.<br><span style='color:#FF0000'><b>前提是,姐姐被你带在身边.</b></span>"],
+[46, "饮剑·改", "#F0A078","将炽烈的进攻元素吸收并化为自身的能力。<br>敌人的生命增加角色攻击的<span style='color:#87CEFA'>2.5倍</span>。"],
+[47, "饮盾·改", "#3C6794","将刚猛的防守元素吸收并化为自身的能力。<br>敌人的生命增加角色防御的<span style='color:#87CEFA'>2.5倍</span>。"],
+[48, "冰凌剑", "#87CEEB",function(enemy){return `冰元素领悟。将冰元素变换为剑形态，刺穿对手的术式，唯有灵活的腾挪方可抵挡。<br>战斗前，对角色造成相当于角色攻防和<span style='color:#87CEFA'>20倍</span>的必中伤害。该技能效果可被敏捷减免，每${format_number(enemy.spec_value[48])}点敏捷可减免1%伤害。`}],
+[49, "冰封术", "#73E4D4",function(enemy){return `冰元素领悟。可以让人瞬间变成冰块的术式，唯有蓬勃的生命得以顽强成长。<br>战斗前，对角色进行<span style='color:#87CEFA'>5段${format_number(enemy.spec_value[49].rnd / 5)}倍</span>的先攻。该技能效果可被生命减免，每${enemy.spec_value[49].hp}点生命可免除0.2倍先攻倍率。`}],
+[50, "冻伤", "#97C6E8",function(enemy){return `冰元素领悟。让对手在低温中感受到难以言喻的痛苦，强大的体魄是镇痛的必要条件。<br>战斗前，对角色造成相当于角色敏捷<span style='color:#87CEFA'>40倍</span>的必中伤害。该技能效果可被攻防和减免，每${enemy.spec_value[50]}点攻防和可减免1%伤害。`}],
+[51, "压制", "#e3e647", "压制对手的招式可能成为窍门或是负累。<br>敌人每回合伤害*<span style='color:#87CEFA'>（敌人攻防和/角色攻防和）</span>。"],
+[52, "压制·伪", "#47e6a4", "压制/牵制对手的招式可能成为窍门或是负累。<br>敌人每回合伤害*<span style='color:#87CEFA'>(敌人攻防和/角色攻防和)^(1-0.01*牵制领悟度)*(敌人防御力/角色防御力)^(0.01*牵制领悟度)</span>。"],
+[53, "同调·魔", "#FF6A00","玄妙且具备威胁的领悟，可以共享属性。<br>敌人会随着角色的变强而变强，其攻击附加<span style='color:#87CEFA'>200%</span>角色的攻击。"],
+[54, "生命限制", "#ffacc5","限制对手的能力可能成为窍门或是负累。<br>敌人每回合伤害*（敌人生命/角色生命）[PS:上限100倍]。"],
+[55, "贪婪·改", "#bfc630",function(enemy){return `这个敌人似乎对金钱十分敏感。<br>角色每拥有${format_money(enemy.spec_value[55])},该敌人伤害减少<span style='color:#87CEFA'>1%</span>,上限<span style='color:#87CEFA'>80%</span>.`}],
+[56, "禁锢", "#808080","敌人死亡时，角色获取一个<span style='color:#87CEFA'>攻速-20%</span>的状态效果，持续<span style='color:#87CEFA'>30s</span>。"],
+[57, "滋生", "#ff20c0","敌人死亡时，场上【心之灵·暴走】数量增加3个。"],
+[58, "暴走", "#fffc62","敌人死亡时，场上【心之灵·暴走】基础攻击/血量增加5%(叠加)。"],
+[59, "心之灵", "#b0f6ff","敌人死亡时，获取1点【灵魂之力】。"],
+[60, "败移" , "#32CD32", "空元素领悟。敌人会召唤一只本区敌人为它挡枪(不会循环召唤)"],
+[61, "小队" ,"#584af0", "小队成员为了生存而聚集在一起战斗。<br>由2-50个单位组成的小队。"],
+[62, "死线" ,"#DCDCDC", "不要忘记那些不得不做的事情。战斗结束后，角色获取<span style='color:#87CEFA'>60s 5倍易伤</span>(会显示在血条上)。"],
+[63, "硬化" ,"#94478a", "当角色攻击大于防御时，怪物将<span style='color:#FFFF00'>无视超出部分的攻击数值</span>。"],
+[64, "大队" ,"#d532eb", "大队成员气势汹汹，欲杀死所有阻拦自己的敌人。<br>由100-5000个单位组成的大队。"],
+[65, "血遁" ,"#a8002d", "燃烧精血获取到的远超同境的移速，精血枯竭时即会原形毕露。<br>敌人有效敏捷上升<span style='color:#FFFF00'>敌人血量百分比的99倍</span>。"],
+[66, "吹火掌","#f55882","火、空元素领悟。穹斗世界古书中记载的某种斗技，控制与对手的距离。<br><span style='color:#FFFF00'>敌人命中角色时</span>，将角色下一次攻击冷却<span style='color:#87CEFA'>增加50%</span>(可叠加)"],
+[67, "血杀","#f55882","你曾为自己的使命流过多少血？<br>当<span style='color:#FFFF00'>角色生命多于敌人</span>时，敌人伤害<span style='color:#87CEFA'>增加一半</span>，反之<span style='color:#87CEFA'>减少一半</span>。"],
+[68, "散华·改", "#d08e53","奇妙的能力，感应血气并作用于攻击。<br>角色攻击的效力削弱（敌人生命/角色生命）的<span style='color:#87CEFA'>10%</span><br>。"],
+[69, "反击" , "#B30000", "战斗前，敌人将角色攻击的<span style='color:#87CEFA'>100%</span>加到自己的攻击上"],
 
+];
 //超过25倍倍率的攻击暂时视为必中！
-function format_percent(perc){
+function format_perc(perc){
     if(perc < 10) return format_number(100*perc) + '%';
     else return format_number(perc) + 'x'; 
 }
 
+function format_numberL(perc){
+    if(perc < 1e-6) return format_number(10000*perc) + '/亿';
+    else if(perc < 0.001) return format_number(10000*perc) + '‱';
+    else if(perc < 10) return format_number(100*perc) + '%';
+    else return format_number(perc) + 'x'; 
+}
 
 function create_new_bestiary_entry(enemy_name) {
     bestiary_entry_divs[enemy_name] = document.createElement("div");
     
-    const enemy = enemy_templates[enemy_name] || Object.values(enemy_templates).find((template_enemy) => template_enemy.name === enemy_name);
-    if(!enemy) {
-        console.error(`Couldn't create bestiary entry for enemy '${enemy_name}' - matching template not found`);
+    const enemy = enemy_templates[enemy_name];
+    if(enemy == undefined){
+        enemy_killcount[enemy_name] = null;
+        console.warn("试图创建未定义的敌人 [" + enemy_name + "] 的怪物手册条目");
         return;
     }
 
@@ -3618,6 +3843,21 @@ function create_new_bestiary_entry(enemy_name) {
     kill_counter.classList.add("bestiary_entry_kill_count");
     
 
+
+    bestiary_entry_divs[enemy_name].appendChild(name_div);
+    bestiary_entry_divs[enemy_name].appendChild(kill_counter);
+    bestiary_entry_divs[enemy_name].setAttribute("data-bestiary", -1*enemy.rank);
+    bestiary_entry_divs[enemy_name].classList.add("bestiary_entry_div");
+    bestiary_list.appendChild(bestiary_entry_divs[enemy_name]);
+
+    //sorts bestiary_list div by enemy rank
+    [...bestiary_list.children].sort((a,b)=>parseInt(a.getAttribute("data-bestiary")) - parseInt(b.getAttribute("data-bestiary")))
+                                .forEach(node=>bestiary_list.appendChild(node));
+}
+
+function add_bestiary_tooltip(enemy_name){
+
+    const enemy = enemy_templates[enemy_name];
     const bestiary_tooltip = document.createElement("div");
     const tooltip_xp = document.createElement("div"); //base xp enemy gives
     tooltip_xp.innerHTML = enemy.description;
@@ -3736,7 +3976,10 @@ function create_new_bestiary_entry(enemy_name) {
 
     for(let ine=0;ine<enemy.spec.length;ine++){
         let S_STS = spec_stat[enemy.spec[ine]];
-        spec_stats.innerHTML += `<br><b><font color="${S_STS[2]}">${S_STS[1][0]==undefined?S_STS[1](enemy):S_STS[1]} </font></b> ：${S_STS[3][0]==undefined?S_STS[3](enemy):S_STS[3]} `;
+        if(S_STS != undefined){
+            spec_stats.innerHTML += `<br><b><font color="${S_STS[2]}">${S_STS[1][0]==undefined?S_STS[1](enemy):S_STS[1]} </font></b> ：${S_STS[3][0]==undefined?S_STS[3](enemy):S_STS[3]} `;
+        }
+        else console.error("特殊属性 编号[" + enemy.spec[ine] + "] 未定义！");
     }
     
     stat_line_5.appendChild(spec_stats);
@@ -3765,7 +4008,7 @@ function create_new_bestiary_entry(enemy_name) {
 
         tooltip_drops.appendChild(loot_line);
     }
-
+    let perdicted_value = 0;
     for(let i = 0; i < enemy.loot_list.length; i++) {
         const loot_line = document.createElement("div");
         const loot_name = document.createElement("div");
@@ -3782,16 +4025,21 @@ function create_new_bestiary_entry(enemy_name) {
         loot_chance_base.classList.add("loot_chance_base");
         loot_chance_current.classList.add("loot_chance_current");
 
-        loot_name.innerHTML = `${loot_item?.getName?.() ?? loot_item_key}`;
-        loot_chance_base.innerHTML = `[${format_percent(enemy.loot_list[i].chance)}]`;
-        loot_chance_current.innerHTML = `${enemy.loot_list[i].ignore_luck?("[Fixed]"):(format_percent(enemy.loot_list[i].chance*enemy.get_droprate_modifier()))}`;
+        loot_name.innerHTML = `${enemy.loot_list[i].item_name}`;
+        loot_chance_base.innerHTML = `[${format_numberL(enemy.loot_list[i].chance)}]`;
+        loot_chance_current.innerHTML = `${enemy.loot_list[i].ignore_luck?("[Fixed]"):(format_numberL(enemy.loot_list[i].chance*enemy.get_droprate_modifier()))}`;
         loot_chance.append(loot_chance_current, loot_chance_base);
         loot_line.append(loot_name, loot_chance);
 
         tooltip_drops.appendChild(loot_line);
+        perdicted_value += enemy.loot_list[i].chance * (enemy.loot_list[i].ignore_luck?1:enemy.get_droprate_modifier()) * item_templates[enemy.loot_list[i].item_name].value;
     }
 
     bestiary_tooltip.classList.add("bestiary_entry_tooltip");
+
+    
+    const tooltip_value = document.createElement("div"); //base enemy stats
+    tooltip_value.innerHTML = "<br>预期收益: " + format_money(perdicted_value);
     
     bestiary_tooltip.appendChild(tooltip_desc);
     bestiary_tooltip.appendChild(stat_realm);
@@ -3799,18 +4047,14 @@ function create_new_bestiary_entry(enemy_name) {
     bestiary_tooltip.appendChild(tooltip_tags);
     bestiary_tooltip.appendChild(tooltip_stats);
     bestiary_tooltip.appendChild(tooltip_drops);
+    bestiary_tooltip.appendChild(tooltip_value);
 
-    bestiary_entry_divs[enemy_name].appendChild(name_div);
-    bestiary_entry_divs[enemy_name].appendChild(kill_counter);
+
     bestiary_entry_divs[enemy_name].appendChild(bestiary_tooltip);
+}
 
-    bestiary_entry_divs[enemy_name].setAttribute("data-bestiary", -1*enemy.rank);
-    bestiary_entry_divs[enemy_name].classList.add("bestiary_entry_div");
-    bestiary_list.appendChild(bestiary_entry_divs[enemy_name]);
-
-    //sorts bestiary_list div by enemy rank
-    [...bestiary_list.children].sort((a,b)=>parseInt(a.getAttribute("data-bestiary")) - parseInt(b.getAttribute("data-bestiary")))
-                                .forEach(node=>bestiary_list.appendChild(node));
+function clear_bestiary_tooltip(enemy_name){
+    bestiary_entry_divs[enemy_name].querySelectorAll('.bestiary_entry_tooltip').forEach(el => el.remove());
 }
 
 
@@ -3820,9 +4064,10 @@ function add_bestiary_lines(zone)
     //zone 11-> 1-1，rank作为1200处理
     //sorts bestiary_list div by enemy rank
     bestiary_entry_divs[zone] = document.createElement("div");
-    let ZoneNameMap = {11:"Nayaka Training Ground",12:"Yangang City",13:"Yangang Outskirts",14:"Underground Palace",15:"Underground Palace Core",21:"Wild Beast Forest",22:"Qingye Riverside",23:"Na Family Secret Realm",24:"Barrier Lake",25:"Shenlv City Ruins",26:"Shenlv City Battlefield",27:"Sky Vessel",28:"Ship Core",31:"Hel Swamp",32:"Dark Forest",33:"Pure White Ice Plains",34:"Ice City",35:"Water Prison",36:"Inheritance Realm"}
+    let ZoneNameMap = {11:"纳家练兵场",12:"燕岗城",13:"燕岗城郊",14:"地宫",15:"地宫核心",21:"荒兽森林",22:"清野江畔",23:"纳家秘境",24:"结界湖",25:"声律城废墟",26:"声律城战场",27:"天外飞船",28:"飞船核心",31:"赫尔沼泽",32:"黑暗森林",33:"纯白冰原",34:"极寒冰宫",35:"时封水牢",36:"传承幻境",37:"幻境核心",41:"城门战",42:"密林战",43:"古墓战",44:"毬毬山谷",45:"鲜血峰",46:"破败之域",47:"破败危壁",48:"灭门战【WIP/需要剧情修正】",51:"枯叶走廊",52:"灰魇【WIP】",53:"灰魇庭院",54:"珍珠海",55:"风雷大会",56:"行道盟审判战",61:"深林【WIP】",62:"血魔海",63:"炎眸【WIP】",64:"葬地【WIP】",65:"冗音圣树",66:"冗音之塔",67:"音界",68:"圣城【WIP】"};//显示名
+    let ZoneTpMap = {11:"纳家大厅",12:"燕岗城",13:"燕岗近郊",14:"地宫浅层",15:"地宫深层",21:"荒兽森林",22:"清野江畔",23:"纳家秘境 - 战斗区",24:"结界湖",25:"声律城废墟",26:"声律城战场",27:"天外飞船",28:"飞船核心",31:"赫尔沼泽",32:"黑暗森林",33:"纯白冰原",34:"极寒冰宫",35:"时封水牢",36:"传承幻境",37:"幻境核心·地宫",41:"狩猎大赛·城门战",42:"狩猎大赛·密林战",43:"狩猎大赛·古墓战",44:"毬毬山谷",45:"鲜血峰",46:"破败之域",47:"破败危壁",48:"灭门战【WIP/需要剧情修正】",51:"枯叶走廊",52:"灰魇【WIP】",53:"灰魇庭院",54:"珍珠海",55:"风雷大会",56:"行道盟审判战",61:"深林【WIP】",62:"血魔海",63:"炎眸【WIP】",64:"葬地【WIP】",65:"冗音圣树",66:"冗音之塔",67:"音界",68:"圣城【WIP】"};//TP地点名
     const name_div = document.createElement("div");
-    name_div.innerHTML = `<b>【${ZoneNameMap[zone]}】</b>`;
+    name_div.innerHTML = `<b><div  onclick="change_location('${ZoneTpMap[zone]}')">【${ZoneNameMap[zone]}】</div></b>`;
     name_div.classList.add("bestiary_entry_name");
 
     const kill_counter = document.createElement("div");
@@ -3847,7 +4092,11 @@ function add_bestiary_lines(zone)
  * @param {String} enemy_name 
  */
 function update_bestiary_entry(enemy_name) {
-    bestiary_entry_divs[enemy_name].children[1].innerHTML = enemy_killcount[enemy_name];
+    if(bestiary_entry_divs[enemy_name].children[1] != undefined) bestiary_entry_divs[enemy_name].children[1].innerHTML = enemy_killcount[enemy_name];
+    else{
+        console.log(bestiary_entry_divs[enemy_name]);
+        console.error(`敌人[${enemy_name}] 的怪物手册词条未定义！`)
+    }
 }
 
 function clear_bestiary() {
@@ -3858,6 +4107,7 @@ function clear_bestiary() {
 
 function add_bestiary_zones(enemy_name)
 {
+    if(enemy_name == "毛茸茸") add_bestiary_lines(11);
     if(enemy_name == "纳家待从") add_bestiary_lines(12);
     if(enemy_name == "腐蚀质石精") add_bestiary_lines(13);
     if(enemy_name == "夜行幽灵") add_bestiary_lines(14);
@@ -3873,6 +4123,15 @@ function add_bestiary_zones(enemy_name)
     if(enemy_name == "无面修者") add_bestiary_lines(31);
     if(enemy_name == "有角族壮年") add_bestiary_lines(32);
     if(enemy_name == "冰原之痕") add_bestiary_lines(33);
+    if(enemy_name == "探险者的怨恨") add_bestiary_lines(34);
+    if(enemy_name == "大门派先锋") add_bestiary_lines(35);
+    if(enemy_name == "奇异菇菇") add_bestiary_lines(36);
+    if(enemy_name == "心魔") add_bestiary_lines(37);
+    if(enemy_name == "魔草绿球") add_bestiary_lines(41);
+    if(enemy_name == "水晶骷髅") add_bestiary_lines(42);
+    if(enemy_name == "燕岗战法小队") add_bestiary_lines(43);
+    if(enemy_name == "青茸茸将军") add_bestiary_lines(44);
+    if(enemy_name == "翩然蝶仙") add_bestiary_lines(45);
 }
 
 function reload_bestiary(){
@@ -3886,6 +4145,7 @@ function reload_bestiary(){
 
 
 function create_new_levelary_entry(level_name) {
+    if(levelary_entry_divs[level_name] != undefined) return;
     levelary_entry_divs[level_name] = document.createElement("div");
 
     const level = locations[level_name] || Object.values(locations).find(l => l.name === level_name);
@@ -3906,6 +4166,21 @@ function create_new_levelary_entry(level_name) {
     if(level.rank==0) return;
     
 
+    levelary_entry_divs[level_name].appendChild(name_div);
+    levelary_entry_divs[level_name].appendChild(kill_counter);
+
+    levelary_entry_divs[level_name].setAttribute("data-levelary", -1*level.rank);
+    levelary_entry_divs[level_name].classList.add("bestiary_entry_div");
+    levelary_list.appendChild(levelary_entry_divs[level_name]);
+
+    // sorts levelary_list div by enemy rank
+    [...levelary_list.children].sort((a,b)=>parseInt(a.getAttribute("data-levelary")) - parseInt(b.getAttribute("data-levelary")))
+                                .forEach(node=>levelary_list.appendChild(node));
+}
+
+
+function add_levelary_tooltip(level_name) {
+    const level = locations[level_name];
     const levelary_tooltip = document.createElement("div");
     levelary_tooltip.classList.add("bestiary_entry_tooltip");
     const tooltip_xp = document.createElement("div"); //base xp enemy gives
@@ -3917,7 +4192,7 @@ function create_new_levelary_entry(level_name) {
     if(level.types.length > 0) {
         tooltip_tags.innerHTML = `<br><br>Floor Properties:`;
         
-        const LocationTypesMap = {"dark":"Dark","aura":"Aura","stress":"Oppression"}
+        const LocationTypesMap = {"dark":"黑暗","aura":"光环","stress":"威压","toxic":"毒液"}
         const LocationStageMap = {1:"I",2:"II",3:"III"};
         for(let j=0;j<level.types.length;j++)
         {
@@ -3936,7 +4211,21 @@ function create_new_levelary_entry(level_name) {
             inf_combat.B3 = inf_combat.B3 || 0;
             c_halo = inf_combat.B3 * 0.01;
         }
-        tooltip_tags.innerHTML += `<br>Aura ${format_number(c_halo * 100.0)} %(Loot +${format_number((Math.pow(c_halo+1,1)-1)*100.0)}%, XP +${format_number((Math.pow(c_halo+1,1.5)-1)*100.0)}%)`;
+        if(level_name.includes("鲜血峰 - ")){
+            const key_id1 = item_templates["血峰限制器"].getInventoryKey();
+            let key_cnt1 = character.inventory[key_id1]?character.inventory[key_id1].count:0;
+            key_cnt1 = Math.min(key_cnt1,5);
+            if(key_cnt1 != 0){
+                c_halo *= 1 - 0.2 * key_cnt1;
+            }
+            const key_id2 = item_templates["血峰增幅器"].getInventoryKey();
+            let key_cnt2 = character.inventory[key_id2]?character.inventory[key_id2].count:0;
+            key_cnt2 = Math.min(key_cnt2,999025);
+            if(key_cnt2 != 0){
+                c_halo *= 1 + 0.2 * (key_cnt2 ** 0.5);
+            }
+        }
+        tooltip_tags.innerHTML += `<br>光环 ${format_number(c_halo * 100.0)} %(掉落 + ${format_number((Math.pow(c_halo+1,1)-1)*100.0)}%,经验 + ${format_number((Math.pow(c_halo+1,1.5)-1)*100.0)}%)`;
     }
     tooltip_enemies.innerHTML = `<br><br>Enemies here:<br>`;
     for(let j=0;j<level.enemies_list.length;j++)
@@ -3948,6 +4237,7 @@ function create_new_levelary_entry(level_name) {
      tooltip_loots.innerHTML += `<br>Loot here (avg):<br>`;
     let lootlist = {0:0};
     let I_list = [];
+    let predict_value = 0;
      for(let j=0;j<level.enemies_list.length;j++)
     {
         let C_enemy = enemy_templates[level.enemies_list[j]];
@@ -3957,9 +4247,14 @@ function create_new_levelary_entry(level_name) {
             let I_name = C_enemy.loot_list[k].item_name;
             if(I_list[I_name] == undefined) I_list[I_name] = C_enemy.loot_list[k].chance;
             else I_list[I_name] += C_enemy.loot_list[k].chance;
+            predict_value += C_enemy.loot_list[k].chance * item_templates[C_enemy.loot_list[k].item_name].value * (C_enemy.loot_list[k].ignore_luck?1:C_enemy.get_droprate_modifier());
         }
         //tooltip_enemies.innerHTML += `<img src=${enemy_templates[level.enemies_list[j]].image}>`;
     }
+    predict_value /= level.enemies_list.length;
+
+    const value_loots = document.createElement("div");
+    value_loots.innerHTML += `<br>预期收益/敌人：` + format_money(predict_value);
 
     for(let j=0;j<level.enemies_list.length;j++)
     {
@@ -3970,7 +4265,7 @@ function create_new_levelary_entry(level_name) {
             if(lootlist[I_name] == undefined)
             {
                 lootlist[I_name] = 1;
-                tooltip_loots.innerHTML += `[ ${item_templates[I_name]?.getName?.() ?? I_name} ] - ${format_percent(I_list[I_name] * character.stats.full.luck / level.enemies_list.length)} <br>`
+                tooltip_loots.innerHTML += `[ ${I_name} ] - ${format_numberL(I_list[I_name] * character.stats.full.luck / level.enemies_list.length)} <br>`
             }
         }
         //tooltip_enemies.innerHTML += `<img src=${enemy_templates[level.enemies_list[j]].image}>`;
@@ -3981,24 +4276,15 @@ function create_new_levelary_entry(level_name) {
     levelary_tooltip.appendChild(tooltip_tags);
     levelary_tooltip.appendChild(tooltip_enemies);
     levelary_tooltip.appendChild(tooltip_loots);
-
-    levelary_entry_divs[level_name].appendChild(name_div);
-    levelary_entry_divs[level_name].appendChild(kill_counter);
+    levelary_tooltip.appendChild(value_loots);
     levelary_entry_divs[level_name].appendChild(levelary_tooltip);
+}
 
-    levelary_entry_divs[level_name].setAttribute("data-levelary", -1*level.rank);
-    levelary_entry_divs[level_name].classList.add("bestiary_entry_div");
-    levelary_list.appendChild(levelary_entry_divs[level_name]);
-
-    // sorts levelary_list div by enemy rank
-    [...levelary_list.children].sort((a,b)=>parseInt(a.getAttribute("data-levelary")) - parseInt(b.getAttribute("data-levelary")))
-                                .forEach(node=>levelary_list.appendChild(node));
+function clear_levelary_tooltip(level_name) {
+    levelary_entry_divs[level_name].querySelectorAll('.bestiary_entry_tooltip').forEach(el => el.remove());
 }
 
 
-function update_levelary_entry(level_name) {
-    levelary_entry_divs[level_name].children[1].innerHTML = enemy_killcount[enemy_name];
-}
 
 function clear_levelary() {
     Object.keys(levelary_entry_divs).forEach((level) => {
@@ -4015,11 +4301,25 @@ function clear_skill_list(){
 }
 
 function update_enemy_attack_bar(enemy_id, num) {
-    enemies_div.children[enemy_id].querySelector(".enemy_attack_bar").style.width = `${Math.min(num*2.6,100)}%`;
+    enemies_div.children[enemy_id].querySelector(".enemy_attack_bar").style.width = `${Math.min(num*100,100)}%`;
 }
 
 function update_character_attack_bar(num) {
-    character_attack_bar.style.width = `${Math.min(num*2.6,100)}%`;
+    if(num>=0){
+        character_attack_bar.style.backgroundColor = 'rgb(156, 0, 156)';
+        character_attack_bar.style.width = `${Math.min(num*100,100)}%`;
+        character_attack_bar_cnt.innerText = `/`
+        character_attack_bar_cnt.style.display = `none`;
+    }
+    else{
+        character_attack_bar.style.backgroundColor = 'rgb(99, 255, 99)';
+        character_attack_bar.style.width = `${Math.round(num*(-100))%100}%`;
+        if(num<-1){
+            character_attack_bar_cnt.innerText = `(+x${Math.floor(num*-1)})`
+            character_attack_bar_cnt.style.display = `inherit`;
+        }
+        else character_attack_bar_cnt.style.display = `none`;
+    }
 }
 
 function update_backup_load_button(date_string){
@@ -4160,4 +4460,11 @@ export {
     reload_bestiary,
     add_bestiary_zones,
     unlock_moonwheel,
+    add_bestiary_tooltip,
+    clear_bestiary_tooltip,
+    add_levelary_tooltip,
+    clear_levelary_tooltip,
+    update_displayed_family,
+    update_displayed_family_members,
+    format_numberL,
 }

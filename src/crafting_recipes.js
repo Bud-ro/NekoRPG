@@ -4,11 +4,11 @@ import { character } from "./character.js";
 import { Armor, ArmorComponent, Shield, ShieldComponent, Weapon, WeaponComponent, item_templates } from "./items.js";
 import { skills } from "./skills.js";
 
-const crafting_recipes = {items: {}, items2: {},items3: {}, components: {}, equipment: {}};
-const cooking_recipes = {items: {}, items2: {},items3: {},};
-const smelting_recipes = {items: {}, items2: {},items3: {},};
+const crafting_recipes = {items: {}, items2: {},items3: {},items4:{}, components: {}, equipment: {}};
+const cooking_recipes = {items: {}, items2: {},items3: {},items4:{}};
+const smelting_recipes = {items: {}, items2: {},items3: {},items4:{}};
 const forging_recipes = {items: {}, items2: {} ,items3: {}, components: {}};
-const alchemy_recipes = {items: {}, items2: {},items3: {},};
+const alchemy_recipes = {items: {}, items2: {},items3: {},items4:{}};
 
 /*
     recipes can be treated differently for display based on if they are in items/components/equipment category
@@ -76,9 +76,15 @@ class ItemRecipe extends Recipe {
 
     get_availability() {
         for(let i = 0; i < this.materials.length; i++) {
-            const key = item_templates[this.materials[i].material_id].getInventoryKey();
-            if(!character.inventory[key] || character.inventory[key].count < this.materials[i].count) {
-                return false;
+            if(item_templates[this.materials[i].material_id] != undefined){
+                const key = item_templates[this.materials[i].material_id].getInventoryKey();
+                if(!character.inventory[key] || character.inventory[key].count < this.materials[i].count) {
+                    return false;
+                }
+            }
+            else{
+                
+                throw new Error(`物品 ${this.materials[i].material_id} 不存在!`);
             }
         }
         return true;
@@ -129,6 +135,24 @@ class ComponentRecipe extends ItemRecipe{
                 throw new Error(`Component recipe ${this.name} does not produce a valid result!`);
             }
         }
+        this.getResultWithFixedQuality = function(material, quality = 100){
+            const result = item_templates[this.materials.filter(x => x.material_id===material.id)[0].result_id];
+            if(result.tags["clothing"]) {
+                //means its a clothing (wearable internal part of armor)
+                return new Armor({...item_templates[result.id], quality: quality});
+            } else if(result.tags["armor component"]) {
+
+                return new ArmorComponent({...item_templates[result.id], quality: quality});
+            } else if(result.tags["weapon component"]) {
+
+                return new WeaponComponent({...item_templates[result.id], quality: quality});
+            } else if(result.tags["shield component"]) {
+
+                return new ShieldComponent({...item_templates[result.id], quality: quality});
+            } else {
+                throw new Error(`Component recipe ${this.name} does not produce a valid result!`);
+            }
+        }//真批量专用
     }
 
     get_quality_range(tier = 0) {
@@ -203,7 +227,44 @@ class EquipmentRecipe extends Recipe {
                 throw new Error(`Recipe "${this.name}" has an incorrect item_type provided ("${this.item_type}")`);
             }
         }
+        
+        this.getResultWithFixedQuality = function(component_1, component_2, quality = 100){
+            if(this.item_type === "Weapon") {
+                return new Weapon(
+                    {
+                        components: {
+                            head: component_1.id,
+                            handle: component_2.id,
+                        },
+                        quality: quality,
+                    }
+                );
+            } else if(this.item_type === "Armor") {
+                return new Armor(
+                    {
+                        components: {
+                            internal: component_1.id,
+                            external: component_2.id,
+                        },
+                        quality: quality,
+                    }
+                );
+            } else if(this.item_type === "Shield") {
+                return new Shield(
+                    {
+                        components: {
+                            shield_base: component_1.id,
+                            handle: component_2.id,
+                        },
+                        quality: quality,
+                    }
+                );
+            } else {
+                throw new Error(`Recipe "${this.name}" has an incorrect item_type provided ("${this.item_type}")`);
+            }
+        }
     }
+    
 
     get_quality_range(component_quality, tier = 0) {
         //const skill = skills[this.recipe_skill];
@@ -240,7 +301,7 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
     if(!selected_recipe) {
         throw new Error(`Tried to use a recipe that doesn't exist: ${category} -> ${subcategory} -> ${recipe_id}`);
     }
-    if(subcategory === "items" || subcategory === "items2" || subcategory === "items3") {
+    if(subcategory.includes("items")) {
         exp_value = Math.max(exp_value,1.2 ** selected_recipe.recipe_level[1] * 1);
         //maybe scale with materials needed?
     } else if (subcategory === "components" || selected_recipe.recipe_type === "component") {
@@ -273,6 +334,7 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
             {material_id: "秘银锭", count: 2, result_id: "秘银剑刃"}, 
             {material_id: "旋律合金锭", count: 2, result_id: "旋律剑刃"}, 
             {material_id: "万载冰髓锭", count: 2, result_id: "冰髓剑刃"}, 
+            {material_id: "晶化合金锭", count: 2, result_id: "晶化剑刃"}, 
             //未完待续
         ],
         item_type: "Component",
@@ -303,6 +365,7 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
             {material_id: "秘银锭", count: 6, result_id: "秘银戟头"},
             {material_id: "旋律合金锭", count: 6, result_id: "旋律戟头"},  
             {material_id: "万载冰髓锭", count: 6, result_id: "冰髓戟头"}, 
+            {material_id: "晶化合金锭", count: 6, result_id: "晶化戟头"}, 
             //未完待续
         ],
         item_type: "Component",
@@ -314,7 +377,15 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
             {material_id: "秘银锭", count: 18, result_id: "秘银轮锋"}, 
             {material_id: "旋律合金锭", count: 18, result_id: "旋律轮锋"}, 
             {material_id: "万载冰髓锭", count: 18, result_id: "冰髓轮锋"}, 
-            //未完待续 某个临界点后改为36
+            {material_id: "晶化合金锭", count: 18, result_id: "晶化轮锋"}, 
+            {material_id: "水素合金锭", count: 18, result_id: "水素轮锋"}, 
+            {material_id: "宝石母锭", count: 18, result_id: "宝石轮锋"}, 
+            {material_id: "魂晶锭", count: 18, result_id: "魂晶轮锋"}, 
+            {material_id: "盖亚合金锭", count: 36, result_id: "盖亚轮锋"}, 
+            {material_id: "远古合金锭", count: 36, result_id: "远古轮锋"}, 
+            {material_id: "古源金锭", count: 36, result_id: "源金轮锋"}, 
+            {material_id: "红钨锭", count: 36, result_id: "红钨轮锋"},
+            {material_id: "血钻锭", count: 36, result_id: "血钻轮锋"}, 
         ],
         item_type: "Component",
         recipe_skill: "Forging"
@@ -324,7 +395,9 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
         materials: [
             {material_id: "固态凝胶", count: 12, result_id: "凝胶轮芯"}, 
             {material_id: "光暗枝丫", count: 12, result_id: "光暗轮芯"}, 
-            //未完待续 某个临界点后改为24
+            {material_id: "虹彩杖芯", count: 12, result_id: "虹彩轮芯"}, 
+            {material_id: "破空紫蕨", count: 12, result_id: "破空轮芯"},  
+            {material_id: "血灵骨棉", count: 24, result_id: "血灵轮芯"}, 
         ],
         item_type: "Component",
         recipe_skill: "Forging"
@@ -382,6 +455,10 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
             {material_id: "海绿锭", count: 3, result_id: "海绿头盔"},
             {material_id: "秘银锭", count: 3, result_id: "秘银头盔"},
             {material_id: "万载冰髓锭", count: 3, result_id: "冰髓头盔"},
+            {material_id: "水素合金锭", count: 3, result_id: "水素头盔"},
+            {material_id: "魂晶锭", count: 5, result_id: "魂晶头盔"},
+            {material_id: "远古合金锭", count: 5, result_id: "远古头盔"},
+            {material_id: "红钨锭", count: 5, result_id: "红钨头盔"},
         ],
         item_type: "Component",
         recipe_skill: "Forging",
@@ -397,6 +474,10 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
             {material_id: "湛蓝芦苇", count: 3, result_id: "苇编帽子"},
             {material_id: "高能织料", count: 3, result_id: "高能帽子"},
             {material_id: "黑森织料", count: 3, result_id: "黑森帽子"},
+            {material_id: "极寒织料", count: 3, result_id: "极寒帽子"},
+            {material_id: "幻符织料", count: 5, result_id: "幻符帽子"},
+            {material_id: "密林织料", count: 5, result_id: "密林帽子"},
+            {material_id: "青冰棉", count: 5, result_id: "冰棉帽子"},
         ],
         item_type: "Component",
         recipe_skill: "Crafting",
@@ -413,6 +494,10 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
             {material_id: "海绿锭", count: 4, result_id: "海绿胸甲"},
             {material_id: "秘银锭", count: 4, result_id: "秘银胸甲"},
             {material_id: "万载冰髓锭", count: 4, result_id: "冰髓胸甲"},
+            {material_id: "水素合金锭", count: 4, result_id: "水素胸甲"},
+            {material_id: "魂晶锭", count: 8, result_id: "魂晶胸甲"},
+            {material_id: "远古合金锭", count: 8, result_id: "远古胸甲"},
+            {material_id: "红钨锭", count: 8, result_id: "红钨胸甲"},
         ],
         item_type: "Component",
         recipe_skill: "Forging",
@@ -428,6 +513,10 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
             {material_id: "湛蓝芦苇", count: 4, result_id: "苇编背心"},
             {material_id: "高能织料", count: 4, result_id: "高能背心"},
             {material_id: "黑森织料", count: 4, result_id: "黑森背心"},
+            {material_id: "极寒织料", count: 4, result_id: "极寒背心"},
+            {material_id: "幻符织料", count: 8, result_id: "幻符背心"},
+            {material_id: "密林织料", count: 8, result_id: "密林背心"},
+            {material_id: "青冰棉", count: 8, result_id: "冰棉背心"},
         ],
         item_type: "Component",
         recipe_skill: "Crafting",
@@ -444,6 +533,10 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
             {material_id: "海绿锭", count: 4, result_id: "海绿腿甲"},
             {material_id: "秘银锭", count: 4, result_id: "秘银腿甲"},
             {material_id: "万载冰髓锭", count: 4, result_id: "冰髓腿甲"},
+            {material_id: "水素合金锭", count: 4, result_id: "水素腿甲"},
+            {material_id: "魂晶锭", count: 7, result_id: "魂晶腿甲"},
+            {material_id: "远古合金锭", count: 7, result_id: "远古腿甲"},
+            {material_id: "红钨锭", count: 7, result_id: "红钨腿甲"},
         ],
         item_type: "Component",
         recipe_skill: "Forging",
@@ -459,6 +552,10 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
             {material_id: "湛蓝芦苇", count: 4, result_id: "苇编裤子"},
             {material_id: "高能织料", count: 4, result_id: "高能裤子"},
             {material_id: "黑森织料", count: 4, result_id: "黑森裤子"},
+            {material_id: "极寒织料", count: 4, result_id: "极寒裤子"},
+            {material_id: "幻符织料", count: 7, result_id: "幻符裤子"},
+            {material_id: "密林织料", count: 7, result_id: "密林裤子"},
+            {material_id: "青冰棉", count: 7, result_id: "冰棉裤子"},
         ],
         item_type: "Component",
         recipe_skill: "Crafting",
@@ -476,6 +573,10 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
             {material_id: "海绿锭", count: 2, result_id: "海绿战靴"},
             {material_id: "秘银锭", count: 2, result_id: "秘银战靴"},
             {material_id: "万载冰髓锭", count: 2, result_id: "冰髓战靴"},
+            {material_id: "水素合金锭", count: 2, result_id: "水素战靴"},
+            {material_id: "魂晶锭", count: 4, result_id: "魂晶战靴"},
+            {material_id: "远古合金锭", count: 4, result_id: "远古战靴"},
+            {material_id: "红钨锭", count: 4, result_id: "红钨战靴"},
         ],
         item_type: "Component",
         recipe_skill: "Forging",
@@ -491,6 +592,10 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
             {material_id: "湛蓝芦苇", count: 2, result_id: "苇编袜子"},
             {material_id: "高能织料", count: 2, result_id: "高能袜子"},
             {material_id: "黑森织料", count: 2, result_id: "黑森袜子"},
+            {material_id: "极寒织料", count: 2, result_id: "极寒袜子"},
+            {material_id: "幻符织料", count: 4, result_id: "幻符袜子"},
+            {material_id: "密林织料", count: 4, result_id: "密林袜子"},
+            {material_id: "青冰棉", count: 4, result_id: "冰棉袜子"},
         ],
         item_type: "Component",
         recipe_skill: "Crafting",
@@ -900,7 +1005,128 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
         Q_able:200,
         recipe_skill: "Crafting",
     });
+    crafting_recipes.items3["冰原之心"] = new ItemRecipe({
+        name: "冰原之心",
+        id: "冰原之心",
+        recipe_type: "items",
+        materials: [{material_id: "飞船之心·材", count: 1},{material_id:"玄冰果实·觉醒",count:5},{material_id:"万载冰髓锭",count:120},{material_id:"多孔冰晶",count:60}],
+        result: {result_id: "冰原之心", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,1],
+        Q_able: 200,
+        recipe_skill: "Crafting",
+    });
+    crafting_recipes.items3["光环法杖"] = new ItemRecipe({
+        name: "光环法杖",
+        id: "光环法杖",
+        recipe_type: "items",
+        materials: [{material_id:"光环杖芯", count: 69},{material_id:"晶化合金锭",count:99},{material_id:"玄冰果实·觉醒",count:9}],
+        result: {result_id: "光环法杖", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [49,63],
+        Q_able: 200,
+        recipe_skill: "Crafting",
+    });
+    crafting_recipes.items3["虹彩灯球"] = new ItemRecipe({
+        name: "虹彩灯球",
+        id: "虹彩灯球",
+        recipe_type: "items",
+        materials: [{material_id: "B7·能量核心", count: 29},{material_id:"水素合金锭",count:49},{material_id:"虹彩杖芯",count:99}],
+        result: {result_id: "虹彩灯球", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [46,67],
+        Q_able: 200,
+        recipe_skill: "Crafting",
+    });
 
+    crafting_recipes.items3["传承水晶·彩"] = new ItemRecipe({
+        name: "传承水晶·彩",
+        id: "传承水晶·彩",
+        recipe_type: "items",
+        materials: [{material_id:"宝石母锭",count:99},{material_id: "传承水晶·粉", count: 75},{material_id:"天空级魂魄",count:33}],
+        result: {result_id: "传承水晶·彩", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,76],
+        Q_able:200,
+        recipe_skill: "Crafting",
+    });
+    crafting_recipes.items3["幻符灵阵"] = new ItemRecipe({
+        name: "幻符灵阵",
+        id: "幻符灵阵",
+        recipe_type: "items",
+        materials: [{material_id:"魂晶锭",count:159},{material_id: "幻境符文", count: 79}],
+        result: {result_id: "幻符灵阵", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,78],
+        Q_able:240,
+        recipe_skill: "Crafting",
+    });
+    
+    crafting_recipes.items3["幻境之心"] = new ItemRecipe({
+        name: "幻境之心",
+        id: "幻境之心",
+        recipe_type: "items",
+        materials: [{material_id: "冰原之心·材", count: 1},{material_id:"血杀剑",count:1},{material_id:"冰柱鱼王",count:1},{material_id:"中等进化结晶碎片",count:1},{material_id:"噬芒兰",count:1},{material_id:"魂晶锭",count:99},{material_id:"破空紫蕨",count:99},{material_id:"幻符织料",count:99}],
+        result: {result_id: "幻境之心", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,1],
+        Q_able: 240,
+        recipe_skill: "Crafting",
+    });
+    crafting_recipes.items4["凝滞力场"] = new ItemRecipe({
+        name: "凝滞力场",
+        id: "凝滞力场",
+        recipe_type: "items",
+        materials: [{material_id:"盖亚合金锭",count:59},{material_id: "力场发生器", count: 99},{material_id: "中等进化结晶碎片", count: 3}],
+        result: {result_id: "凝滞力场", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,85],
+        Q_able:240,
+        recipe_skill: "Crafting",
+    });
+    crafting_recipes.items4["血灵骨网"] = new ItemRecipe({
+        name: "血灵骨网",
+        id: "血灵骨网",
+        recipe_type: "items",
+        materials: [{material_id:"血灵骨棉",count:99},{material_id: "云霄级魂魄", count: 19},{material_id: "中等进化结晶", count: 1}],
+        result: {result_id: "血灵骨网", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,93],
+        Q_able:240,
+        recipe_skill: "Crafting",
+    });
+    crafting_recipes.items4["伪·焚血花王"] = new ItemRecipe({
+        name: "伪·焚血花王",
+        id: "伪·焚血花王",
+        recipe_type: "items",
+        materials: [{material_id:"极冰骨髓",count:99},{material_id: "燃血鲜花", count: 49},{material_id: "中等进化结晶", count: 1}],
+        result: {result_id: "伪·焚血花王", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,108],
+        Q_able:240,
+        recipe_skill: "Crafting",
+    });
+    crafting_recipes.items4["血峰限制器"] = new ItemRecipe({
+        name: "血峰限制器",
+        id: "血峰限制器",
+        recipe_type: "items",
+        materials: [{material_id:"血凝晶",count:5},{material_id: "C4·能量核心", count: 10},{material_id: "亮青碎片", count: 20}],
+        result: {result_id: "血峰限制器", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,106],
+        recipe_skill: "Crafting",
+    });
+    crafting_recipes.items4["血峰增幅器"] = new ItemRecipe({
+        name: "血峰增幅器",
+        id: "血峰增幅器",
+        recipe_type: "items",
+        materials: [{material_id:"血凝晶",count:5},{material_id: "C4·能量核心", count: 10},{material_id: "鲜红碎片", count: 20}],
+        result: {result_id: "血峰增幅器", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,116],
+        recipe_skill: "Crafting",
+    });
+    
 })();
 //熔炼配方
 
@@ -1042,13 +1268,95 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
     smelting_recipes.items3["万载冰髓·古法"] = new ItemRecipe({
         name: "Ice Marrow: Ancient Method",
         recipe_type: "material",
-        materials: [{material_id: "冰原超流体", count: 10},{material_id: "多孔冰晶", count: 5},{material_id: "史诗蓝宝石",count: 5},{material_id: "黑森叶片", count: 5}], 
+        materials: [{material_id: "冰原超流体", count: 6},{material_id: "多孔冰晶", count: 8},{material_id: "史诗蓝宝石",count: 12},{material_id: "黑森叶片", count: 24}], 
         result: {result_id: "万载冰髓锭", count: 1},
         success_chance: [0.5,1],
         recipe_level: [27,60],
         recipe_skill: "Smelting",
     });
+    smelting_recipes.items3["晶化合金(x3)"] = new ItemRecipe({
+        name: "晶化合金(x3)",
+        recipe_type: "material",
+        materials: [{material_id: "万载冰髓锭", count: 2},{material_id: "镶晶盾牌", count: 3},{material_id: "冰宫鳞片",count: 1}], 
+        result: {result_id: "晶化合金锭", count: 3},
+        success_chance: [0.5,1],
+        recipe_level: [27,62],
+        recipe_skill: "Smelting",
+    });
+    smelting_recipes.items3["水素合金(x2)"] = new ItemRecipe({
+        name: "水素合金(x2)",
+        recipe_type: "material",
+        materials: [{material_id: "水素晶体", count: 3},{material_id: "B7·能量核心", count: 2},{material_id: "冰原超流体",count: 4}], 
+        result: {result_id: "水素合金锭", count: 2},
+        success_chance: [0.5,1],
+        recipe_level: [27,67],
+        recipe_skill: "Smelting",
+    });
+    smelting_recipes.items3["熔炼宝石母"] = new ItemRecipe({
+        name: "熔炼宝石母",
+        recipe_type: "material",
+        materials: [{material_id: "传承水晶·橙", count: 1},{material_id: "传承水晶·白", count: 2}], 
+        result: {result_id: "宝石母锭", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [27,72],
+        recipe_skill: "Smelting",
+    });
+    smelting_recipes.items3["熔炼魂晶(x3)"] = new ItemRecipe({
+        name: "熔炼魂晶(x3)",
+        recipe_type: "material",
+        materials: [{material_id: "传承水晶·橙", count: 3},{material_id: "传承水晶·白", count: 1},{material_id: "天空级魂魄", count: 2},{material_id: "紫晶碎片", count: 3}], 
+        result: {result_id: "魂晶锭", count: 3},
+        success_chance: [0.5,1],
+        recipe_level: [27,76],
+        recipe_skill: "Smelting",
+    });
+    smelting_recipes.items4["盖亚合金(x2)"] = new ItemRecipe({
+        name: "盖亚合金(x2)",
+        recipe_type: "material",
+        materials: [{material_id: "魂晶锭", count: 2},{material_id: "城门之星", count: 2},{material_id: "C1·能量核心", count: 1}], 
+        result: {result_id: "盖亚合金锭", count: 2},
+        success_chance: [0.5,1],
+        recipe_level: [88,88],
+        recipe_skill: "Smelting",
+    });
+    smelting_recipes.items4["远古合金(x2)"] = new ItemRecipe({
+        name: "远古合金(x2)",
+        recipe_type: "material",
+        materials: [{material_id: "远古碎片", count: 3},{material_id: "城门之星", count: 1},{material_id: "C1·能量核心", count: 2}], 
+        result: {result_id: "远古合金锭", count: 2},
+        success_chance: [0.5,1],
+        recipe_level: [93,93],
+        recipe_skill: "Smelting",
+    });
+    smelting_recipes.items4["熔炼源金(x2)"] = new ItemRecipe({
+        name: "熔炼源金(x2)",
+        recipe_type: "material",
+        materials: [{material_id: "远古碎片", count: 2},{material_id: "云霄级魂魄", count: 3},{material_id: "琥珀金骨", count: 1}], 
+        result: {result_id: "古源金锭", count: 2},
+        success_chance: [0.5,1],
+        recipe_level: [98,98],
+        recipe_skill: "Smelting",
+    });
+    smelting_recipes.items4["熔炼红钨(x2)"] = new ItemRecipe({
+        name: "熔炼红钨(x2)",
+        recipe_type: "material",
+        materials: [{material_id: "C1·能量核心", count: 8},{material_id: "残破兽铠", count: 3},{material_id: "燃血鲜花", count: 1}], 
+        result: {result_id: "红钨锭", count: 2},
+        success_chance: [0.5,1],
+        recipe_level: [105,105],
+        recipe_skill: "Smelting",
+    });
+    smelting_recipes.items4["熔炼血钻(x2)"] = new ItemRecipe({
+        name: "熔炼血钻(x2)",
+        recipe_type: "material",
+        materials: [{material_id: "C4·能量核心", count: 1},{material_id: "鲜红碎片", count: 3},{material_id: "灰暗军魂", count: 2}], 
+        result: {result_id: "血钻锭", count: 2},
+        success_chance: [0.5,1],
+        recipe_level: [111,111],
+        recipe_skill: "Smelting",
+    });
 })();
+
 
 (function(){
     
@@ -1144,6 +1452,15 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
         recipe_level: [34,34],
         recipe_skill: "Cooking",
     });
+    cooking_recipes.items2["固态凝胶"] = new ItemRecipe({
+        name: "固态凝胶",
+        recipe_type: "material",
+        materials: [{material_id: "高能凝胶", count: 1},{material_id: "雷电加护", count: 1}],
+        result: {result_id: "固态凝胶", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [28,42],
+        recipe_skill: "Cooking",
+    });
     cooking_recipes.items3["天空级·炸肉"] = new ItemRecipe({
         name: "Sky-Grade: Fried Meat",
         recipe_type: "material",
@@ -1162,8 +1479,80 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
         recipe_level: [54,54],
         recipe_skill: "Cooking",
     });
+    
+    cooking_recipes.items3["进阶炼金药剂-散华"] = new ItemRecipe({
+        name: "进阶炼金药剂-散华",
+        recipe_type: "material",
+        materials: [{material_id: "黑白枝丫", count: 10},{material_id: "荧光精华", count: 20},{material_id: "沼泽兽油",count:20}], 
+        result: {result_id: "B9·散华药剂", count: 1},
+        success_chance: [0.3,1],
+        recipe_level: [48,54],
+        recipe_skill: "Cooking",
+    });
+    cooking_recipes.items3["进阶炼金药剂-反戈"] = new ItemRecipe({
+        name: "进阶炼金药剂-反戈",
+        recipe_type: "material",
+        materials: [{material_id: "黑白枝丫", count: 10},{material_id: "荧光精华", count: 20},{material_id: "沼泽兽油",count:20}], 
+        result: {result_id: "B9·反戈药剂", count: 1},
+        success_chance: [0.3,1],
+        recipe_level: [48,54],
+        recipe_skill: "Cooking",
+    });
+    cooking_recipes.items3["进阶炼金药剂-灵闪"] = new ItemRecipe({
+        name: "进阶炼金药剂-灵闪",
+        recipe_type: "material",
+        materials: [{material_id: "黑白枝丫", count: 10},{material_id: "荧光精华", count: 20},{material_id: "沼泽兽油",count:20}], 
+        result: {result_id: "B9·灵闪药剂", count: 1},
+        success_chance: [0.3,1],
+        recipe_level: [48,54],
+        recipe_skill: "Cooking",
+    });
+    cooking_recipes.items3["进阶炼金药剂-异界"] = new ItemRecipe({
+        name: "进阶炼金药剂-异界",
+        recipe_type: "material",
+        materials: [{material_id: "黑白枝丫", count: 10},{material_id: "荧光精华", count: 20},{material_id: "沼泽兽油",count:20}], 
+        result: {result_id: "B9·异界药剂", count: 1},
+        success_chance: [0.3,1],
+        recipe_level: [48,54],
+        recipe_skill: "Cooking",
+    });
+    cooking_recipes.items3["幻境·恢复精华"] = new ItemRecipe({
+        name: "幻境·恢复精华",
+        recipe_type: "material",
+        materials: [{material_id: "传承水晶·橙", count: 1},{material_id: "传承水晶·绿", count: 1}], 
+        result: {result_id: "幻境·恢复精华", count: 1},
+        success_chance: [0.3,1],
+        recipe_level: [54,64],
+        recipe_skill: "Cooking",
+    });
+    cooking_recipes.items3["幻境·狂暴精华"] = new ItemRecipe({
+        name: "幻境·狂暴精华",
+        recipe_type: "material",
+        materials: [{material_id: "传承水晶·橙", count: 1},{material_id: "传承水晶·蓝", count: 1}], 
+        result: {result_id: "幻境·狂暴精华", count: 1},
+        success_chance: [0.3,1],
+        recipe_level: [54,68],
+        recipe_skill: "Cooking",
+    });
+    cooking_recipes.items3["牵制-从入门到精通(x2)"] = new ItemRecipe({
+        name: "牵制-从入门到精通",
+        recipe_type: "material",
+        materials: [{material_id: "传承水晶·粉", count: 1},{material_id: "传承水晶·蓝", count: 1},{material_id: "传承水晶·橙", count: 1},{material_id: "传承水晶·白", count: 1},{material_id: "传承水晶·绿", count: 1},{material_id: "牵制-从入门到入土", count: 1}], 
+        result: {result_id: "牵制-从入门到精通", count: 2},
+        success_chance: [0.3,1],
+        recipe_level: [54,70],
+        recipe_skill: "Cooking",
+    });
+    cooking_recipes.items4["云霄级·烤肉"] = new ItemRecipe({
+        name: "云霄级·烤肉",
+        recipe_type: "material",
+        materials: [{material_id: "C1·能量核心", count: 1},{material_id: "血灵液", count: 2},{material_id: "云霄宝肉",count:2}], 
+        result: {result_id: "蘸酱烤肉", count: 2},
+        success_chance: [0.3,1],
+        recipe_level: [80,80],
+        recipe_skill: "Cooking",
+    });
 })();
-
 //锻造[镐头]
 (function(){
     
@@ -1186,6 +1575,16 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
         recipe_skill: "Forging",
     });
     
+    forging_recipes.items["晶化钻头"] = new ItemRecipe({
+        name: "晶化钻头",
+        recipe_type: "material",
+        materials: [{material_id: "晶化合金锭", count: 4},{material_id: "光暗枝丫", count: 2}], 
+        result: {result_id: "晶化钻头", count: 1},
+        success_chance: [0.5,1],
+        Q_able: 160,
+        recipe_level: [6,65],
+        recipe_skill: "Forging",
+    });
     forging_recipes.items["暗影斧"] = new ItemRecipe({
         name: "Shadow Axe",
         recipe_type: "material",
@@ -1216,23 +1615,33 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
     forging_recipes.items["缠绕水晶-精制[x5]"] = new ItemRecipe({
         name: "Entwined Crystal: Refined [x5]",
         recipe_type: "material",
-        materials: [{material_id: "透明水晶", count: 1},{material_id: "废墟符文", count: 1}],
+        materials: [{material_id: "透明水晶", count: 1},{material_id: "废墟精华", count: 1}],
         result: {result_id: "缠绕水晶", count: 5},
         success_chance: [0.5,1],
         recipe_level: [28,34],
         recipe_skill: "Forging",
     });
     
-    forging_recipes.items["固态凝胶"] = new ItemRecipe({
-        name: "Solidified Gel",
+    forging_recipes.items["极寒相变引擎"] = new ItemRecipe({
+        name: "极寒相变引擎",
         recipe_type: "material",
-        materials: [{material_id: "高能凝胶", count: 1},{material_id: "雷电加护", count: 1}],
-        result: {result_id: "固态凝胶", count: 1},
+        materials: [{material_id: "旋律合金锭", count: 108},{material_id: "冰原超流体", count: 25},{material_id:"多孔冰晶", count: 15}], 
+        result: {result_id: "极寒相变引擎", count: 1},
         success_chance: [0.5,1],
-        recipe_level: [28,42],
+        recipe_level: [27,59],
         recipe_skill: "Forging",
     });
-    
+    forging_recipes.items["死神之镰"] = new ItemRecipe({
+        name: "死神之镰",
+        id: "死神之镰",
+        recipe_type: "items",
+        materials: [{material_id:"魂晶锭",count:18},{material_id: "血莲鱼", count: 6}],
+        result: {result_id: "死神之镰", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,80],
+        Q_able:240,
+        recipe_skill: "Forging",
+    });
     
 })();
 
@@ -1418,45 +1827,118 @@ function get_recipe_xp_value({category, subcategory, recipe_id, material_count, 
         recipe_skill: "Alchemy",
     });
 
-    alchemy_recipes.items3["进阶炼金药剂-散华"] = new ItemRecipe({
-        name: "Advanced Alchemical Potion - Scatter",
+    alchemy_recipes.items3["极寒织料"] = new ItemRecipe({
+        name: "极寒织料",
         recipe_type: "material",
-        materials: [{material_id: "黑白枝丫", count: 10},{material_id: "荧光精华", count: 20},{material_id: "沼泽兽油",count:20}], 
-        result: {result_id: "B9·散华药剂", count: 1},
+        materials: [{material_id: "多孔冰晶", count: 2},{material_id: "光环杖芯", count: 2},{material_id: "冰宫鳞片", count: 1}], 
+        result: {result_id: "极寒织料", count: 1},
         success_chance: [0.3,1],
-        recipe_level: [48,49],
+        recipe_level: [40,60],
         recipe_skill: "Alchemy",
     });
-    alchemy_recipes.items3["进阶炼金药剂-反戈"] = new ItemRecipe({
-        name: "Advanced Alchemical Potion - Reversal",
+    alchemy_recipes.items3["虹彩杖芯(x2)"] = new ItemRecipe({
+        name: "虹彩杖芯(x2)",
         recipe_type: "material",
-        materials: [{material_id: "黑白枝丫", count: 10},{material_id: "荧光精华", count: 20},{material_id: "沼泽兽油",count:20}], 
-        result: {result_id: "B9·反戈药剂", count: 1},
+        materials: [{material_id: "光环杖芯", count: 2},{material_id: "虹彩凝胶", count: 3}], 
+        result: {result_id: "虹彩杖芯", count: 2},
         success_chance: [0.3,1],
-        recipe_level: [48,49],
+        recipe_level: [40,65],
         recipe_skill: "Alchemy",
     });
-    alchemy_recipes.items3["进阶炼金药剂-灵闪"] = new ItemRecipe({
-        name: "Advanced Alchemical Potion - Spirit Flash",
+    alchemy_recipes.items3["进阶炼金药剂……？(x3)"] = new ItemRecipe({
+        name: "进阶炼金药剂……？(x3)",
         recipe_type: "material",
-        materials: [{material_id: "黑白枝丫", count: 10},{material_id: "荧光精华", count: 20},{material_id: "沼泽兽油",count:20}], 
-        result: {result_id: "B9·灵闪药剂", count: 1},
+        materials: [{material_id: "传承水晶·橙", count: 1},{material_id: "传承水晶·粉", count: 1}], 
+        result: {result_id: "B9·??药剂", count: 3},
         success_chance: [0.3,1],
-        recipe_level: [48,49],
+        recipe_level: [40,70],
         recipe_skill: "Alchemy",
     });
-    alchemy_recipes.items3["进阶炼金药剂-异界"] = new ItemRecipe({
-        name: "Advanced Alchemical Potion - Void Gate",
+    alchemy_recipes.items3["破空紫蕨(x2)"] = new ItemRecipe({
+        name: "破空紫蕨(x2)",
         recipe_type: "material",
-        materials: [{material_id: "黑白枝丫", count: 10},{material_id: "荧光精华", count: 20},{material_id: "沼泽兽油",count:20}], 
-        result: {result_id: "B9·异界药剂", count: 1},
+        materials: [{material_id: "绝音蕨", count: 5},{material_id: "引力反常", count: 3},{material_id: "紫晶碎片", count: 1}], 
+        result: {result_id: "破空紫蕨", count: 2},
         success_chance: [0.3,1],
-        recipe_level: [48,49],
+        recipe_level: [40,75],
+        recipe_skill: "Alchemy",
+    });
+    alchemy_recipes.items3["幻符织料"] = new ItemRecipe({
+        name: "幻符织料",
+        recipe_type: "items",
+        materials: [{material_id:"幻境符文",count:1},{material_id: "绝音蕨", count: 2},{material_id:"天空级魂魄",count:1}],
+        result: {result_id: "幻符织料", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,77],
+        recipe_skill: "Alchemy",
+    });
+    alchemy_recipes.items4["密林织料(x3)"] = new ItemRecipe({
+        name: "密林织料(x3)",
+        recipe_type: "items",
+        materials: [{material_id:"C1·能量核心",count:1},{material_id: "血灵液", count: 2},{material_id:"草木之芯",count:3}],
+        result: {result_id: "密林织料", count: 3},
+        success_chance: [0.5,1],
+        recipe_level: [1,90],
+        recipe_skill: "Alchemy",
+    });
+    alchemy_recipes.items4["血灵骨棉(x3)"] = new ItemRecipe({
+        name: "血灵骨棉(x3)",
+        recipe_type: "items",
+        materials: [{material_id:"琥珀金骨",count:3},{material_id: "爆燃粉末", count: 2},{material_id:"血灵液",count:4}],
+        result: {result_id: "血灵骨棉", count: 3},
+        success_chance: [0.5,1],
+        recipe_level: [1,95],
+        recipe_skill: "Alchemy",
+    });
+    alchemy_recipes.items4["青冰棉(x2)"] = new ItemRecipe({
+        name: "青冰棉(x2)",
+        recipe_type: "items",
+        materials: [{material_id: "爆燃粉末", count: 4},{material_id:"魔力布匹",count:3},{material_id:"极冰骨髓",count:4}],
+        result: {result_id: "青冰棉", count: 2},
+        success_chance: [0.5,1],
+        recipe_level: [1,102],
+        recipe_skill: "Alchemy",
+    });
+    alchemy_recipes.items4["精英炼金药剂-吹火"] = new ItemRecipe({
+        name: "精英炼金药剂-吹火",
+        recipe_type: "items",
+        materials: [{material_id: "亮青碎片", count: 15},{material_id:"灰暗军魂",count:8},{material_id:"血凝晶",count:5}],
+        result: {result_id: "C6·吹火药剂", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,110],
+        recipe_skill: "Alchemy",
+    });
+    alchemy_recipes.items4["精英炼金药剂-压制"] = new ItemRecipe({
+        name: "精英炼金药剂-压制",
+        recipe_type: "items",
+        materials: [{material_id: "亮青碎片", count: 15},{material_id:"灰暗军魂",count:8},{material_id:"血凝晶",count:5}],
+        result: {result_id: "C6·压制药剂", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,110],
+        recipe_skill: "Alchemy",
+    });
+    alchemy_recipes.items4["精英炼金药剂-血遁"] = new ItemRecipe({
+        name: "精英炼金药剂-血遁",
+        recipe_type: "items",
+        materials: [{material_id: "亮青碎片", count: 15},{material_id:"灰暗军魂",count:8},{material_id:"血凝晶",count:5}],
+        result: {result_id: "C6·血遁药剂", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,110],
+        recipe_skill: "Alchemy",
+    });
+    alchemy_recipes.items4["精英炼金药剂-硬化"] = new ItemRecipe({
+        name: "精英炼金药剂-硬化",
+        recipe_type: "items",
+        materials: [{material_id: "亮青碎片", count: 15},{material_id:"灰暗军魂",count:8},{material_id:"血凝晶",count:5}],
+        result: {result_id: "C6·硬化药剂", count: 1},
+        success_chance: [0.5,1],
+        recipe_level: [1,110],
         recipe_skill: "Alchemy",
     });
 
     
 })();
+
 
 const recipes = {
     crafting: crafting_recipes, 

@@ -23,6 +23,7 @@ class Enemy {
                  loot_multi = 1,
                  spec_value = {},
                  image = "",
+                 pos = 0,
                 }) {
                     
         this.name = name;
@@ -35,6 +36,7 @@ class Enemy {
         this.spec = spec;
         this.spec_value = spec_value;
         this.image = image;//image
+        this.pos = 0;
         //only ma.gic & defense can be 0 in stats, other things will cause issues
         this.stats.max_health = stats.health;
         this.loot_list = loot_list;
@@ -54,6 +56,14 @@ class Enemy {
             this.size = size;
         }
 
+    }
+    dispose(){
+        this.image = null;
+        this.loot_list = null;
+        this.description = null;
+        this.stats = null;
+        this.realm = null;
+        this.is_alive = false;
     }
     get_loot() {
         // goes through items and calculates drops
@@ -91,7 +101,6 @@ class Enemy {
     get_droprate_modifier() {
         let droprate_modifier = this.loot_multi;
         droprate_modifier *= character.stats.full.luck;
-        //console.log(character.stats.full.luck);
         /*
         if(enemy_killcount[this.name] >= 999) {
             droprate_modifier = 0.1;
@@ -1766,7 +1775,7 @@ class Enemy {
         size: "small",
         spec: [19],
         tags: [],
-        stats: {health: 22200, attack:4800, agility: 4050, attack_speed: 1.2, defense: 1000}, 
+        stats: {health: 22200, attack:4800, agility: 3750, attack_speed: 1.2, defense: 1000}, 
         loot_list: [
             {item_name: "高级蓝宝石", chance:0.03},
             {item_name: "高级红宝石", chance:0.02},
@@ -2481,7 +2490,7 @@ class Enemy {
         size: "small",
         spec: [19],
         tags: [],
-        stats: {health: 250000, attack:40000, agility: 24000, attack_speed: 1.2, defense: 16000}, 
+        stats: {health: 250000, attack:40000, agility: 22000, attack_speed: 1.2, defense: 16000}, 
         loot_list: [
             {item_name: "极品黄宝石", chance:0.05},
             {item_name: "极品蓝宝石", chance:0.01},
@@ -2929,7 +2938,7 @@ class Enemy {
         spec: [19,37],
         spec_value:{},
         tags: [],
-        stats: {health: 1090000, attack:160000, agility: 102000, attack_speed: 1.2, defense: 50000}, 
+        stats: {health: 1090000, attack:160000, agility: 91600, attack_speed: 1.2, defense: 50000}, 
         loot_list: [
             {item_name: "极品红宝石", chance:0.05},
             {item_name: "水溶精华", chance:0.2},
@@ -3090,7 +3099,7 @@ class Enemy {
         loot_list: [
             {item_name: "极品红宝石", chance:0.05},
             {item_name: "极品绿宝石", chance:0.02},
-            {item_name: "蓝晶碎片", chance:0.07},
+            {item_name: "蓝金碎片", chance:0.07},
             //5.0Z
         ],
     });
@@ -3395,7 +3404,7 @@ class Enemy {
         spec: [19,15],
         spec_value:{},
         tags: [],
-        stats: {health: 1280000, attack:570000, agility: 440000, attack_speed: 1.6, defense: 34000}, 
+        stats: {health: 1280000, attack:570000, agility: 390600, attack_speed: 1.6, defense: 34000}, 
         loot_list: [
             {item_name: "绿色刀币", chance:0.01},
             {item_name: "废墟符文", chance:0.04},
@@ -4873,7 +4882,7 @@ class Enemy {
         image: "image/enemy/E3115.png",
         realm: "<span class=realm_sky><b>Sky Rank: Stage 3 +</b></span>",
         spec: [19],
-        stats: {health: 1849e4, attack: 2600e4, agility: 1980e4, attack_speed: 1.3, defense: 1200e4}, 
+        stats: {health: 1849e4, attack: 2600e4, agility: 1780e4, attack_speed: 1.3, defense: 1200e4}, 
         loot_list: [
             {item_name: "殿堂绿宝石", chance:0.015},
             {item_name: "史诗黄宝石", chance:0.04},
@@ -5312,7 +5321,7 @@ class Enemy {
         image: "image/enemy/E3306.png",
         realm: "<span class=realm_sky><b>Sky Rank: Stage 5</b></span>",
         spec: [19],
-        stats: {health: 6.48e8, attack: 10700e4, agility: 6900e4, attack_speed: 1.3, defense: 5200e4}, 
+        stats: {health: 6.48e8, attack: 10700e4, agility: 6200e4, attack_speed: 1.3, defense: 5200e4}, 
         loot_list: [
             {item_name: "史诗蓝宝石", chance:0.012},
             {item_name: "史诗红宝石", chance:0.030},
@@ -5451,10 +5460,9 @@ class Enemy {
         stats: {health: 60, attack: 12250e4, agility: 10000e4, attack_speed: 1.4, defense: 8500e4}, 
         loot_list: [
             {item_name: "史诗红宝石", chance:0.036},
-            {item_name: "史诗绿宝石", chance:0.006},
             {item_name: "蓝金锭", chance:1},
-            {item_name: "秘银锭", chance:0.25},
-            {item_name: "旋律合金锭", chance:0.05},
+            {item_name: "秘银锭", chance:0.30},
+            {item_name: "旋律合金锭", chance:0.06},
             //90D
         ],
     });
@@ -5469,7 +5477,6 @@ class Enemy {
         stats: {health: 15.644e8, attack: 22000e4, agility: 10400e4, attack_speed: 1.3, defense: 4400e4}, 
         loot_list: [
             {item_name: "史诗红宝石", chance:0.036},
-            {item_name: "史诗绿宝石", chance:0.006},
             {item_name: "玄冰果实", chance:0.0032},
             //90D
         ],
@@ -5486,22 +5493,3328 @@ class Enemy {
         stats: {health: 13.6e8, attack: 17000e4, agility: 10800e4, attack_speed: 1.3, defense: 8500e4}, 
         loot_list: [
             {item_name: "史诗红宝石", chance:0.036},
-            {item_name: "史诗绿宝石", chance:0.006},
-            {item_name: "多孔冰晶", chance:0.11},
+            {item_name: "多孔冰晶", chance:0.13},
             //90D
+        ],
+    });
+    
+    //【LIFE CHANGE】
+    // 20%↑
+    //
+    // 30%↓
+    enemy_templates["探险者的怨恨"] = new Enemy({
+        name: "探险者的怨恨", 
+        description: "时封？血量太薄了……它真的可以撑到第二次攻击吗？", 
+        xp_value: 102334155, 
+        rank: 3401,
+        image: "image/enemy/E3401.png",
+        realm: "<span class=realm_sky><b>天空级五阶 +</b></span>",
+        size: "small",
+        spec: [12],
+        spec_value:{},
+        tags: [],
+        stats: {health: 2.7e8, attack: 39690e4, agility: 1.2e8, attack_speed: 1.7, defense:0e4}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.020},
+            {item_name: "史诗绿宝石", chance:0.002},
+            {item_name: "B4·能量核心", chance:0.4},
+            //90D
+        ],
+    });
+    enemy_templates["出芽橙茸战士"] = new Enemy({
+        name: "出芽橙茸战士", 
+        description: "彩虹攻击:(2/7)!!单独出芽和单独拿着武器都没什么用，连在一起……看起来是本命灵宝！", 
+        xp_value: 102334155, 
+        rank: 3402,
+        image: "image/enemy/E3402.png",
+        realm: "<span class=realm_sky><b>天空级五阶 +</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 6.6e8, attack: 1.85e8, agility: 1.3e8, attack_speed: 1.3, defense:1.25e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.020},
+            {item_name: "史诗绿宝石", chance:0.002},
+            {item_name: "镶晶盾牌", chance:0.02},
+            {item_name: "冰原超流体", chance:0.04},
+            //90D
+        ],
+    });
+    enemy_templates["敌意猎兵"] = new Enemy({
+        name: "敌意猎兵", 
+        description: "和刚刚那只除了血薄了很多以外没有什么区别。之前来群殴你的六只已经是精锐了啦……", 
+        xp_value: 102334155, 
+        rank: 3403,
+        image: "image/enemy/E3403.png",
+        realm: "<span class=realm_sky><b>天空级五阶 +</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 9.075e8, attack: 2.2e8, agility: 1.4e8, attack_speed: 1.3, defense:1.1e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.020},
+            {item_name: "史诗绿宝石", chance:0.002},
+            {item_name: "冰宫鳞片", chance:0.015},
+            {item_name: "多孔冰晶", chance:0.045},
+            //90D
+        ],
+    });
+    enemy_templates["大眼霜冻鱼"] = new Enemy({
+        name: "大眼霜冻鱼", 
+        description: "很遗憾，因为温度太低，冰元素四溢，这里没有湖可以钓鱼……活着的鱼都爬出来了！", 
+        xp_value: 102334155, 
+        rank: 3404,
+        image: "image/enemy/E3404.png",
+        realm: "<span class=realm_sky><b>天空级五阶 +</b></span>",
+        size: "small",
+        spec: [50],
+        spec_value:{50:361e4},
+        tags: [],
+        stats: {health: 33e8, attack: 1.84e8, agility: 1.6e8, attack_speed: 1.3, defense:1.0e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.020},
+            {item_name: "史诗绿宝石", chance:0.002},
+            {item_name: "冰宫鳞片", chance:0.03},
+            //90D
+        ],
+    });
+    enemy_templates["敌意女巫"] = new Enemy({
+        name: "敌意女巫", 
+        description: "就是它……不仅光环强还可以叠加！实在是好过分的说！", 
+        xp_value: 165580141, 
+        rank: 3405,
+        image: "image/enemy/E3405.png",
+        realm: "<span class=realm_sky><b>天空级六阶</b></span>",
+        size: "small",
+        spec: [0],
+        spec_value:{},
+        tags: [],
+        stats: {health: 33e8, attack: 1.84e8, agility: 1.8e8, attack_speed: 1.3, defense:1.0e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.016},
+            {item_name: "史诗绿宝石", chance:0.008},
+            {item_name: "光环杖芯", chance:0.023},
+            //160D
+        ],
+    });
+    enemy_templates["出芽黄茸战士"] = new Enemy({
+        name: "出芽黄茸战士", 
+        description: "彩虹攻击(3/7)！特殊能力如何比拟久经锻炼的……茸身？", 
+        xp_value: 165580141, 
+        rank: 3406,
+        image: "image/enemy/E3406.png",
+        realm: "<span class=realm_sky><b>天空级六阶</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 2.1e8, attack: 3.2e8, agility: 2.0e8, attack_speed: 1.3, defense:1.6e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.016},
+            {item_name: "史诗绿宝石", chance:0.008},
+            {item_name: "镶晶盾牌", chance:0.04},
+            {item_name: "冰原超流体", chance:0.06},
+            //160D
+        ],
+    });
+    enemy_templates["绝对低温能源"] = new Enemy({
+        name: "绝对低温能源", 
+        description: "不仅仅本身的温度接近0K，还含有致死量的冰元素。一个这货可以中和几十个【核爆能源】！", 
+        xp_value: 165580141, 
+        rank: 3407,
+        image: "image/enemy/E3407.png",
+        realm: "<span class=realm_sky><b>天空级六阶</b></span>",
+        size: "small",
+        spec: [50,39],
+        spec_value:{50:486e4,39:8.0e8},
+        tags: [],
+        stats: {health: 0.0001e8, attack: 0.0001e8, agility: 2.1e8, attack_speed: 1.3, defense:0.0001e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.016},
+            {item_name: "史诗绿宝石", chance:0.008},
+            {item_name: "冰原超流体", chance:0.1},
+            {item_name: "万载冰髓锭", chance:0.01},
+            //160D
+        ],
+    });
+    enemy_templates["敌意骑士"] = new Enemy({
+        name: "敌意骑士", 
+        description: "很久很久以前，【燕岗城】区域就有一只长得差不多的怪……还记得第一次commit的时候，中间忘了，总之せーの！っインターネット最高！", 
+        xp_value: 165580141, 
+        rank: 3408,
+        image: "image/enemy/E3408.png",
+        realm: "<span class=realm_sky><b>天空级六阶</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 7.5e8, attack: 2.704e8, agility: 2.2e8, attack_speed: 1.3, defense:1.6e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.016},
+            {item_name: "史诗绿宝石", chance:0.008},
+            {item_name: "镶晶盾牌", chance:0.06},
+            //160D
+        ],
+    });
+    enemy_templates["出芽绿茸战士"] = new Enemy({
+        name: "出芽绿茸战士", 
+        description: "彩虹攻击(4/7)！明明只比前面那只强了一点点吧……", 
+        xp_value: 165580141, 
+        rank: 3409,
+        image: "image/enemy/E3409.png",
+        realm: "<span class=realm_sky><b>天空级六阶</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 15e8, attack: 4e8, agility: 2.2e8, attack_speed: 1.3, defense:1.8e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.016},
+            {item_name: "史诗绿宝石", chance:0.008},
+            {item_name: "镶晶盾牌", chance:0.03},
+            {item_name: "光环杖芯", chance:0.02},
+            //160D
+        ],
+    });
+    enemy_templates["冰血除草者"] = new Enemy({
+        name: "冰血除草者", 
+        description: "热血沸腾的组合技，1080亿(划掉)480亿的斩杀线！虽然因为RPG的机制，冰封和圣阵的组合技消失了就是了啦。", 
+        xp_value: 165580141, 
+        rank: 3410,
+        image: "image/enemy/E3410.png",
+        realm: "<span class=realm_sky><b>天空级六阶</b></span>",
+        size: "small",
+        spec: [5,42,49],
+        spec_value:{49:{rnd:300,hp:1.6e8}},
+        tags: [],
+        stats: {health: 26.7e8, attack: 3.5e8, agility: 2.3e8, attack_speed: 1.0, defense:0.9e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.016},
+            {item_name: "史诗绿宝石", chance:0.008},
+            {item_name: "光环杖芯", chance:0.02},
+            {item_name: "冰宫鳞片", chance:0.03},
+            //160D
+        ],
+    });
+    enemy_templates["夹击卫戍"] = new Enemy({
+        name: "夹击卫戍", 
+        description: "居然还是一个系列的。你那会用激光的兄弟距离这里有点远的……", 
+        xp_value: 165580141, 
+        rank: 3411,
+        image: "image/enemy/E3411.png",
+        realm: "<span class=realm_sky><b>天空级六阶</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 18e8, attack: 2.8e8, agility: 2.4e8, attack_speed: 1.4, defense:1.5e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.016},
+            {item_name: "史诗绿宝石", chance:0.008},
+            {item_name: "冰宫鳞片", chance:0.03},
+            {item_name: "B4·能量核心", chance:0.40},
+            //160D
+        ],
+    });
+    enemy_templates["敌意傀儡"] = new Enemy({
+        name: "敌意傀儡", 
+        description: "说起来，极寒冰宫的敌意是不是有点太大了？好多【敌意】词头的家伙！", 
+        xp_value: 165580141, 
+        rank: 3412,
+        image: "image/enemy/E3412.png",
+        realm: "<span class=realm_sky><b>天空级六阶</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 2.6508e8, attack: 3.1e8, agility: 2.5e8, attack_speed: 1.4, defense:1.9e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.016},
+            {item_name: "史诗绿宝石", chance:0.008},
+            {item_name: "B4·能量核心", chance:0.40},
+            {item_name: "镶晶盾牌", chance:0.04},
+            //160D
+        ],
+    });
+    enemy_templates["冰兽龙龙"] = new Enemy({
+        name: "冰兽龙龙", 
+        description: "一种体温极低，可以释放冰霜吐息的龙亚种。", 
+        xp_value: 267914296, 
+        rank: 3413,
+        image: "image/enemy/E3413.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [50],
+        spec_value:{50:616e4},
+        tags: [],
+        stats: {health: 19.8e8, attack: 3.7e8, agility: 2.7e8, attack_speed: 1.3, defense:2.2e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.008},
+            {item_name: "史诗绿宝石", chance:0.020},
+            {item_name: "冰宫鳞片", chance:0.09},
+            //280D
+        ],
+    });
+    enemy_templates["雪茸茸战士"] = new Enemy({
+        name: "雪茸茸战士", 
+        description: "双刀流！左剑伤害高~右剑高伤害！", 
+        xp_value: 165580141, 
+        rank: 3414,
+        image: "image/enemy/E3414.png",
+        realm: "<span class=realm_sky><b>天空级六阶</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 12e8, attack: 4e8, agility: 2.8e8, attack_speed: 3.0, defense:0.0e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.016},
+            {item_name: "史诗绿宝石", chance:0.008},
+            {item_name: "镶晶盾牌", chance:0.03},
+            {item_name: "多孔冰晶", chance:0.09},
+            //160D
+        ],
+    });
+    enemy_templates["大教内门弟子"] = new Enemy({
+        name: "大教内门弟子", 
+        description: "远道之后，是足以匹敌混沌10转……不好意思串台了，这个大教明显比炒鸡蛋的大教小好多的说……", 
+        xp_value: 165580141, 
+        rank: 3415,
+        image: "image/enemy/E3415.png",
+        realm: "<span class=realm_sky><b>天空级六阶</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 14.4e8, attack: 2.8e8, agility: 2.6e8, attack_speed: 1.3, defense:2.1e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.016},
+            {item_name: "史诗绿宝石", chance:0.008},
+            {item_name: "光环杖芯", chance:0.05},
+            //160D
+        ],
+    });
+    enemy_templates["敌意美杜莎"] = new Enemy({
+        name: "敌意美杜莎", 
+        description: "大地境修者只要被瞪一下就会变成石头。但是对于天空级中期以上战力，这样的技巧只会有微弱的效益。", 
+        xp_value: 267914296, 
+        rank: 3416,
+        image: "image/enemy/E3416.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [0,8],
+        spec_value:{8:10},
+        tags: [],
+        stats: {health: 14.7e8, attack: 1.0e8, agility: 2.4e8, attack_speed: 1.3, defense:2.0e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.008},
+            {item_name: "史诗绿宝石", chance:0.020},
+            {item_name: "冰宫鳞片", chance:0.10},
+            //280D
+        ],
+    });
+    enemy_templates["敌意巫师"] = new Enemy({
+        name: "敌意巫师", 
+        description: "叠甲，过！这个巫师明明超强却过分谨慎——虽然没用就是了啦。", 
+        xp_value: 267914296, 
+        rank: 3417,
+        image: "image/enemy/E3417.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 27e8, attack: 3.3e8, agility: 2.7e8, attack_speed: 1.3, defense:2.3e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.008},
+            {item_name: "史诗绿宝石", chance:0.020},
+            {item_name: "光环杖芯", chance:0.08},
+            //280D
+        ],
+    });
+    enemy_templates["出芽青茸战士"] = new Enemy({
+        name: "出芽青茸战士", 
+        description: "比起双刀流选手，这位更加贴近所谓的防杀策略。2.8亿防御足以让它傲视群雄……除了那些冰封和冻伤的机制怪！", 
+        xp_value: 267914296, 
+        rank: 3418,
+        image: "image/enemy/E3418.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 7.5e8, attack: 4.2e8, agility: 3.2e8, attack_speed: 1.3, defense:2.8e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.008},
+            {item_name: "史诗绿宝石", chance:0.020},
+            {item_name: "冰原超流体", chance:0.12},
+            {item_name: "镶晶盾牌", chance:0.08},
+            //280D
+        ],
+    });enemy_templates["自爆步兵"] = new Enemy({
+        name: "自爆步兵", 
+        description: "全体都有~板载！这次可是携带了超强的绝对零度·疾冻弹药！", 
+        xp_value: 267914296, 
+        rank: 3419,
+        image: "image/enemy/E3419.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [36],
+        spec_value:{},
+        tags: [],
+        stats: {health: 21.675e8, attack: 3.8e8, agility: 3.6e8, attack_speed: 1.3, defense:3.2e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.008},
+            {item_name: "史诗绿宝石", chance:0.020},
+            {item_name: "玄冰果实", chance:0.01},
+            {item_name: "玄冰果实·觉醒", chance:0.001},
+            //280D
+        ],
+    });
+    enemy_templates["敌意老人"] = new Enemy({
+        name: "敌意老人", 
+        description: "【广告位招租】：这里急缺一个乳牵制笑话~", 
+        xp_value: 267914296, 
+        rank: 3420,
+        image: "image/enemy/E3420.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [5],
+        spec_value:{},
+        tags: [],
+        stats: {health: 32.67e8, attack: 4.5e8, agility: 3.9e8, attack_speed: 1.4, defense:3.0e8}, //血量30%
+        loot_list: [
+            {item_name: "史诗红宝石", chance:0.008},
+            {item_name: "史诗绿宝石", chance:0.020},
+            {item_name: "B4·能量核心", chance:0.5},
+            {item_name: "多孔冰晶", chance:0.15},
+            //280D
         ],
     });
 
     
+    //【LIFE CHANGE】
+    // 30%↑
+    //
+    // 40%↓
+
+    enemy_templates["大门派先锋"] = new Enemy({
+        name: "大门派先锋", 
+        description: "如果把先锋全部丢进这种低光速黑洞一样的地方，这个门派估计离死不远了……", 
+        xp_value: 267914296, 
+        rank: 3501,
+        image: "image/enemy/E3501.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [34],
+        spec_value:{},
+        tags: [],
+        stats: {health: 17.6e8, attack: 4.8e8, agility: 4.4e8, attack_speed: 1.3, defense:3.2e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.025},
+            {item_name: "水素晶体", chance:0.025},
+            //280D
+        ],
+    });
+    enemy_templates["水牢雪怪"] = new Enemy({
+        name: "水牢雪怪", 
+        description: "真的不会融化吗……或许它的体内自带一个极寒引擎的循环？", 
+        xp_value: 267914296, 
+        rank: 3502,
+        image: "image/enemy/E3502.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 51.2e8, attack: 5.2e8, agility: 4.5e8, attack_speed: 1.3, defense:3.0e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.025},
+            {item_name: "多孔冰晶", chance:0.36},
+            //280D
+        ],
+    });
+    enemy_templates["水牢花妖"] = new Enemy({
+        name: "水牢花妖", 
+        description: "幸好是超凡的世界，即使没有氧气，根部也不会烂掉的！", 
+        xp_value: 267914296, 
+        rank: 3503,
+        image: "image/enemy/E3503.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 51.2e8, attack: 5.2e8, agility: 4.6e8, attack_speed: 1.3, defense:3.0e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.025},
+            {item_name: "虹彩凝胶", chance:0.025},
+            //280D
+        ],
+    });
+    enemy_templates["成熟期蛟龙"] = new Enemy({
+        name: "成熟期蛟龙", 
+        description: "既不是地龙也不是飞龙，因为血脉不纯的原因，就到此为止了呢……", 
+        xp_value: 267914296, 
+        rank: 3504,
+        image: "image/enemy/E3504.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 30e8, attack: 5.5e8, agility: 4.8e8, attack_speed: 1.1, defense:3.5e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.025},
+            {item_name: "冰宫鳞片", chance:0.09},
+            //280D
+        ],
+    });
+    enemy_templates["出芽蓝茸战士"] = new Enemy({
+        name: "出芽蓝茸战士", 
+        description: "彩虹攻击(6/7).怎么突然多了这么多能力啊！", 
+        xp_value: 267914296, 
+        rank: 3505,
+        image: "image/enemy/E3505.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [4],
+        spec_value:{},
+        tags: [],
+        stats: {health: 58e8, attack: 5.3e8, agility: 5.0e8, attack_speed: 2.9, defense:2.6e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.025},
+            {item_name: "虹彩凝胶", chance:0.03},
+            //280D
+        ],
+    });
+    enemy_templates["燕岗迷途强者"] = new Enemy({
+        name: "燕岗迷途强者", 
+        description: "迷い星のうた——不过就算一起迷路也迷太远了吧。这是钓到冰柱鱼王了吗……", 
+        xp_value: 267914296, 
+        rank: 3506,
+        image: "image/enemy/E3506.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [5],
+        spec_value:{},
+        tags: [],
+        stats: {health: 28.9e8, attack: 6.225e8, agility: 5.2e8, attack_speed: 1.3, defense:3.125e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.025},
+            {item_name: "紫色刀币", chance:0.3},
+            //280D
+        ],
+    });
+    enemy_templates["水牢嗜血哥布林"] = new Enemy({
+        name: "水牢嗜血哥布林", 
+        description: "七个字的标题耶。简直是除了百方[荒兽森林 ver.][BOSS]以外名字最长的家伙了。<br>(PS:半角算半个，所以舰船中枢B6[BOSS]也是七个字~", 
+        xp_value: 267914296, 
+        rank: 3507,
+        image: "image/enemy/E3507.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [49],
+        spec_value:{49:{rnd:200,hp:3e8}},
+        tags: [],
+        stats: {health: 60e8, attack: 5.1e8, agility: 5.0e8, attack_speed: 1.3, defense:2.55e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.025},
+            {item_name: "光环杖芯", chance:0.11},
+            //280D
+        ],
+    });
+    enemy_templates["识灵水藻"] = new Enemy({
+        name: "识灵水藻", 
+        description: "似乎是相当没有存在感的灵体。高伤成群的情况下灵体也没什么特别的不是吗？", 
+        xp_value: 433494437, 
+        rank: 3508,
+        image: "image/enemy/E3508.png",
+        realm: "<span class=realm_sky><b>天空级七阶</b></span>",
+        size: "small",
+        spec: [27,21],
+        spec_value:{21:6.0e8},
+        tags: [],
+        stats: {health: 132e8, attack: 5.8e8, agility: 5.2e8, attack_speed: 1.3, defense:3.4e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.012},
+            {item_name: "传说黄宝石", chance:0.006},
+            {item_name: "B7·能量核心", chance:0.045},
+            //500D
+        ],
+    });
+    enemy_templates["徘徊的紫乌"] = new Enemy({
+        name: "徘徊的紫乌", 
+        description: "出芽紫茸？不要以为带了个帽子就没人认识你了啦。", 
+        xp_value: 433494437, 
+        rank: 3509,
+        image: "image/enemy/E3509.png",
+        realm: "<span class=realm_sky><b>天空级七阶</b></span>",
+        size: "small",
+        spec: [19],
+        tags: [],
+        stats: {health: 62.28e8, attack: 5.2e8, agility: 4.5e8, attack_speed: 1.4, defense:4.1e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.012},
+            {item_name: "传说黄宝石", chance:0.006},
+            {item_name: "水素晶体", chance:0.02},
+            {item_name: "虹彩凝胶", chance:0.02},
+            //500D
+        ],
+    });
+    enemy_templates["夜巡傀儡"] = new Enemy({
+        name: "夜巡傀儡", 
+        description: "话说，水牢应该不分昼夜吧……如果可以看到天的话，没理由关的住人哇。", 
+        xp_value: 433494437, 
+        rank: 3510,
+        image: "image/enemy/E3510.png",
+        realm: "<span class=realm_sky><b>天空级七阶</b></span>",
+        size: "small",
+        spec: [18],
+        spec_value:{18:100e12},
+        tags: [],
+        stats: {health: 64e8, attack: 6.2e8, agility: 5.4e8, attack_speed: 1.3, defense:4.2e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.012},
+            {item_name: "传说黄宝石", chance:0.006},
+            {item_name: "宇宙币", chance:0.0005},
+            //500D
+        ],
+    });
+    enemy_templates["水猫茸茸"] = new Enemy({
+        name: "水猫茸茸", 
+        description: "一种上限较高但较为温和的光环茸茸。或许是水溶茸茸长大后的样子呢？", 
+        xp_value: 433494437, 
+        rank: 3511,
+        image: "image/enemy/E3511.png",
+        realm: "<span class=realm_sky><b>天空级七阶</b></span>",
+        size: "small",
+        spec: [11],
+        tags: [],
+        stats: {health: 84.64e8, attack: 5.75e8, agility: 5.6e8, attack_speed: 1.3, defense:4.5e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.012},
+            {item_name: "传说黄宝石", chance:0.006},
+            {item_name: "B7·能量核心", chance:0.08},
+            //500D
+        ],
+    });
+    enemy_templates["徘徊的骸骨"] = new Enemy({
+        name: "徘徊的骸骨", 
+        description: "你也迷路了？看来冰柱鱼王肯定不止一条~不对，骷髅会钓鱼吗？", 
+        xp_value: 433494437, 
+        rank: 3512,
+        image: "image/enemy/E3512.png",
+        realm: "<span class=realm_sky><b>天空级七阶</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 160e8, attack: 6.3e8, agility: 6.0e8, attack_speed: 1.3, defense:3.7e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.012},
+            {item_name: "传说黄宝石", chance:0.006},
+            {item_name: "水素晶体", chance:0.05},
+            //500D
+        ],
+    });
+    enemy_templates["水牢骨角茸茸"] = new Enemy({
+        name: "水牢骨角茸茸", 
+        description: "好多各种各样的茸茸~并不奇怪，毕竟最容易构建的就是环形回路，产生的生命也就是茸茸了。", 
+        xp_value: 433494437, 
+        rank: 3513,
+        image: "image/enemy/E3513.png",
+        realm: "<span class=realm_sky><b>天空级七阶</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 140e8, attack: 6.4e8, agility: 6.4e8, attack_speed: 1.3, defense:4.9e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.012},
+            {item_name: "传说黄宝石", chance:0.006},
+            {item_name: "冰原超流体", chance:0.2},
+            {item_name: "虹彩凝胶", chance:0.03},
+            //500D
+        ],
+    });
+    enemy_templates["水牢石灵"] = new Enemy({
+        name: "水牢石灵", 
+        description: "如果以后有高血量坚固怪会是个问题么？现在的倍率已经是40%了……", 
+        xp_value: 433494437, 
+        rank: 3514,
+        image: "image/enemy/E3514.png",
+        realm: "<span class=realm_sky><b>天空级七阶</b></span>",
+        size: "small",
+        spec: [1],
+        tags: [],
+        stats: {health: 39.6, attack: 10.0e8, agility: 6.8e8, attack_speed: 1.3, defense:8.0e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.006},
+            {item_name: "传说黄宝石", chance:0.015},
+            {item_name: "万载冰髓锭", chance:0.25},
+            //500D
+        ],
+    });
+    enemy_templates["仙旅城强战士"] = new Enemy({
+        name: "仙旅城强战士", 
+        description: "声律城倒下了，迎接我们的是……仙旅城？什么时候加入酰氯城w", 
+        xp_value: 433494437, 
+        rank: 3515,
+        image: "image/enemy/E3515.png",
+        realm: "<span class=realm_sky><b>天空级七阶</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 153.76e8, attack: 9.0e8, agility: 7.0e8, attack_speed: 1.3, defense:4.5e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.006},
+            {item_name: "传说黄宝石", chance:0.015},
+            {item_name: "光环杖芯", chance:0.15},
+            //500D
+        ],
+    });
+    enemy_templates["城主府队长"] = new Enemy({
+        name: "城主府队长", 
+        description: "虽然城主府标配着白色制服和骷髅头套，但在水牢呆了数百年，这套制服已经被水元素浸染成蓝色的样子了。", 
+        xp_value: 433494437, 
+        rank: 3516,
+        image: "image/enemy/E3516.png",
+        realm: "<span class=realm_sky><b>天空级七阶</b></span>",
+        size: "small",
+        spec: [7],
+        tags: [],
+        stats: {health: 179.56e8, attack: 9.9e8, agility: 7.2e8, attack_speed: 1.3, defense:4.4e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.006},
+            {item_name: "传说黄宝石", chance:0.015},
+            {item_name: "水素晶体", chance:0.06},
+            //500D
+        ],
+    });
+    enemy_templates["火箭卫戍"] = new Enemy({
+        name: "火箭卫戍", 
+        description: "在这个所有东西都是蓝的地方还能保持自己的红衣，已经是实力的证明了。", 
+        xp_value: 433494437, 
+        rank: 3517,
+        image: "image/enemy/E3517.png",
+        realm: "<span class=realm_sky><b>天空级七阶</b></span>",
+        size: "small",
+        spec: [35],
+        spec_value: {35:10e8},
+        tags: [],
+        stats: {health: 144e8, attack: 12.9e8, agility: 7.6e8, attack_speed: 1.3, defense:6.9e8}, //血量40%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:0.006},
+            {item_name: "传说黄宝石", chance:0.015},
+            {item_name: "B7·能量核心", chance:0.09},
+            //500D
+        ],
+    });
+    enemy_templates["小门派长老"] = new Enemy({
+        name: "小门派长老", 
+        description: "长老走了这么久，门派还好吗……空有境界没有实力，宛如一颗肥美的经验球。", 
+        xp_value: 701408733, 
+        rank: 3518,
+        image: "image/enemy/E3518.png",
+        realm: "<span class=realm_sky><b>天空级七阶 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 144e8, attack: 7.5e8, agility: 7.2e8, attack_speed: 1.3, defense:5.5e8}, //血量40%
+        loot_list: [
+            {item_name: "传说黄宝石", chance:0.015},
+            {item_name: "传说蓝宝石", chance:0.006},
+            {item_name: "冰原超流体", chance:0.2},
+            {item_name: "多孔冰晶", chance:0.2},
+            //900D
+        ],
+    });
+    enemy_templates["水牢幽暗人形"] = new Enemy({
+        name: "水牢幽暗人形", 
+        description: "在这里可能看不出来，但是它真的和环境融为一体了。喵可可看不到巨大的伤害数字……", 
+        xp_value: 701408733, 
+        rank: 3519,
+        image: "image/enemy/E3519.png",
+        realm: "<span class=realm_sky><b>天空级七阶 +</b></span>",
+        size: "small",
+        spec: [0],
+        tags: [],
+        stats: {health: 30e8, attack: 5.25e8, agility: 7.2e8, attack_speed: 1.3, defense:5.25e8}, //血量40%
+        loot_list: [
+            {item_name: "传说黄宝石", chance:0.015},
+            {item_name: "传说蓝宝石", chance:0.006},
+            {item_name: "水素晶体", chance:0.10},
+            //900D
+        ],
+    });
+    enemy_templates["出芽紫茸战士"] = new Enemy({
+        name: "出芽紫茸战士", 
+        description: "彩虹攻击(7/7).你是不是有点掉队了的说？", 
+        xp_value: 701408733, 
+        rank: 3520,
+        image: "image/enemy/E3520.png",
+        realm: "<span class=realm_sky><b>天空级七阶 +</b></span>",
+        size: "small",
+        spec: [16],
+        tags: [],
+        stats: {health: 39e8, attack: 9.9e8, agility: 7.6e8, attack_speed: 1.3, defense:6.3e8}, //血量40%
+        loot_list: [
+            {item_name: "传说黄宝石", chance:0.015},
+            {item_name: "传说蓝宝石", chance:0.006},
+            {item_name: "虹彩凝胶", chance:0.08},
+            //900D
+        ],
+    });
+    enemy_templates["星月幻术师"] = new Enemy({
+        name: "星月幻术师", 
+        description: "实力强劲的法师，兼具buff/回血/攻击三种形态。", 
+        xp_value: 701408733, 
+        rank: 3521,
+        image: "image/enemy/E3521.png",
+        realm: "<span class=realm_sky><b>天空级七阶 +</b></span>",
+        size: "small",
+        spec: [0,11,31],
+        tags: [],
+        stats: {health: 39e8, attack: 11.5e8, agility: 8.0e8, attack_speed: 1.3, defense:7.2e8}, //血量40%
+        loot_list: [
+            {item_name: "传说黄宝石", chance:0.015},
+            {item_name: "传说蓝宝石", chance:0.006},
+            {item_name: "虹彩凝胶", chance:0.04},
+            {item_name: "光环杖芯", chance:0.15},
+            //900D
+        ],
+    });
+    enemy_templates["绿皮怪物"] = new Enemy({
+        name: "绿皮怪物", 
+        description: "喂喂，这个有点敷衍了……狂战士没有人权吗？", 
+        xp_value: 701408733, 
+        rank: 3522,
+        image: "image/enemy/E3522.png",
+        realm: "<span class=realm_sky><b>天空级七阶 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 127.2e8, attack: 13.2e8, agility: 8.4e8, attack_speed: 1.3, defense:5.5e8}, //血量40%
+        loot_list: [
+            {item_name: "传说黄宝石", chance:0.015},
+            {item_name: "传说蓝宝石", chance:0.006},
+            {item_name: "B7·能量核心", chance:0.12},
+            //900D
+        ],
+    });
+    enemy_templates["魔化枭蝎"] = new Enemy({
+        name: "魔化枭蝎", 
+        description: "这种魔力有点强的样子啊。属性超级强化，而技能全数保留。", 
+        xp_value: 701408733, 
+        rank: 3523,
+        image: "image/enemy/E3523.png",
+        realm: "<span class=realm_sky><b>天空级七阶 +</b></span>",
+        size: "small",
+        spec: [22,16],
+        tags: [],
+        stats: {health: 120e8, attack: 13.3e8, agility: 9.2e8, attack_speed: 1.3, defense:8.0e8}, //血量40%
+        loot_list: [
+            {item_name: "传说黄宝石", chance:0.015},
+            {item_name: "传说蓝宝石", chance:0.006},
+            {item_name: "虹彩凝胶", chance:0.10},
+            //900D
+        ],
+    });
+    enemy_templates["古龙幼崽"] = new Enemy({
+        name: "古龙幼崽", 
+        description: "喵可龙族排行榜:蛟龙<<地龙<飞龙<<古龙。", 
+        xp_value: 701408733, 
+        rank: 3524,
+        image: "image/enemy/E3524.png",
+        realm: "<span class=realm_sky><b>天空级七阶 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 57.6e8, attack: 9.9e8, agility: 8.8e8, attack_speed: 1.3, defense:7.1e8}, //血量40%
+        loot_list: [
+            {item_name: "传说黄宝石", chance:0.015},
+            {item_name: "传说蓝宝石", chance:0.006},
+            {item_name: "水素晶体", chance:0.12},
+            //900D
+        ],
+    });
+    enemy_templates["血杀殿余孽"] = new Enemy({
+        name: "血杀殿余孽", 
+        description: "这个组织还挺强的……不过血杀殿秘法和水牢规则倒也是一对好搭配。", 
+        xp_value: 701408733, 
+        rank: 3525,
+        image: "image/enemy/E3525.png",
+        realm: "<span class=realm_sky><b>天空级七阶 +</b></span>",
+        size: "small",
+        spec: [19],
+        tags: [],
+        stats: {health: 124e8, attack: 12.1e8, agility: 8.5e8, attack_speed: 1.3, defense:4.0e8}, //血量40%
+        loot_list: [
+            {item_name: "传说黄宝石", chance:0.015},
+            {item_name: "传说蓝宝石", chance:0.006},
+            {item_name: "宇宙币", chance:0.001},
+            //900D
+        ],
+    });
+    enemy_templates["城主府骨干"] = new Enemy({
+        name: "城主府骨干", 
+        description: "字面意义上的骨干。也不知道城主府的员工是不是签了群星那永身雇佣制合同之类的，都这样了还归属于城主府。", 
+        xp_value: 1134903170, 
+        rank: 3526,
+        image: "image/enemy/E3526.png",
+        realm: "<span class=realm_sky><b>天空级七阶 ++</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 133.2e8, attack: 14.6e8, agility: 10.5e8, attack_speed: 1.3, defense:9.6e8}, //血量40%
+        loot_list: [
+            {item_name: "传说黄宝石", chance:0.006},
+            {item_name: "传说蓝宝石", chance:0.015},
+            {item_name: "冰原超流体", chance:0.3},
+            {item_name: "光环杖芯", chance:0.15},
+            //900D
+        ],
+    });
+    enemy_templates["奇异菇菇"] = new Enemy({
+        name: "奇异菇菇", 
+        description: "已经进入了幻境，但战斗还要继续！说起来，外面的装备居然可以带进来耶。", 
+        xp_value: 701408733, 
+        rank: 3601,
+        image: "image/enemy/E3601.png",
+        realm: "<span class=realm_sky><b>天空级七阶 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 150e8, attack: 15.4e8, agility: 12.0e8, attack_speed: 1.3, defense:8.9e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.010},
+            {item_name: "传承水晶·绿", chance:0.015},
+            //900D
+        ],
+    });
+    enemy_templates["幻境掌灯人"] = new Enemy({
+        name: "幻境掌灯人", 
+        description: "喂喂，版本更新了！这里到处都是光，要你有什么用哇。", 
+        xp_value: 701408733, 
+        rank: 3602,
+        image: "image/enemy/E3602.png",
+        realm: "<span class=realm_sky><b>天空级七阶 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 72e8, attack: 16.1e8, agility: 13e8, attack_speed: 1.3, defense:13.5e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.010},
+            {item_name: "传承水晶·蓝", chance:0.012},
+            //900D
+        ],
+    });
+    enemy_templates["蓝皮怪物"] = new Enemy({
+        name: "蓝皮怪物", 
+        description: "和绿皮怪物一桌!这一只和那个东西一样敷衍啊。", 
+        xp_value: 701408733, 
+        rank: 3603,
+        image: "image/enemy/E3603.png",
+        realm: "<span class=realm_sky><b>天空级七阶 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 90e8, attack: 17.2e8, agility: 14.0e8, attack_speed: 1.3, defense:10.5e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.010},
+            {item_name: "传承水晶·橙", chance:0.022},
+            //900D
+        ],
+    });
+    enemy_templates["幻境通识者"] = new Enemy({
+        name: "幻境通识者", 
+        description: "胸口蝴蝶结，但看起来心事重重的样子。衣服不会是他抢来的吧……", 
+        xp_value: 1134903170, 
+        rank: 3604,
+        image: "image/enemy/E3604.png",
+        realm: "<span class=realm_sky><b>天空级八阶</b></span>",
+        size: "small",
+        spec: [18],
+        spec_value:{18:400e12},
+        tags: [],
+        stats: {health: 440e8, attack: 17.7e8, agility: 16.0e8, attack_speed: 1.3, defense:12.5e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.010},
+            {item_name: "传说红宝石", chance:0.004},
+            {item_name: "传承水晶·白", chance:0.027},
+            //1.6B
+        ],
+    });
+    enemy_templates["火烈茸茸"] = new Enemy({
+        name: "火烈茸茸", 
+        description: "居然在高温下还可以下毒。只要防杀喵可就好了吧~(不过你能看到这个就说明它失败了！)", 
+        xp_value: 1134903170, 
+        rank: 3605,
+        image: "image/enemy/E3605.png",
+        realm: "<span class=realm_sky><b>天空级八阶</b></span>",
+        size: "small",
+        spec: [8],
+        spec_value:{8:10},
+        tags: [],
+        stats: {health: 16e8, attack: 35e8, agility: 17.0e8, attack_speed: 1.3, defense:17.5e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.010},
+            {item_name: "传说红宝石", chance:0.004},
+            {item_name: "传承水晶·橙", chance:0.04},
+            //1.6B
+        ],
+    });
+    enemy_templates["幻境翠绿行者"] = new Enemy({
+        name: "幻境翠绿行者", 
+        description: "蓝帽行者总是被模仿，但400%血量下它也从未被超越。", 
+        xp_value: 1134903170, 
+        rank: 3606,
+        image: "image/enemy/E3606.png",
+        realm: "<span class=realm_sky><b>天空级八阶</b></span>",
+        size: "small",
+        spec: [3],
+        tags: [],
+        stats: {health: 16e8, attack: 22.5e8, agility: 18.0e8, attack_speed: 1.3, defense:14.0e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.010},
+            {item_name: "传说红宝石", chance:0.004},
+            {item_name: "传承水晶·绿", chance:0.026},
+            //1.6B
+        ],
+    });
+    enemy_templates["风尘的窃贼"] = new Enemy({
+        name: "风尘的窃贼", 
+        description: "追光……？既然可以破防火烈茸茸，你大概也接近20亿攻防了吧。", 
+        xp_value: 1134903170, 
+        rank: 3607,
+        image: "image/enemy/E3607.png",
+        realm: "<span class=realm_sky><b>天空级八阶</b></span>",
+        size: "small",
+        spec: [40],
+        tags: [],
+        stats: {health: 288e8, attack: 20e8, agility: 19.0e8, attack_speed: 1.3, defense:14.8e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.010},
+            {item_name: "传说红宝石", chance:0.004},
+            {item_name: "传承水晶·白", chance:0.033},
+            //1.6B
+        ],
+    });
+    enemy_templates["深邃级魔法师"] = new Enemy({
+        name: "深邃级魔法师", 
+        description: "丢掉了本职工作——魔攻。是法师失格！绝对算的吧！这就是deep♂dark♂fantasy的代价啊。", 
+        xp_value: 1134903170, 
+        rank: 3608,
+        image: "image/enemy/E3608.png",
+        realm: "<span class=realm_sky><b>天空级八阶</b></span>",
+        size: "small",
+        spec: [20,49],
+        spec_value:{49:{rnd:200,hp:8e8}},
+        tags: [],
+        stats: {health: 288e8, attack: 22e8, agility: 20e8, attack_speed: 1.3, defense:11.0e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.010},
+            {item_name: "传说红宝石", chance:0.004},
+            {item_name: "传承水晶·粉", chance:0.013},
+            //1.6B
+        ],
+    });
+    enemy_templates["荒野守尸人"] = new Enemy({
+        name: "荒野守尸人", 
+        description: "骷髅守尸是准备组个mc小队吗？这样，带上苦力怕蜘蛛和末影人，组个乐队……", 
+        xp_value: 1134903170, 
+        rank: 3609,
+        image: "image/enemy/E3609.png",
+        realm: "<span class=realm_sky><b>天空级八阶</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 360e8, attack: 25.6e8, agility: 21.0e8, attack_speed: 1.3, defense:16.0e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.010},
+            {item_name: "传说红宝石", chance:0.004},
+            {item_name: "传承水晶·白", chance:0.037},
+            //1.6B
+        ],
+    });
+    enemy_templates["幻境火蝶"] = new Enemy({
+        name: "幻境火蝶", 
+        description: "你已经救出了公主！你可以选择就此封盘，认为你已经“通关”了，又或者你还愿意继续……串台了。公主不是红色翅膀……", 
+        xp_value: 1134903170, 
+        rank: 3610,
+        image: "image/enemy/E3610.png",
+        realm: "<span class=realm_sky><b>天空级八阶</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 109.6e8, attack: 27e8, agility: 22.0e8, attack_speed: 1.3, defense:16.0e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.010},
+            {item_name: "传说红宝石", chance:0.004},
+            {item_name: "传承水晶·橙", chance:0.045},
+            //1.6B
+        ],
+    });
+    enemy_templates["出芽粉茸战士"] = new Enemy({
+        name: "出芽粉茸战士", 
+        description: "彩虹攻击(8/7)。是不是最开始搞错了啦……", 
+        xp_value: 1134903170, 
+        rank: 3611,
+        image: "image/enemy/E3611.png",
+        realm: "<span class=realm_sky><b>天空级八阶</b></span>",
+        size: "small",
+        spec: [23],
+        tags: [],
+        stats: {health: 81e8, attack: 24.01e8, agility: 23.0e8, attack_speed: 1.3, defense:18.0e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.010},
+            {item_name: "传说红宝石", chance:0.004},
+            {item_name: "传承水晶·粉", chance:0.015},
+            //1.6B
+        ],
+    });
+    enemy_templates["凶恶的金乌"] = new Enemy({
+        name: "凶恶的金乌", 
+        description: "我，纱雪，在此发誓！我绝不会和上次一样把乌打成马了！", 
+        xp_value: 1836311903, 
+        rank: 3612,
+        image: "image/enemy/E3612.png",
+        realm: "<span class=realm_sky><b>天空级八阶 +</b></span>",
+        size: "small",
+        spec: [19],
+        tags: [],
+        stats: {health: 270.4e8, attack: 24e8, agility: 21.5e8, attack_speed: 1.3, defense:20.8e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.004},
+            {item_name: "传说红宝石", chance:0.010},
+            {item_name: "传承水晶·蓝", chance:0.02},
+            {item_name: "传承水晶·绿", chance:0.02},
+            //2.8B
+        ],
+    });
+    enemy_templates["幻境血魔"] = new Enemy({
+        name: "幻境血魔", 
+        description: "血魔海一滴血液分化而成的生命。只有普通七阶后期的战力，但生命力雄厚。", 
+        xp_value: 1836311903, 
+        rank: 3613,
+        image: "image/enemy/E3613.png",
+        realm: "<span class=realm_sky><b>天空级八阶 +</b></span>",
+        size: "small",
+        spec: [37],
+        tags: [],
+        stats: {health: 440e8, attack: 18.8e8, agility: 25.0e8, attack_speed: 1.3, defense:13.5e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.004},
+            {item_name: "传说红宝石", chance:0.010},
+            {item_name: "传承水晶·橙", chance:0.07},
+            //2.8B
+        ],
+    });
+    enemy_templates["窥秘商人"] = new Enemy({
+        name: "窥秘商人", 
+        description: "看起来就很狡猾。影魇族人转生来了？", 
+        xp_value: 1836311903, 
+        rank: 3614,
+        image: "image/enemy/E3614.png",
+        realm: "<span class=realm_sky><b>天空级八阶 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 704e8, attack: 30e8, agility: 26.0e8, attack_speed: 1.3, defense:20e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.004},
+            {item_name: "传说红宝石", chance:0.010},
+            {item_name: "传承水晶·粉", chance:0.01},
+            {item_name: "传承水晶·白", chance:0.03},
+            //2.8B
+        ],
+    });
+    enemy_templates["燕岗领独行侠"] = new Enemy({
+        name: "燕岗领独行侠", 
+        description: "走投无路的迷途强者，误入水牢，从厮杀中悟出领域三重……多棒的故事啊。可惜这个结界可不是那种真正的传承之地哦。", 
+        xp_value: 1836311903, 
+        rank: 3615,
+        image: "image/enemy/E3615.png",
+        realm: "<span class=realm_sky><b>天空级八阶 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 140e8, attack: 35e8, agility: 27.0e8, attack_speed: 1.3, defense:0e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.004},
+            {item_name: "传说红宝石", chance:0.010},
+            {item_name: "传承水晶·绿", chance:0.035},
+            //2.8B
+        ],
+    });
+    enemy_templates["幻境飞蛾"] = new Enemy({
+        name: "幻境飞蛾", 
+        description: "在这里是不是搞错了什么哇。上下都是八阶巅峰，而你只是八阶初期……", 
+        xp_value: 1134903170, 
+        rank: 3616,
+        image: "image/enemy/E3616.png",
+        realm: "<span class=realm_sky><b>天空级八阶</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 320e8, attack: 21e8, agility: 17.0e8, attack_speed: 1.3, defense:12e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.010},
+            {item_name: "传说红宝石", chance:0.004},
+            {item_name: "传承水晶·蓝", chance:0.022},
+            //1.6B
+        ],
+    });
+    enemy_templates["幻境石灵"] = new Enemy({
+        name: "幻境石灵", 
+        description: "如果生命倍率一直这样提高，这些石头怪迟早会变成问题的?内甲的A.mul会保护大家的！", 
+        xp_value: 1836311903, 
+        rank: 3617,
+        image: "image/enemy/E3617.png",
+        realm: "<span class=realm_sky><b>天空级八阶 +</b></span>",
+        size: "small",
+        spec: [1],
+        tags: [],
+        stats: {health: 96, attack: 28.8e8, agility: 28.0e8, attack_speed: 1.3, defense:24e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.004},
+            {item_name: "传说红宝石", chance:0.010},
+            {item_name: "传承水晶·蓝", chance:0.044},
+            //2.8B
+        ],
+    });
+    enemy_templates["磐石蜘蛛"] = new Enemy({
+        name: "磐石蜘蛛", 
+        description: "蜘蛛类绝对是最强的荒兽。每回合高百分比而且无上限的回血呢。", 
+        xp_value: 1836311903, 
+        rank: 3618,
+        image: "image/enemy/E3618.png",
+        realm: "<span class=realm_sky><b>天空级八阶 +</b></span>",
+        size: "small",
+        spec: [31],
+        tags: [],
+        stats: {health: 409.6e8, attack: 33e8, agility: 29.0e8, attack_speed: 1.3, defense:22e8}, //血量40%
+        loot_list: [
+            {item_name: "传说蓝宝石", chance:0.004},
+            {item_name: "传说红宝石", chance:0.010},
+            {item_name: "传承水晶·白", chance:0.08},
+            //2.8B
+        ],
+    });
+
+    
+    //【LIFE CHANGE】
+    // 40%↑
+    //
+    // 50%↓
+
+    enemy_templates["心魔"] = new Enemy({
+        name: "心魔", 
+        description: "和那只BOSS级的有相同的弱点。可以干死四只就可以干死它！", 
+        xp_value: 2971215073, 
+        rank: 3701,
+        image: "image/enemy/E3701.png",
+        realm: "<span class=realm_sky><b>天空级巅峰</b></span>",
+        size: "small",
+        spec: [52,33,53],
+        spec_value:{33:13},
+        tags: [],
+        stats: {health: 2222e8, attack: 56.78e8, agility: 30e8, attack_speed: 1.0, defense:1e4}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.008},
+            {item_name: "传说绿宝石", chance:0.003},
+            {item_name: "天空级魂魄", chance:0.023},
+            //5B
+        ],
+    });
+    enemy_templates["燕岗辉煌佣兵"] = new Enemy({
+        name: "燕岗辉煌佣兵", 
+        description: "我乃蓝玉职业者巅峰！何人能杀我，何人敢杀我？", 
+        xp_value: 2971215073, 
+        rank: 3702,
+        image: "image/enemy/E3702.png",
+        realm: "<span class=realm_sky><b>天空级八阶 ++</b></span>",
+        size: "small",
+        spec: [6],
+        tags: [],
+        stats: {health: 440e8, attack: 36e8, agility: 32e8, attack_speed: 1.5, defense:22e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.008},
+            {item_name: "传说绿宝石", chance:0.003},
+            {item_name: "传承水晶·白", chance:0.05},
+            {item_name: "传承水晶·橙", chance:0.062},
+            //5B
+        ],
+    });
+    enemy_templates["地宫虫将"] = new Enemy({
+        name: "地宫虫将", 
+        description: "从卒到将的属性加了五个数量级……【地宫虫劫】是不是达到不朽神灵级了？", 
+        xp_value: 2971215073, 
+        rank: 3703,
+        image: "image/enemy/E3703.png",
+        realm: "<span class=realm_sky><b>天空级八阶 ++</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 1100e8, attack: 38e8, agility: 34e8, attack_speed: 1.4, defense:20e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.008},
+            {item_name: "传说绿宝石", chance:0.003},
+            {item_name: "传承水晶·粉", chance:0.02},
+            {item_name: "天空级魂魄", chance:0.012},
+            //5B
+        ],
+    });
+    enemy_templates["地宫不眠者"] = new Enemy({
+        name: "地宫不眠者", 
+        description: "原来熬夜不睡觉可以进入别人的心魔幻境！奇怪的知识又增加了。", 
+        xp_value: 2971215073, 
+        rank: 3704,
+        image: "image/enemy/E3704.png",
+        realm: "<span class=realm_sky><b>天空级八阶 ++</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 250e8, attack: 55e8, agility: 36e8, attack_speed: 1.4, defense:27.5e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.008},
+            {item_name: "传说绿宝石", chance:0.003},
+            {item_name: "天空级魂魄", chance:0.025},
+            //5B
+        ],
+    });
+    enemy_templates["地下焚天火"] = new Enemy({
+        name: "地下焚天火", 
+        description: "打人非常痛！不过生命如风中残烛……台风中篝火？总之很容易灭就是了。", 
+        xp_value: 2971215073, 
+        rank: 3705,
+        image: "image/enemy/E3705.png",
+        realm: "<span class=realm_sky><b>天空级巅峰</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 75e8, attack: 90e8, agility: 38e8, attack_speed: 1.4, defense:35e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.008},
+            {item_name: "传说绿宝石", chance:0.003},
+            {item_name: "天空级魂魄", chance:0.026},
+            //5B
+        ],
+    });
+    
+    enemy_templates["燕岗城卫队长"] = new Enemy({
+        name: "燕岗城卫队长", 
+        description: "之前就是你小子把坚固队员派到光环怪旁边的？", 
+        xp_value: 2971215073, 
+        rank: 3706,
+        image: "image/enemy/E3706.png",
+        realm: "<span class=realm_sky><b>天空级八阶 ++</b></span>",
+        size: "small",
+        spec: [1],
+        tags: [],
+        stats: {health: 160, attack: 44.44e8, agility: 40e8, attack_speed: 1.4, defense:0e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.008},
+            {item_name: "传说绿宝石", chance:0.003},
+            {item_name: "传承水晶·粉", chance:0.02},
+            {item_name: "天空级魂魄", chance:0.012},
+            //5B
+        ],
+    });
+
+    enemy_templates["秘境荧光帕芙"] = new Enemy({
+        name: "秘境荧光帕芙", 
+        description: "最近，好多人都在抓的闪光品种，是这个吗？", 
+        xp_value: 2971215073, 
+        rank: 3707,
+        image: "image/enemy/E3707.png",
+        realm: "<span class=realm_sky><b>天空级巅峰</b></span>",
+        size: "small",
+        spec: [0],
+        tags: [],
+        stats: {health: 320e8, attack: 32e8, agility: 42e8, attack_speed: 1.4, defense:32e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.008},
+            {item_name: "传说绿宝石", chance:0.003},
+            {item_name: "传承水晶·白", chance:0.06},
+            {item_name: "传承水晶·橙", chance:0.06},
+            //5B
+        ],
+    });
+    enemy_templates["秘境闪耀精灵"] = new Enemy({
+        name: "秘境闪耀精灵", 
+        description: "更亮了！惑幻……说起来，明明是幻境，它居然是第一只有这种属性的敌人吗？", 
+        xp_value: 2971215073, 
+        rank: 3708,
+        image: "image/enemy/E3708.png",
+        realm: "<span class=realm_sky><b>天空级巅峰</b></span>",
+        size: "small",
+        spec: [13,27],
+        tags: [],
+        stats: {health: 344.45e8, attack: 49e8, agility: 44e8, attack_speed: 1.4, defense:33e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.008},
+            {item_name: "传说绿宝石", chance:0.003},
+            {item_name: "传承水晶·粉", chance:0.05},
+            //5B
+        ],
+    });
+    enemy_templates["喵咕啦"] = new Enemy({
+        name: "喵咕啦", 
+        description: "这种生物是怎么拟态成姐姐的样子的……衣服可以模拟，那皮肤呢？", 
+        xp_value: 2971215073, 
+        rank: 3709,
+        image: "image/enemy/E3709.png",
+        realm: "<span class=realm_sky><b>天空级巅峰</b></span>",
+        size: "small",
+        spec: [21],
+        spec_value:{21:60e8},
+        tags: [],
+        stats: {health: 555.5e8, attack: 1e4, agility: 46e8, attack_speed: 1.4, defense:37.5e8}, //血量50%(x)
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.008},
+            {item_name: "传说绿宝石", chance:0.003},
+            {item_name: "紫晶碎片", chance:0.018},
+            //5B
+        ],
+    });
+    enemy_templates["残雪灵阵"] = new Enemy({
+        name: "残雪灵阵", 
+        description: "相传，在一个魔女之力满地飞的时间线，许多残雪灵阵被释放进了地宫。好在这里没有那种事情。", 
+        xp_value: 2971215073, 
+        rank: 3710,
+        image: "image/enemy/E3710.png",
+        realm: "<span class=realm_sky><b>天空级巅峰</b></span>",
+        size: "small",
+        spec: [11],
+        tags: [],
+        stats: {health: 1e4, attack: 1e4, agility: 48e8, attack_speed: 1.4, defense:42e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.008},
+            {item_name: "传说绿宝石", chance:0.003},
+            {item_name: "紫晶碎片", chance:0.020},
+            //5B
+        ],
+    });
+    enemy_templates["晓雪魅蝠"] = new Enemy({
+        name: "晓雪魅蝠", 
+        description: "名字前面加一个晓的确听起来厉害多了！越打血越多的可恶蝙蝠……", 
+        xp_value: 2971215073, 
+        rank: 3711,
+        image: "image/enemy/E3711.png",
+        realm: "<span class=realm_sky><b>天空级巅峰</b></span>",
+        size: "small",
+        spec: [31],
+        tags: [],
+        stats: {health: 451.25e8, attack: 52e8, agility: 50e8, attack_speed: 1.4, defense:36e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.008},
+            {item_name: "传说绿宝石", chance:0.003},
+            {item_name: "紫晶碎片", chance:0.022},
+            //5B
+        ],
+    });
+    enemy_templates["威武星骑士"] = new Enemy({
+        name: "威武星骑士", 
+        description: "幸好结界湖的蓝帽行者没有戴着更大的帽子出现在这里。否则它大概能有几兆血。", 
+        xp_value: 4807526976, 
+        rank: 3712,
+        image: "image/enemy/E3712.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 1352e8, attack: 63e8, agility: 52e8, attack_speed: 1.4, defense:27e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.003},
+            {item_name: "传说绿宝石", chance:0.008},
+            {item_name: "紫晶碎片", chance:0.027},
+            //9B
+        ],
+    });
+    enemy_templates["圣荒城头目"] = new Enemy({
+        name: "圣荒城头目", 
+        description: "幻境也复刻了对应城市居民的弱点！无伤它的方法已经昭然若揭了。", 
+        xp_value: 4807526976, 
+        rank: 3713,
+        image: "image/enemy/E3713.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [18],
+        spec_value: {18:1e15},
+        tags: [],
+        stats: {health: 1104.5e8, attack: 63e8, agility: 48e8, attack_speed: 1.4, defense:37e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.003},
+            {item_name: "传说绿宝石", chance:0.008},
+            {item_name: "传承水晶·白", chance:0.04},
+            {item_name: "传承水晶·橙", chance:0.04},
+            {item_name: "传承水晶·粉", chance:0.04},
+            //9B
+        ],
+    });
+    enemy_templates["兰陵城头目"] = new Enemy({
+        name: "兰陵城头目", 
+        description: "这只也差不多！虽然冰宫幻境本身在燕岗领深处，但幻境中的灵却是恐惧显化而成。", 
+        xp_value: 4807526976, 
+        rank: 3714,
+        image: "image/enemy/E3714.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [39],
+        spec_value: {39:5000e8},
+        tags: [],
+        stats: {health: 924.5e8, attack: 55e8, agility: 50e8, attack_speed: 1.4, defense:44e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.003},
+            {item_name: "传说绿宝石", chance:0.008},
+            {item_name: "幻境符文", chance:0.021},
+            //9B
+        ],
+    });
+    enemy_templates["战场不朽骸骨"] = new Enemy({
+        name: "战场不朽骸骨", 
+        description: "就连头骨都已然发黑。光环……甚至还增强了一些？", 
+        xp_value: 4807526976, 
+        rank: 3715,
+        image: "image/enemy/E3715.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [11],
+        tags: [],
+        stats: {health: 900e8, attack: 65e8, agility: 52e8, attack_speed: 1.4, defense:30e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.003},
+            {item_name: "传说绿宝石", chance:0.008},
+            {item_name: "幻境符文", chance:0.024},
+            //9B
+        ],
+    });
+    enemy_templates["血腥追风者"] = new Enemy({
+        name: "血腥追风者", 
+        description: "【废墟追风者】的概念扰动延续到幻境了！毕竟追光作为小怪技能也太超模了啦……", 
+        xp_value: 4807526976, 
+        rank: 3716,
+        image: "image/enemy/E3716.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [36,16],
+        tags: [],
+        stats: {health: 1350e8, attack: 65e8, agility: 52e8, attack_speed: 1.4, defense:30e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.003},
+            {item_name: "传说绿宝石", chance:0.008},
+            {item_name: "幻境符文", chance:0.027},
+            //9B
+        ],
+    });
+    enemy_templates["黄桃重工B9"] = new Enemy({
+        name: "黄桃重工B9", 
+        description: "呵，长大了。饮盾倍率也高了十倍。不过——普攻倍率翻了可不止十倍啊！", 
+        xp_value: 4807526976, 
+        rank: 3717,
+        image: "image/enemy/E3717.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [12,47],
+        tags: [],
+        stats: {health: 100e8, attack: 68e8, agility: 60e8, attack_speed: 1.5, defense:54e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.003},
+            {item_name: "传说绿宝石", chance:0.008},
+            {item_name: "引力反常", chance:0.022},
+            //9B
+        ],
+    });
+    enemy_templates["不可能三角B9"] = new Enemy({
+        name: "不可能三角B9", 
+        description: "有没有一种可能……我是说可能……它有一堆战前给自己上buff的属性，只是我们不知道？", 
+        xp_value: 4807526976, 
+        rank: 3718,
+        image: "image/enemy/E3718.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 1512.5e8, attack: 77e8, agility: 64e8, attack_speed: 1.6, defense:48e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.003},
+            {item_name: "传说绿宝石", chance:0.008},
+            {item_name: "引力反常", chance:0.024},
+            //9B
+        ],
+    });
+    enemy_templates["极寒之锋B9"] = new Enemy({
+        name: "极寒之锋B9", 
+        description: "或许我永远不会忘记被鲜血之锋B1支配的恐惧的。另外，生命限制……牵制出3.0版了？！", 
+        xp_value: 4807526976, 
+        rank: 3719,
+        image: "image/enemy/E3719.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [49,54],
+        spec_value:{49:{rnd:648,hp:10e8}},
+        tags: [],
+        stats: {health: 6480e8, attack: 88e8, agility: 68e8, attack_speed: 1.4, defense:1e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.003},
+            {item_name: "传说绿宝石", chance:0.008},
+            {item_name: "传承水晶·蓝", chance:0.02},
+            {item_name: "紫晶碎片", chance:0.03},
+            //9B
+        ],
+    });
+    enemy_templates["金色血眼B9"] = new Enemy({
+        name: "金色血眼B9", 
+        description: "简单的技能，极……和我的月轮说去吧！", 
+        xp_value: 4807526976, 
+        rank: 3720,
+        image: "image/enemy/E3720.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [1],
+        tags: [],
+        stats: {health: 140, attack: 80e8, agility: 72e8, attack_speed: 1.5, defense:70e8}, //血量50%
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.003},
+            {item_name: "传说绿宝石", chance:0.008},
+            {item_name: "引力反常", chance:0.026},
+            //9B
+        ],
+    });
+    enemy_templates["恐怖机人B9"] = new Enemy({
+        name: "恐怖机人B9", 
+        description: "道理我都懂，为什么你不是32*32的？异界之门原来是传送门啊！", 
+        xp_value: 4807526976, 
+        rank: 3721,
+        image: "image/enemy/E3721.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 1200e8, attack: 81e8, agility: 76e8, attack_speed: 1.5, defense:60e8}, //血量50%*5(异界)
+        loot_list: [
+            {item_name: "传说红宝石", chance:0.003},
+            {item_name: "传说绿宝石", chance:0.008},
+            {item_name: "引力反常", chance:0.028},
+            //9B
+        ],
+    });
+    enemy_templates["冈崎喵妖"] = new Enemy({
+        name: "冈崎喵妖", 
+        description: "恐怖爆攻……你的迅捷哪去了！不会以为这么脆也打得到人吧？", 
+        xp_value: 7778742049, 
+        rank: 3722,
+        image: "image/enemy/E3722.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 ++</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 90e8, attack: 240e8, agility: 88e8, attack_speed: 1.7, defense:80e8}, //血量50%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.015},
+            {item_name: "天空级魂魄", chance:0.075},
+            //16B
+        ],
+    });
+    enemy_templates["血洛大陆骨干"] = new Enemy({
+        name: "血洛大陆骨干", 
+        description: "骨干从骨头变成了帅气的机甲啊！难怪燕岗城主府一直以来都不算太强的样子", 
+        xp_value: 7778742049, 
+        rank: 3723,
+        image: "image/enemy/E3723.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 ++</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 720e8, attack: 112e8, agility: 96e8, attack_speed: 1.5, defense:60e8}, //血量50%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.015},
+            {item_name: "幻境符文", chance:0.041},
+            //16B
+        ],
+    });
+    enemy_templates["扭曲毒虫"] = new Enemy({
+        name: "扭曲毒虫", 
+        description: "加强自己和削弱敌人的手段简直出神入化。什么时候纳可也可以学会这些呢？", 
+        xp_value: 7778742049, 
+        rank: 3724,
+        image: "image/enemy/E3724.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 ++</b></span>",
+        size: "small",
+        spec: [8,19,46,47],
+        spec_value:{8:10},
+        tags: [],
+        stats: {health: 1056e8, attack: 85e8, agility: 88e8, attack_speed: 1.4, defense:50e8}, //血量50%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.015},
+            {item_name: "引力反常", chance:0.035},
+            //16B
+        ],
+    });
+    enemy_templates["狠咕兽"] = new Enemy({
+        name: "狠咕兽", 
+        description: "版本更新了……现在纯度不高的堆数值没用了啦。和我的普攻倍率说去吧！", 
+        xp_value: 7778742049, 
+        rank: 3725,
+        image: "image/enemy/E3725.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 ++</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 2777.5e8, attack: 110e8, agility: 100e8, attack_speed: 1.5, defense:55e8}, //血量50%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.015},
+            {item_name: "紫晶碎片", chance:0.048},
+            //16B
+        ],
+    });
+    enemy_templates["超量凶悍树妖"] = new Enemy({
+        name: "超量凶悍树妖", 
+        description: "一般来说，超出常规巅峰2倍的基础数值即可被称为【超量/破限】，领取【喽啰/人阶】等阶位……<br>但为了直观起见，喵可RPG全部使用加号！", 
+        xp_value: 7778742049, 
+        rank: 3726,
+        image: "image/enemy/E3726.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 ++</b></span>",
+        size: "small",
+        spec: [31],
+        tags: [],
+        stats: {health: 1000e8, attack: 110e8, agility:104e8, attack_speed: 1.5, defense:50e8}, //血量50%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.015},
+            {item_name: "传承水晶·粉", chance:0.12},
+            //16B
+        ],
+    });
+    enemy_templates["暗杀飞蛾"] = new Enemy({
+        name: "暗杀飞蛾", 
+        description: "非常遗憾，暗杀什么的在这里不生效——你在战斗框里就是索敌对象！", 
+        xp_value: 7778742049, 
+        rank: 3727,
+        image: "image/enemy/E3727.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 ++</b></span>",
+        size: "small",
+        spec: [26],
+        tags: [],
+        stats: {health: 216e8, attack: 108.9e8, agility:100e8, attack_speed: 1.5, defense:88.36e8}, //血量50%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.015},
+            {item_name: "幻境符文", chance:0.052},
+            //16B
+        ],
+    });
+    enemy_templates["古龙小兽"] = new Enemy({
+        name: "古龙小兽", 
+        description: "【古龙】可是这里最强的龙族！每一条都有成年<span class='realm_cloudy'>云霄级巅峰</span>的血脉。不过它大概长不大就是了。", 
+        xp_value: 7778742049, 
+        rank: 3728,
+        image: "image/enemy/E3728.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 ++</b></span>",
+        size: "small",
+        spec: [26],
+        tags: [],
+        stats: {health: 2000e8, attack: 125e8, agility:108e8, attack_speed: 1.5, defense:72e8}, //血量50%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.015},
+            {item_name: "紫晶碎片", chance:0.052},
+            //16B
+        ],
+    });
+    enemy_templates["巨人强豪"] = new Enemy({
+        name: "巨人强豪", 
+        description: "还记得无限秘境的【巨人先锋】吗……如果秘境不封顶，891,880层的它将会拥有这一只的攻击强度。", 
+        xp_value: 7778742049, 
+        rank: 3729,
+        image: "image/enemy/E3729.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 ++</b></span>",
+        size: "small",
+        spec: [16],
+        tags: [],
+        stats: {health: 750e8, attack: 132e8, agility:112e8, attack_speed: 1.5, defense:90e8}, //血量50%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.015},
+            {item_name: "天空级魂魄", chance:0.081},
+            //16B
+        ],
+    });
+    enemy_templates["血洛流浪剑客"] = new Enemy({
+        name: "血洛流浪剑客", 
+        description: "又一个流浪进来的！真想学天剑呐……普攻倍率是不缺，但攻击乘区可是缺的很。", 
+        xp_value: 7778742049, 
+        rank: 3730,
+        image: "image/enemy/E3730.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 ++</b></span>",
+        size: "small",
+        spec: [10,20],
+        tags: [],
+        stats: {health: 1104.5e8, attack: 133e8, agility:116e8, attack_speed: 1.5, defense:78e8}, //血量50%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.015},
+            {item_name: "魂晶锭", chance:0.022},
+            //16B
+        ],
+    });
+    enemy_templates["大门派精英"] = new Enemy({
+        name: "大门派精英", 
+        description: "拥有着极为深厚的积累，如果想要突破的话它随时都可以突破。不过，毕竟成为【心之灵】的一员的未来还是太黑暗了……", 
+        xp_value: 12586269025, 
+        rank: 3731,
+        image: "image/enemy/E3731.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +++</b></span>",
+        size: "small",
+        spec: [33,34],
+        spec_value:{33:5},
+        tags: [],
+        stats: {health: 1521e8, attack: 114e8, agility:120e8, attack_speed: 1.2, defense:94e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.03},
+            {item_name: "宇宙币", chance:0.028},
+            //28B
+        ],
+    });
+    //4-1
+    enemy_templates["魔草绿球"] = new Enemy({
+        name: "魔草绿球", 
+        description: "最弱的云霄1也是云霄1！很抱歉之前boss战的能力被收回了啦……要不要我给伊芙加点属性？", 
+        xp_value: 12586269025, 
+        rank: 4101,
+        image: "image/enemy/E4101.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 1400e8, attack: 290e8, agility:140e8, attack_speed: 1.4, defense:130e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.03},
+            {item_name: "C1·能量核心", chance:0.015},
+            //50B
+        ],
+    });
+    enemy_templates["刺穿的菇灵"] = new Enemy({
+        name: "刺穿的菇灵", 
+        description: "牵制药水·高光时刻！再问删了？这下删不了了！", 
+        xp_value: 12586269025, 
+        rank: 4102,
+        image: "image/enemy/E4102.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 7290e8, attack: 300e8, agility:160e8, attack_speed: 1.6, defense:1}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.03},
+            {item_name: "城门之星", chance:0.023},
+            //50B
+        ],
+    });
+    enemy_templates["奸猾绝凶兽"] = new Enemy({
+        name: "奸猾绝凶兽", 
+        description: "死后召唤出本地图的随机敌人。强迫你多砍一刀……", 
+        xp_value: 12586269025, 
+        rank: 4103,
+        image: "image/enemy/E4103.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶</b></span>",
+        size: "small",
+        spec: [60],
+        tags: [],
+        stats: {health: 5600e8, attack: 328e8, agility:180e8, attack_speed: 1.6, defense:125e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.03},
+            {item_name: "破空紫蕨", chance:0.082},
+            //50B
+        ],
+    });
+    enemy_templates["暴风野蝠"] = new Enemy({
+        name: "暴风野蝠", 
+        description: "蝠学风老师~我还记得你~一拳一拳~把我打进迷雾里~", 
+        xp_value: 12586269025, 
+        rank: 4104,
+        image: "image/enemy/E4104.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶</b></span>",
+        size: "small",
+        spec: [16],
+        tags: [],
+        stats: {health: 7840e8, attack: 255e8, agility:200e8, attack_speed: 1.5, defense:120e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.03},
+            {item_name: "中等进化结晶碎片", chance:0.001},
+            {item_name: "城门之星", chance:0.015},
+            //50B
+        ],
+    });
+    enemy_templates["城门战傀儡"] = new Enemy({
+        name: "城门战傀儡", 
+        description: "能匹敌云霄级一阶的傀儡想必相当值钱吧。这些也是城门战奖品的一部分！", 
+        xp_value: 12586269025, 
+        rank: 4105,
+        image: "image/enemy/E4105.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 16810e8, attack: 280e8, agility:220e8, attack_speed: 1.5, defense:140e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.03},
+            {item_name: "魂晶锭", chance:0.09},
+            {item_name: "盖亚合金锭", chance:0.001},
+            //50B
+        ],
+    });
+    enemy_templates["毒牙噬蝠"] = new Enemy({
+        name: "毒牙噬蝠", 
+        description: "怎么变异荒兽都是些蝙蝠。是因为生物量基数大并且基础面板还不错的？", 
+        xp_value: 12586269025, 
+        rank: 4106,
+        image: "image/enemy/E4106.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶</b></span>",
+        size: "small",
+        spec: [7,8],
+        spec_value:{8:10},
+        tags: [],
+        stats: {health: 11560e8, attack: 370e8, agility:240e8, attack_speed: 1.5, defense:120e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.03},
+            {item_name: "C1·能量核心", chance:0.02},
+            //50B
+        ],
+    });
+    enemy_templates["深邃法师小队"] = new Enemy({
+        name: "深邃法师小队", 
+        description: "10只天空8逆伐云霄1.这就是我们尊贵的法术系啊！对了，攻速没填错。", 
+        xp_value: 11349031700, 
+        rank: 4107,
+        image: "image/enemy/E4107.png",
+        realm: "<span class=realm_sky><b>天空级八阶 [x10]</b></span>",
+        size: "small",
+        spec: [61,0],
+        tags: [],
+        stats: {health: 5600e8, attack: 140e8, agility:200e8, attack_speed: 4.5, defense:160e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.03},
+            {item_name: "城门之星", chance:0.03},
+            //50B
+        ],
+    });
+    enemy_templates["燕岗狂剑小队"] = new Enemy({
+        name: "燕岗狂剑小队", 
+        description: "通过连续砍击造成更深的伤口的小队。多次有效攻击压缩成一次，有了云霄级破防实力。对了，这个攻速也没填错。", 
+        xp_value: 22698063400, 
+        rank: 4108,
+        image: "image/enemy/E4108.png",
+        realm: "<span class=realm_sky><b>天空级八阶 ++ [x10]</b></span>",
+        size: "small",
+        spec: [61],
+        tags: [],
+        stats: {health: 6760e8, attack: 299e8, agility:220e8, attack_speed: 7.5, defense:0e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.03},
+            {item_name: "城门之星", chance:0.05},
+            //50B
+        ],
+    });
+    enemy_templates["古树蜘蛛"] = new Enemy({
+        name: "古树蜘蛛", 
+        description: "温馨提示：切巨星对破它的防御没有任何用处。", 
+        xp_value: 20365011074, 
+        rank: 4109,
+        image: "image/enemy/E4109.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶 +</b></span>",
+        size: "small",
+        spec: [9],
+        tags: [],
+        stats: {health: 5290e8, attack: 625e8, agility:280e8, attack_speed: 1.2, defense:289e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.05},
+            {item_name: "力场发生器", chance:0.022},
+            //90B
+        ],
+    });
+    enemy_templates["燕城看门人"] = new Enemy({
+        name: "燕城看门人", 
+        description: "实际上居于燕岗城各个哨所，念力覆盖数个城门进行详细检查。但是如果真的要打的话这位拦得住吗……", 
+        xp_value: 12586269025, 
+        rank: 4110,
+        image: "image/enemy/E4110.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 8600e8, attack: 410e8, agility:300e8, attack_speed: 1.6, defense:170e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.03},
+            {item_name: "破空紫蕨", chance:0.04},
+            {item_name: "魂晶锭", chance:0.04},
+            //50B
+        ],
+    });
+    enemy_templates["炽烈茸茸"] = new Enemy({
+        name: "炽烈茸茸", 
+        description: "发出绿光了！根据维恩位移定律，它的色温大概是5400K。至于为什么太阳不是绿的……可能是视锥细胞敏感度的问题吧。", 
+        xp_value: 20365011074, 
+        rank: 4111,
+        image: "image/enemy/E4111.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 932e8, attack: 466e8, agility:300e8, attack_speed: 1.6, defense:233e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.05},
+            {item_name: "C1·能量核心", chance:0.035},
+            //90B
+        ],
+    });
+    enemy_templates["城门战淘汰者"] = new Enemy({
+        name: "城门战淘汰者", 
+        description: "请道友入我人皇幡中一叙~喵可什么时候可以考虑锻造个人皇幡诶。", 
+        xp_value: 20365011074, 
+        rank: 4112,
+        image: "image/enemy/E4112.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 10890e8, attack: 484e8, agility:320e8, attack_speed: 1.6, defense:190e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.05},
+            {item_name: "力场发生器", chance:0.02},
+            //90B
+        ],
+    });
+    enemy_templates["哥布林头目"] = new Enemy({
+        name: "哥布林头目", 
+        description: "血洛强族哥布林……我们急需圣骑士来净化它们。", 
+        xp_value: 20365011074, 
+        rank: 4113,
+        image: "image/enemy/E4113.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 7400e8, attack: 710e8, agility:340e8, attack_speed: 1.7, defense:280e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.05},
+            {item_name: "城门之星", chance:0.03},
+            {item_name: "中等进化结晶碎片", chance:0.0015},
+            //90B
+        ],
+    });
+    enemy_templates["燕岗知识分子"] = new Enemy({
+        name: "燕岗知识分子", 
+        description: "知识就是力量！我悟了！——他喊着这样的话，就冲上来了呢。", 
+        xp_value: 20365011074, 
+        rank: 4114,
+        image: "image/enemy/E4114.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶 +</b></span>",
+        size: "small",
+        spec: [54],
+        tags: [],
+        stats: {health: 61000e8, attack: 540e8, agility:360e8, attack_speed: 1.7, defense:90e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.05},
+            {item_name: "魂晶锭", chance:0.15},
+            //90B
+        ],
+    });
+    enemy_templates["古古怪树"] = new Enemy({
+        name: "古古怪树", 
+        description: "临时扣血不好做，所以改成了五倍易伤。老师血条有点发紫是不是心脏不太好？", 
+        xp_value: 20365011074, 
+        rank: 4115,
+        image: "image/enemy/E4115.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶 +</b></span>",
+        size: "small",
+        spec: [62],
+        tags: [],
+        stats: {health: 12960e8, attack: 441e8, agility:360e8, attack_speed: 1.7, defense:256e8}, //血量100%
+        loot_list: [
+            {item_name: "传说绿宝石", chance:0.05},
+            {item_name: "城门之星", chance:0.02},
+            {item_name: "力场发生器", chance:0.01},
+            //90B
+        ],
+    });
+    enemy_templates["燕岗射手小队"] = new Enemy({
+        name: "燕岗射手小队", 
+        description: "我们至今仍然没有知道为什么阻击技能也可以被小队增幅。", 
+        xp_value: 77787420490, 
+        rank: 4201,
+        image: "image/enemy/E4201.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 ++[x10]</b></span>",
+        size: "small",
+        spec: [61,29],
+        spec_value:{29:500e8},
+        tags: [],
+        stats: {health: 12960e8, attack: 890e8, agility:540e8, attack_speed: 1.6, defense:490e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.015},
+            {item_name: "城门之星", chance:0.05},
+            //160B
+        ],
+    });
+    enemy_templates["壮硕走地兽"] = new Enemy({
+        name: "壮硕走地兽", 
+        description: "全身覆盖鳞甲的均衡性选手。如果压制都无法带来优势，那肯定是本来就打不过了！", 
+        xp_value: 20365011074 , 
+        rank: 4202,
+        image: "image/enemy/E4202.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶 +</b></span>",
+        size: "small",
+        spec: [51],
+        tags: [],
+        stats: {health: 7840e8, attack: 810e8, agility:420e8, attack_speed: 1.6, defense:340e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.005},
+            {item_name: "云霄宝肉", chance:0.008},
+            //90B
+        ],
+    });
+    enemy_templates["水晶骷髅"] = new Enemy({
+        name: "水晶骷髅", 
+        description: "如果骷髅全身都是水晶而不是骨头做的，那它还能被称为骷髅吗？", 
+        xp_value: 20365011074, 
+        rank: 4203,
+        image: "image/enemy/E4203.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶 +</b></span>",
+        size: "small",
+        spec: [51,1],
+        tags: [],
+        stats: {health: 1000, attack: 660e8, agility:440e8, attack_speed: 1.8, defense:1}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.005},
+            {item_name: "远古碎片", chance:0.014},
+            //90B
+        ],
+    });
+    enemy_templates["绿原圣触"] = new Enemy({
+        name: "绿原圣触", 
+        description: "魔塔刻板印象1：任何长得像蛇或者触手的东西必定是挂debuff用的。这是假的。", 
+        xp_value: 20365011074, 
+        rank: 4204,
+        image: "image/enemy/E4204.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶 +</b></span>",
+        size: "small",
+        spec: [27,31],
+        tags: [],
+        stats: {health: 6760e8, attack: 680e8, agility:480e8, attack_speed: 1.6, defense:360e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.005},
+            {item_name: "草木之芯", chance:0.01},
+            //90B
+        ],
+    });
+    enemy_templates["腐毒仙子"] = new Enemy({
+        name: "腐毒仙子", 
+        description: "魔塔刻板印象2：带翅膀的家伙总是可以给自己回血。这倒是真的。", 
+        xp_value: 32951280099, 
+        rank: 4205,
+        image: "image/enemy/E4205.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶</b></span>",
+        size: "small",
+        spec: [8,31],
+        spec_value:{8:10},
+        tags: [],
+        stats: {health: 9610e8, attack: 740e8, agility:460e8, attack_speed: 1.6, defense:370e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.01},
+            {item_name: "血灵液", chance:0.015},
+            {item_name: "C1·能量核心", chance:0.017},
+            //160B
+        ],
+    });
+    enemy_templates["奥术大师"] = new Enemy({
+        name: "奥术大师", 
+        description: "守序邪恶：还记得376F的六边形红宝石吗？让你不看地图就吃六边形黄宝石……", 
+        xp_value: 32951280099, 
+        rank: 4206,
+        image: "image/enemy/E4206.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶</b></span>",
+        size: "small",
+        spec: [0,12,60],
+        tags: [],
+        stats: {health: 500e8, attack: 900e8, agility:600e8, attack_speed: 1.6, defense:540e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.01},
+            {item_name: "C1·能量核心", chance:0.03},
+            {item_name: "远古碎片", chance:0.015},
+            {item_name: "中等进化结晶碎片", chance:0.002},
+            //160B
+        ],
+    });
+    
+    enemy_templates["绿原蜂后"] = new Enemy({
+        name: "绿原蜂后", 
+        description: "上一个叫绿原的是不是1-3那个老登？难道他真是隐藏的高手……", 
+        xp_value: 53316291173 , 
+        rank: 4207,
+        image: "image/enemy/E4207.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        spec: [8,31],
+        spec_value:{8:10},
+        tags: [],
+        stats: {health: 20800e8, attack: 1040e8, agility:600e8, attack_speed: 1.6, defense:520e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.015},
+            {item_name: "血灵液", chance:0.035},
+            //280B
+        ],
+    });
+    enemy_templates["燕岗威武小队"] = new Enemy({
+        name: "燕岗威武小队", 
+        description: "比起迅捷的攻击更擅长吸引火力的小队。当然在这里只能算路边一条了。", 
+        xp_value: 29712150730, 
+        rank: 4208,
+        image: "image/enemy/E4208.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 [x10]</b></span>",
+        size: "small",
+        spec: [5,61],
+        tags: [],
+        stats: {health: 13000e8, attack: 570e8, agility: 350e8, attack_speed: 1.5, defense:290e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.005},
+            {item_name: "城门之星", chance:0.01},
+            {item_name: "远古碎片", chance:0.01},
+            //90B
+        ],
+    });
+    enemy_templates["绿原守灵人"] = new Enemy({
+        name: "绿原守灵人", 
+        description: "按理来说50%光环应该是血量光环之类的。但是忘记做这个了！摸了！", 
+        xp_value: 53316291173 , 
+        rank: 4209,
+        image: "image/enemy/E4209.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 10800e8, attack: 960e8, agility:760e8, attack_speed: 1.6, defense:640e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.015},
+            {item_name: "草木之芯", chance:0.03},
+            //280B
+        ],
+    });
+    enemy_templates["燕岗钢铁战士"] = new Enemy({
+        name: "燕岗钢铁战士", 
+        description: "这下想起伊芙的好了吗？当然，做一套装备肯定是更值得的。", 
+        xp_value: 32951280099, 
+        rank: 4210,
+        image: "image/enemy/E4210.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶</b></span>",
+        size: "small",
+        spec: [63],
+        tags: [],
+        stats: {health: 10240e8, attack: 800e8, agility:600e8, attack_speed: 1.6, defense:400e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.01},
+            {item_name: "远古碎片", chance:0.015},
+            {item_name: "C1·能量核心", chance:0.025},
+            //160B
+        ],
+    });
+    enemy_templates["燕岗骑砍小队"] = new Enemy({
+        name: "燕岗骑砍小队", 
+        description: "用压倒性的攻击速度迫使敌人屈服的小队。你真的觉得混战还能占到便宜？", 
+        xp_value: 29712150730, 
+        rank: 4211,
+        image: "image/enemy/E4211.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 [x10]</b></span>",
+        size: "small",
+        spec: [5,61],
+        tags: [],
+        stats: {health: 7200e8, attack: 700e8, agility: 350e8, attack_speed: 3.6, defense:200e8}, //血量100x
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.005},
+            {item_name: "云霄宝肉", chance:0.008},
+            //90B
+        ],
+    });
+    enemy_templates["燕岗金甲战士"] = new Enemy({
+        name: "燕岗金甲战士", 
+        description: "爆攻，轻而易举啊……坏了!坏了坏了!!", 
+        xp_value: 32951280099, 
+        rank: 4212,
+        image: "image/enemy/E4212.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶</b></span>",
+        size: "small",
+        spec: [16,63],
+        tags: [],
+        stats: {health: 8410e8, attack: 740e8, agility:620e8, attack_speed: 1.6, defense:470e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.01},
+            {item_name: "远古碎片", chance:0.015},
+            {item_name: "血灵液", chance:0.01},
+            //160B
+        ],
+    });
+    enemy_templates["燕岗卫戍小队"] = new Enemy({
+        name: "燕岗卫戍小队", 
+        description: "偏重防御阵法的小队……bro觉得360e防御在4-2老强了。", 
+        xp_value: 29712150730, 
+        rank: 4213,
+        image: "image/enemy/E4213.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 [x10]</b></span>",
+        size: "small",
+        spec: [61],
+        tags: [],
+        stats: {health: 1690e8, attack: 720e8, agility: 350e8, attack_speed: 1.8, defense:360e8}, //血量100x
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.005},
+            {item_name: "血灵液", chance:0.012},
+            //90B
+        ],
+    });
+    enemy_templates["燕岗暮年强者"] = new Enemy({
+        name: "燕岗暮年强者", 
+        description: "反正时日无多，为何不为了家族最后再拼一把？但你的防御也太低了吧。", 
+        xp_value: 32951280099, 
+        rank: 4214,
+        image: "image/enemy/E4214.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶</b></span>",
+        size: "small",
+        spec: [20],
+        tags: [],
+        stats: {health: 19200e8, attack: 650e8, agility:650e8, attack_speed: 1.6, defense:200e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.01},
+            {item_name: "草木之芯", chance:0.01},
+            {item_name: "远古碎片", chance:0.01},
+            //160B
+        ],
+    });
+    enemy_templates["燕岗精英铁卫"] = new Enemy({
+        name: "燕岗精英铁卫", 
+        description: "你确定你是精英？卫兵测试强度的方法不会是站着挨打吧。", 
+        xp_value: 32951280099, 
+        rank: 4215,
+        image: "image/enemy/E4215.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 24900e8, attack: 690e8, agility:550e8, attack_speed: 1.6, defense:380e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.01},
+            {item_name: "远古碎片", chance:0.025},
+            //160B
+        ],
+    });
+    enemy_templates["燕岗名流商人"] = new Enemy({
+        name: "燕岗名流商人", 
+        description: "【求援】实在太难做了。RPG的【败移】反而更加适应这样的特性……那就直接用！对了，掉落是它招来的杂兵掉的。", 
+        xp_value: 53316291173 , 
+        rank: 4216,
+        image: "image/enemy/E4216.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        spec: [60],
+        tags: [],
+        stats: {health: 12600e8, attack: 1080e8, agility:650e8, attack_speed: 1.6, defense:480e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.015},
+            {item_name: "云霄宝肉", chance:0.012},
+            {item_name: "草木之芯", chance:0.015},
+            {item_name: "中等进化结晶碎片", chance:0.0025},
+            //280B
+        ],
+    });
+    enemy_templates["燕岗江洋大盗"] = new Enemy({
+        name: "燕岗江洋大盗", 
+        description: "清野江窃贼之所以改名了，不是因为混不下去了，而是因为太强了可以满燕岗领抢劫了。", 
+        xp_value: 53316291173 , 
+        rank: 4217,
+        image: "image/enemy/E4217.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        spec: [46,47],
+        tags: [],
+        stats: {health: 10500e8, attack: 1100e8, agility:720e8, attack_speed: 1.6, defense:605e8}, //血量100%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.015},
+            {item_name: "C1·能量核心", chance:0.02},
+            {item_name: "远古碎片", chance:0.03},
+            {item_name: "血灵液", chance:0.01},
+            //280B
+        ],
+    });
+    enemy_templates["燕岗战法小队"] = new Enemy({
+        name: "燕岗战法小队", 
+        description: "谁给他报的名？看来是趁着警戒哨被干掉，从城门战跑过来的。", 
+        xp_value: 29712150730 , 
+        rank: 4301,
+        image: "image/enemy/E4301.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 [x10]</b></span>",
+        size: "small",
+        spec: [61,0,3],
+        tags: [],
+        stats: {health: 12000e8, attack: 200e8, agility:200e8, attack_speed: 1.8, defense:200e8}, //血量200%
+        loot_list: [
+            {item_name: "神话黄宝石", chance:0.015},
+            {item_name: "血灵液", chance:0.015},
+            //90B
+            //
+        ],
+    });
+    enemy_templates["毛茸茸绅士"] = new Enemy({
+        name: "毛茸茸绅士", 
+        description: "和之前那些会被钱贿赂的家伙不同，它看到你钱越多，就越想杀人夺宝……", 
+        xp_value: 53316291173 , 
+        rank: 4302,
+        image: "image/enemy/E4302.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [18,39],
+        spec_value:{18:-500e15,39:1000e16},
+        stats: {health: 25000e8, attack: 1090e8, agility:760e8, attack_speed: 1.6, defense:650e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.005},
+            {item_name: "爆燃粉末", chance:0.021},
+            //280B
+        ],
+    });
+    enemy_templates["驯兽地龙"] = new Enemy({
+        name: "驯兽地龙", 
+        description: "被当做驯兽培育之后已经毫不逊色于一般飞龙的地龙。就是领悟这东西灌不出来，所以还在这样的等级。", 
+        xp_value: 53316291173 , 
+        rank: 4303,
+        image: "image/enemy/E4303.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [16],
+        stats: {health: 45000e8, attack: 1600e8, agility:800e8, attack_speed: 1.6, defense:720e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.005},
+            {item_name: "远古碎片", chance:0.02},
+            {item_name: "血灵液", chance:0.02},
+            //280B
+        ],
+    });
+    enemy_templates["驯兽养殖者"] = new Enemy({
+        name: "驯兽养殖者", 
+        description: "虽然看起来狰狞可怖，但那些只是虫类驯兽而已。除却立场不同，它并不能算是坏人。", 
+        xp_value: 53316291173 , 
+        rank: 4304,
+        image: "image/enemy/E4304.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [60],
+        stats: {health: 17000e8, attack: 2250e8, agility:850e8, attack_speed: 1.6, defense:750e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.005},
+            {item_name: "中等进化结晶碎片", chance:0.003},
+            {item_name: "云霄级魂魄", chance:0.014},
+            //280B
+        ],
+    });
+    enemy_templates["燕岗巨斧斗士"] = new Enemy({
+        name: "燕岗巨斧斗士", 
+        description: "巨斧武者不应该起码是同境的九阶吗？好吧，看来他只是有一把大斧头。", 
+        xp_value: 53316291173 , 
+        rank: 4305,
+        image: "image/enemy/E4305.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [22,32],
+        stats: {health: 23120e8, attack: 880e8, agility:900e8, attack_speed: 1.6, defense:576e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.005},
+            {item_name: "琥珀金骨", chance:0.011},
+            //280B
+        ],
+    });
+    enemy_templates["燕岗双剑小队"] = new Enemy({
+        name: "燕岗双剑小队", 
+        description: "之前几个小队的连击数都超高的。双剑大概是十个人用2把剑~", 
+        xp_value: 125862690250 , 
+        rank: 4306,
+        image: "image/enemy/E4306.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶 [x10]</b></span>",
+        size: "small",
+        tags: [],
+        spec: [3],
+        stats: {health: 55000e8, attack: 1950e8, agility:1400e8, attack_speed: 1.6, defense:1100e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.012},
+            {item_name: "云霄级魂魄", chance:0.023},
+            //500B
+        ],
+    });
+    enemy_templates["燕岗大剑战士"] = new Enemy({
+        name: "燕岗大剑战士", 
+        description: "散华也是时候该加强了。喵可血量都叠成啥样了啊！", 
+        xp_value: 53316291173, 
+        rank: 4307,
+        image: "image/enemy/E4307.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [37,7],
+        stats: {health: 21000e8, attack: 1400e8, agility:960e8, attack_speed: 1.6, defense:600e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.005},
+            {item_name: "琥珀金骨", chance:0.016},
+            //280B
+        ],
+    });
+    enemy_templates["燕岗城警戒哨"] = new Enemy({
+        name: "燕岗城警戒哨", 
+        description: "时封被各种倍率怎么也变成路边一条了！平衡啊——", 
+        xp_value: 53316291173, 
+        rank: 4308,
+        image: "image/enemy/E4308.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [12],
+        stats: {health: 17600e8, attack: 1400e8, agility:960e8, attack_speed: 1.6, defense:600e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.005},
+            {item_name: "爆燃粉末", chance:0.01},
+            {item_name: "远古碎片", chance:0.018},
+            //280B
+        ],
+    });
+    enemy_templates["独行双剑侠"] = new Enemy({
+        name: "独行双剑侠", 
+        description: "双剑小队的攻速想必就是您抢走的了。比火烧云还多一段！", 
+        xp_value: 53316291173, 
+        rank: 4309,
+        image: "image/enemy/E4309.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [33],
+        spec_value:{33:7},
+        stats: {health: 6400e8, attack: 1600e8, agility:1000e8, attack_speed: 1.1, defense:800e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.005},
+            {item_name: "血灵液", chance:0.02},
+            {item_name: "灵红补给品", chance:0.006},
+            //280B
+        ],
+    });
+    enemy_templates["诡计披甲人"] = new Enemy({
+        name: "诡计披甲人", 
+        description: "人到齐了吗？齐了我就开溜了(^^)", 
+        xp_value: 53316291173, 
+        rank: 4310,
+        image: "image/enemy/E4310.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [60],
+        stats: {health: 33620e8, attack: 1764e8, agility:1060e8, attack_speed: 1.0, defense:900e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.005},
+            {item_name: "琥珀金骨", chance:0.016},
+            //280B
+        ],
+    });
+    enemy_templates["自守的斗士"] = new Enemy({
+        name: "自守的斗士", 
+        description: "同样是900亿防御，有的人1764亿攻满脑子都是逃跑，有的人1450亿攻却勇往直前……", 
+        xp_value: 53316291173, 
+        rank: 4311,
+        image: "image/enemy/E4311.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [60],
+        stats: {health: 54000e8, attack: 1450e8, agility:1120e8, attack_speed: 1.8, defense:900e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.005},
+            {item_name: "爆燃粉末", chance:0.010},
+            {item_name: "琥珀金骨", chance:0.012},
+            //280B
+        ],
+    });
+    enemy_templates["燕岗杖剑大队"] = new Enemy({
+        name: "燕岗杖剑大队", 
+        description: "其实图片里的敌人数量暗示的是敌人实际数量的位数(逃).经验看起来很多，但云霄级瓶颈会帮你吃了，然后压级再吃80%~", 
+        xp_value: 297121507300, 
+        rank: 4312,
+        image: "image/enemy/E4312.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 [x100]</b></span>",
+        size: "small",
+        tags: [],
+        spec: [64,37],
+        stats: {health: 95000e8, attack: 1650e8, agility:1200e8, attack_speed: 1.6, defense:1050e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.012},
+            {item_name: "血灵液", chance:0.078},
+            //500B
+        ],
+    });
+    enemy_templates["茸茸魔导师"] = new Enemy({
+        name: "茸茸魔导师", 
+        description: "这下知道为什么要把神话宝石的生命倍率提高了吧！至于头几十颗都加的血……不要在意这些细节。", 
+        xp_value: 86267571272, 
+        rank: 4313,
+        image: "image/enemy/E4313.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶</b></span>",
+        size: "small",
+        tags: [],
+        spec: [54,0],
+        stats: {health: 192200e8, attack: 1690e8, agility:1280e8, attack_speed: 1.6, defense:1260e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.012},
+            {item_name: "灵红补给品", chance:0.014},
+            //500B
+        ],
+    });
+    enemy_templates["燕岗城巡逻哨"] = new Enemy({
+        name: "燕岗城巡逻哨", 
+        description: "听起来[巡逻]的级别不如[警戒]，但我说监考老师和巡考老师，大家就可以听懂了。", 
+        xp_value: 86267571272, 
+        rank: 4314,
+        image: "image/enemy/E4314.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶</b></span>",
+        size: "small",
+        tags: [],
+        spec: [10,5],
+        stats: {health: 72000e8, attack: 1849e8, agility:1360e8, attack_speed: 1.6, defense:1200e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.012},
+            {item_name: "云霄级魂魄", chance:0.023},
+            //500B
+        ],
+    });
+    enemy_templates["燕岗壁垒大队"] = new Enemy({
+        name: "燕岗壁垒大队", 
+        description: "(纱雪翻阅399层的样子)(大失所望)。这样天赋异禀的家伙不在boss战太可惜了……", 
+        xp_value: 297121507300, 
+        rank: 4315,
+        image: "image/enemy/E4315.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 [x100]</b></span>",
+        size: "small",
+        tags: [],
+        spec: [64],
+        stats: {health: 14400e8, attack: 2500e8, agility:1440e8, attack_speed: 1.6, defense:1500e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.012},
+            {item_name: "远古碎片", chance:0.10},
+            //500B
+        ],
+    });
+    enemy_templates["奸诈的恶棍"] = new Enemy({
+        name: "奸诈的恶棍", 
+        description: "坏了……我都计划好把求援换成败移了。也没人告诉过我这两个可以共存啊！那给你补个2连击吧。", 
+        xp_value: 86267571272, 
+        rank: 4316,
+        image: "image/enemy/E4316.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶</b></span>",
+        size: "small",
+        tags: [],
+        spec: [60,3],
+        stats: {health: 145800e8, attack: 2401e8, agility:1520e8, attack_speed: 1.6, defense:1200e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.012},
+            {item_name: "灵红补给品", chance:0.016},
+            //500B
+        ],
+    });
+    enemy_templates["燕岗魔力大队"] = new Enemy({
+        name: "燕岗魔力大队", 
+        description: "攻击这么高和魔攻居然是兼得的……这就是大队的实力吗？", 
+        xp_value: 480752697600, 
+        rank: 4317,
+        image: "image/enemy/E4317.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 + [x100]</b></span>",
+        size: "small",
+        tags: [],
+        spec: [64,0],
+        stats: {health: 42000e8, attack: 2200e8, agility:1600e8, attack_speed: 1.6, defense:1400e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.012},
+            {item_name: "中等进化结晶碎片", chance:0.005},
+            {item_name: "爆燃粉末", chance:0.035},
+            //500B
+        ],
+    });
+    enemy_templates["隐秘行刺者"] = new Enemy({
+        name: "隐秘行刺者", 
+        description: "什么你要和我抢资源?捅死你喵(DMG 50x)捅死你喵(DMG 50x)捅死你喵(DMG 50x)。", 
+        xp_value: 86267571272, 
+        rank: 4318,
+        image: "image/enemy/E4318.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶</b></span>",
+        size: "small",
+        tags: [],
+        spec: [40],
+        stats: {health: 51680e8, attack: 2584e8, agility:1680e8, attack_speed: 1.6, defense:1597e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.012},
+            {item_name: "琥珀金骨", chance:0.022},
+            //500B
+        ],
+    });
+    enemy_templates["公正的袍师"] = new Enemy({
+        name: "公正的袍师", 
+        description: "160倍血/防比起当年的60倍的蓝帽小怪都强了！虽然也有一部分原因是小怪的血量倍率一直在加啦……", 
+        xp_value: 86267571272, 
+        rank: 4319,
+        image: "image/enemy/E4319.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶</b></span>",
+        size: "small",
+        tags: [],
+        spec: [42],
+        stats: {health: 200000e8, attack: 2500e8, agility:1680e8, attack_speed: 1.6, defense:1250e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.012},
+            {item_name: "中等进化结晶碎片", chance:0.005},
+            {item_name: "云霄级魂魄", chance:0.03},
+            //500B
+        ],
+    });
+    enemy_templates["燕岗全职大队"] = new Enemy({
+        name: "燕岗全职大队", 
+        description: "报——我们队里面100个人有40个都在释放硬化魔法！攻击比隔壁不硬化的差了好多啊！！", 
+        xp_value: 480752697600, 
+        rank: 4320,
+        image: "image/enemy/E4320.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 + [x100]</b></span>",
+        size: "small",
+        tags: [],
+        spec: [64,0,63],
+        stats: {health: 42000e8, attack: 1200e8, agility:1560e8, attack_speed: 1.6, defense:1400e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.012},
+            {item_name: "琥珀金骨", chance:0.024},
+            //500B
+        ],
+    });
+    enemy_templates["青年天才"] = new Enemy({
+        name: "青年天才", 
+        description: "凌弱？百方真的转世了？！虽然云霄级毕竟寿命10纪元，理论上3纪元以下都是青年……但1纪元还没到五阶基本这辈子无缘领域级了。", 
+        xp_value: 86267571272, 
+        rank: 4321,
+        image: "image/enemy/E4321.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶</b></span>",
+        size: "small",
+        tags: [],
+        spec: [34],
+        stats: {health: 160000e8, attack: 2400e8, agility:2000e8, attack_speed: 1.6, defense:1750e8}, //血量200%
+        loot_list: [
+            {item_name: "神话蓝宝石", chance:0.012},
+            {item_name: "云霄级魂魄", chance:0.035},
+            //500B
+        ],
+    });
+    enemy_templates["青衣卫巫小队"] = new Enemy({
+        name: "青衣卫巫小队", 
+        description: "这都多少区了哇。终于有人意识到法师可以给战士回血了……1.5阶战斗力呢！这可是！", 
+        xp_value: 329512800990, 
+        rank: 4401,
+        image: "image/enemy/E4401.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 [x10]</b></span>",
+        size: "small",
+        tags: [],
+        spec: [34],
+        stats: {health: 660000e8, attack: 5200e8, agility:3000e8, attack_speed: 1.8, defense:1900e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.010},
+            {item_name: "C1·能量核心", chance:0.10},
+            {item_name: "魔力布匹", chance:0.011},
+            //900B
+        ],
+    });
+    enemy_templates["青茸茸将军"] = new Enemy({
+        name: "青茸茸将军", 
+        description: "只会求援的它是怎么混上将军的……还是说，它其实是斥候型角色？", 
+        xp_value: 86267571272, 
+        rank: 4402,
+        image: "image/enemy/E4402.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶</b></span>",
+        size: "small",
+        tags: [],
+        spec: [60],
+        stats: {health: 660000e8, attack: 3450e8, agility:2150e8, attack_speed: 1.8, defense:1700e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.003},
+            {item_name: "魔力布匹", chance:0.009},
+            //500B
+        ],
+    });
+    enemy_templates["青鬼八爪鱼"] = new Enemy({
+        name: "青鬼八爪鱼", 
+        description: "偷袭……让你把我的同族做成结界湖血肉！这下知道错了吧？", 
+        xp_value: 86267571272, 
+        rank: 4403,
+        image: "image/enemy/E4403.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶</b></span>",
+        size: "small",
+        tags: [],
+        spec: [48],
+        spec_value: {48:36e8},
+        stats: {health: 240000e8, attack: 4300e8, agility:2300e8, attack_speed: 1.8, defense:1200e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.003},
+            {item_name: "极冰骨髓", chance:0.007},
+            //500B
+        ],
+    });
+    enemy_templates["红仆小恶魔"] = new Enemy({
+        name: "红仆小恶魔", 
+        description: "不就是牵制？看我随手拿捏……不对！这是什么啊啊啊！！", 
+        xp_value: 86267571272, 
+        rank: 4404,
+        image: "image/enemy/E4404.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶</b></span>",
+        size: "small",
+        tags: [],
+        spec: [5,62],
+        stats: {health: 700000e8, attack: 2900e8, agility:2450e8, attack_speed: 1.8, defense:1600e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.003},
+            {item_name: "残破兽铠", chance:0.011},
+            //500B
+        ],
+    });
+    enemy_templates["红角茸茸"] = new Enemy({
+        name: "红角茸茸", 
+        description: "看看青茸茸将军都招到了些什么兵。真是一对……算了，直接吃吧。", 
+        xp_value: 86267571272, 
+        rank: 4405,
+        image: "image/enemy/E4405.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶</b></span>",
+        size: "small",
+        tags: [],
+        spec: [],
+        stats: {health: 600000e8, attack: 3200e8, agility:2600e8, attack_speed: 1.8, defense:1900e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.003},
+            {item_name: "爆燃粉末", chance:0.02},
+            {item_name: "残破兽铠", chance:0.005},
+            //500B
+        ],
+    });
+    enemy_templates["天青驯兽"] = new Enemy({
+        name: "天青驯兽", 
+        description: "【驯兽养殖者】，你的眼睛究竟看到了多远？还是说这货背叛了你罢了。", 
+        xp_value: 139583862445, 
+        rank: 4406,
+        image: "image/enemy/E4406.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [],
+        stats: {health: 369800e8, attack: 3969e8, agility:2750e8, attack_speed: 1.8, defense:2400e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.010},
+            {item_name: "极冰骨髓", chance:0.007},
+            {item_name: "魔力布匹", chance:0.007},
+            //900B
+        ],
+    });
+    enemy_templates["飞飞茸茸"] = new Enemy({
+        name: "飞飞茸茸", 
+        description: "飞起来~打断你愉快的攻击体验！", 
+        xp_value: 139583862445, 
+        rank: 4407,
+        image: "image/enemy/E4407.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [66],
+        stats: {health: 1000000e8, attack: 4300e8, agility:2900e8, attack_speed: 1.8, defense:2100e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.010},
+            {item_name: "C1·能量核心", chance:0.15},
+            {item_name: "爆燃粉末", chance:0.04},
+            //900B
+        ],
+    });
+    enemy_templates["青面大侠"] = new Enemy({
+        name: "青面大侠", 
+        description: "没有突破真是屈才了。这种强者就算突破了应该也有一个加号才对诶。", 
+        xp_value: 225851433717, 
+        rank: 4408,
+        image: "image/enemy/E4408.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶 ++</b></span>",
+        size: "small",
+        tags: [],
+        spec: [0],
+        stats: {health: 250000e8, attack: 3025e8, agility:3450e8, attack_speed: 1.8, defense:3025e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.03},
+            {item_name: "魔力布匹", chance:0.01},
+            {item_name: "燃血鲜花", chance:0.007},
+            //1.6U
+        ],
+    });
+    enemy_templates["红邪鬼随从商"] = new Enemy({
+        name: "红邪鬼随从商", 
+        description: "按理来说该有只叫红邪鬼的小BOSS的。打过4-4-2就解锁……", 
+        xp_value: 139583862445, 
+        rank: 4409,
+        image: "image/enemy/E4409.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [5,60],
+        stats: {health: 1400000e8, attack: 4000e8, agility:3050e8, attack_speed: 1.8, defense:1800e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.010},
+            {item_name: "残破兽铠", chance:0.015},
+            {item_name: "燃血鲜花", chance:0.002},
+            //900B
+        ],
+    });
+    enemy_templates["绯红剑侍"] = new Enemy({
+        name: "绯红剑侍", 
+        description: "血牛越来越多了！不过这个特殊属性……实在不行咱学个固定1.5倍普攻倍率的【撕裂】咋样？", 
+        xp_value: 139583862445, 
+        rank: 4410,
+        image: "image/enemy/E4410.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [67],
+        stats: {health: 3999600e8, attack: 5300e8, agility:3200e8, attack_speed: 1.8, defense:2100e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.010},
+            {item_name: "燃血鲜花", chance:0.006},
+            //900B
+        ],
+    });
+    enemy_templates["青衣魔法使"] = new Enemy({
+        name: "青衣魔法使", 
+        description: "魔塔玩家辛辛苦苦救出来的公主就这样来到战场上了。真是可悲可叹的结局。", 
+        xp_value: 139583862445, 
+        rank: 4411,
+        image: "image/enemy/E4411.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [49,62],
+        spec_value:{49:{rnd:1000,hp:540e8}},
+        stats: {health: 1260000e8, attack: 6100e8, agility:3350e8, attack_speed: 1.8, defense:2700e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.010},
+            {item_name: "魔力布匹", chance:0.015},
+            //900B
+        ],
+    });
+    enemy_templates["难缠的红蝙蝠"] = new Enemy({
+        name: "难缠的红蝙蝠", 
+        description: "如果实在觉得这东西太离谱，就回去吃点牵制书吧……指定会有用的。", 
+        xp_value: 139583862445, 
+        rank: 4412,
+        image: "image/enemy/E4412.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [52,54],
+        stats: {health: 2440000e8, attack: 9000e8, agility:3500e8, attack_speed: 1.8, defense:1e4}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.010},
+            {item_name: "残破兽铠", chance:0.020},
+            //900B
+        ],
+    });
+    enemy_templates["深红毒蛇刺剑"] = new Enemy({
+        name: "深红毒蛇刺剑", 
+        description: "无情的防御力检测bot。一般区域里面这种家伙可以给到夯，滚去-4了，但这里是机制怪横飞的4-4，所以4-4-3去吧~", 
+        xp_value: 139583862445, 
+        rank: 4413,
+        image: "image/enemy/E4413.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [20],
+        stats: {health: 1680000e8, attack: 3600e8, agility:3650e8, attack_speed: 1.8, defense:3250e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.010},
+            {item_name: "残破兽铠", chance:0.015},
+            {item_name: "爆燃粉末", chance:0.012},
+            //900B
+        ],
+    });
+    enemy_templates["蛮血枭蝎"] = new Enemy({
+        name: "蛮血枭蝎", 
+        description: "成也散华，败也散华。原版散华在4幕已经没法玩了啦……", 
+        xp_value: 225851433717, 
+        rank: 4414,
+        image: "image/enemy/E4414.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶 ++</b></span>",
+        size: "small",
+        tags: [],
+        spec: [68,54],//散华·改
+        stats: {health: 2500000e8, attack: 5400e8, agility:3800e8, attack_speed: 1.8, defense:3300e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.03},
+            {item_name: "燃血鲜花", chance:0.012},
+            //1.6U
+        ],
+    });
+    enemy_templates["冰霜骸骨"] = new Enemy({
+        name: "冰霜骸骨", 
+        description: "给你8100亿的攻防和，希望你能撑过这个冬天。", 
+        xp_value: 139583862445, 
+        rank: 4415,
+        image: "image/enemy/E4415.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [50],
+        spec_value:{50:81e8},
+        stats: {health: 11000e8, attack: 10500e8, agility:3950e8, attack_speed: 1.8, defense:3300e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.010},
+            {item_name: "极冰骨髓", chance:0.015},
+            //900B
+        ],
+    });
+    enemy_templates["蓝泽追光者"] = new Enemy({
+        name: "蓝泽追光者", 
+        description: "这里……真的是……我等应当涉足之地吗……", 
+        xp_value: 225851433717, 
+        rank: 4416,
+        image: "image/enemy/E4416.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶 ++</b></span>",
+        size: "small",
+        tags: [],
+        spec: [31,40],
+        stats: {health: 180000e8, attack: 7200e8, agility:4100e8, attack_speed: 1.8, defense:4000e8}, //血量200%
+        loot_list: [
+            {item_name: "神话红宝石", chance:0.03},
+            {item_name: "魔力布匹", chance:0.02},
+            {item_name: "极冰骨髓", chance:0.006},
+            //1.6U
+        ],
+    });
+    enemy_templates["亮青水晶"] = new Enemy({
+        name: "亮青水晶", 
+        description: "较为脆弱的增幅水晶。【血峰限制器】的重要材料…", 
+        xp_value: 225851433717, 
+        rank: 4501,
+        image: "image/enemy/E4501.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        spec: [11],
+        stats: {health: 1e8, attack: 1e8, agility:1e8, attack_speed: 0.1, defense:6300e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.003},
+            {item_name: "亮青碎片", chance:0.018},
+            //1.6U
+        ],
+    });
+    enemy_templates["鲜红水晶"] = new Enemy({
+        name: "鲜红水晶", 
+        description: "较为坚韧的增幅水晶。【血峰增幅器】的重要材料…", 
+        xp_value: 365435296162, 
+        rank: 4502,
+        image: "image/enemy/E4502.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶 +</b></span>",
+        spec: [11],
+        stats: {health: 1e8, attack: 1e8, agility:1e8, attack_speed: 0.1, defense:8888e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.010},
+            {item_name: "鲜红碎片", chance:0.022},
+            //2.8U
+        ],
+    });
+    enemy_templates["翩然蝶仙"] = new Enemy({
+        name: "翩然蝶仙", 
+        description: "没有黑化的【红邪鬼】。吹火掌没了瞬间变成路边一条了哇……迟早得学学这个技能！", 
+        rank: 4503,
+        xp_value: 225851433717, 
+        image: "image/enemy/E4503.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        spec: [30],
+        spec_value:{30:1},
+        stats: {health: 52.56e12, attack: 13140e8, agility:4500e8, attack_speed: 1.8, defense:5200e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.003},
+            {item_name: "C4·能量核心", chance:0.015},
+            {item_name: "鲜红碎片", chance:0.006},
+            //1.6U
+        ],
+    });
+    enemy_templates["红宝石近卫"] = new Enemy({
+        name: "红宝石近卫", 
+        description: "我们仍未知道什么红宝石盾牌的防御力如此强悍。但或许这是类似黄金-蓝玉-紫晶一类修炼体系的后续名称呢？", 
+        rank: 4504,
+        xp_value: 225851433717, 
+        image: "image/enemy/E4504.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        spec: [],
+        stats: {health: 144e12, attack: 9400e8, agility:4750e8, attack_speed: 1.8, defense:5500e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.003},
+            {item_name: "灰暗军魂", chance:0.005},
+            {item_name: "鲜红碎片", chance:0.008},
+            //1.6U
+        ],
+    });
+    enemy_templates["心火红茸茸"] = new Enemy({
+        name: "心火红茸茸", 
+        description: "改版的惑幻一般还是能发挥出应有效果的……这小身板，三回合还没过去就暴毙了，就少吃伤害了！", 
+        rank: 4505,
+        xp_value: 225851433717, 
+        image: "image/enemy/E4505.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        spec: [13,27],
+        stats: {health: 21.6e12, attack: 9000e8, agility:5000e8, attack_speed: 1.8, defense:5400e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.003},
+            {item_name: "C4·能量核心", chance:0.022},
+            {item_name: "血凝晶", chance:0.005},
+            //1.6U
+        ],
+    });
+    enemy_templates["报春红食人花"] = new Enemy({
+        name: "报春红食人花", 
+        description: "春天来了，又到了探险者随机刷新的季节~这种探险者最好骗了，以为有天材地宝就冲过来了。", 
+        rank: 4506,
+        xp_value: 225851433717, 
+        image: "image/enemy/E4506.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        spec: [7],
+        stats: {health: 26.66e12, attack: 11560e8, agility:5250e8, attack_speed: 1.8, defense:5750e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.003},
+            {item_name: "血凝晶", chance:0.011},
+            //1.6U
+        ],
+    });
+    enemy_templates["红角邪恶触触"] = new Enemy({
+        name: "红角邪恶触触", 
+        description: "如果碰到有这种特殊属性的BOSS可以临时切个花海……但小怪就不用了吧！", 
+        rank: 4507,
+        xp_value: 225851433717, 
+        image: "image/enemy/E4507.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        spec: [69],
+        stats: {health: 192e12, attack: 1e8, agility:5500e8, attack_speed: 1.8, defense:5550e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.003},
+            {item_name: "亮青碎片", chance:0.020},
+            //1.6U
+        ],
+    });
+    enemy_templates["炽热幽闻藤"] = new Enemy({
+        name: "炽热幽闻藤", 
+        xp_value: 225851433717, 
+        description: "嘻嘻，这给吹火掌偷加攻速，多是一件美事哇。", 
+        rank: 4508,
+        image: "image/enemy/E4508.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        spec: [66],
+        stats: {health: 44e12, attack: 10500e8, agility:5750e8, attack_speed: 2.1, defense:4000e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.003},
+            {item_name: "鲜红碎片", chance:0.014},
+            //1.6U
+        ],
+    });
+    enemy_templates["大眼烧烤鱼"] = new Enemy({
+        name: "大眼烧烤鱼",
+        xp_value: 225851433717, 
+        description: "依托于精血途径变强的大眼八爪鱼。至少血肉能量驳杂无用，不会和结界湖里那样被挖走肉了……", 
+        rank: 4509,
+        image: "image/enemy/E4509.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        spec: [67],
+        stats: {health: 217.8e12, attack: 11000e8, agility:6000e8, attack_speed: 1.8, defense:3000e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.003},
+            {item_name: "血凝晶", chance:0.007},
+            {item_name: "C4·能量核心", chance:0.016},
+            //1.6U
+        ],
+    });
+    enemy_templates["红甲射箭小队"] = new Enemy({
+        name: "红甲射箭小队",
+        xp_value: 225851433717, 
+        description: "所以，你是说你们十个云霄4合起来还是云霄4战力?明明就是趁着一只闪避的时候剩下9只放箭吧！然后一只死掉9只溜走……", 
+        rank: 4510,
+        image: "image/enemy/E4510.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶 [x10?]</b></span>",
+        spec: [60,29,61],
+        spec_value:{29:1e12},
+        stats: {health: 95e12, attack: 9500e8, agility:6250e8, attack_speed: 1.8, defense:4200e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.003},
+            {item_name: "灰暗军魂", chance:0.006},
+            {item_name: "鲜红碎片", chance:0.010},
+            //1.6U
+        ],
+    });
+    enemy_templates["灰暗双剑小队"] = new Enemy({
+        name: "灰暗双剑小队",
+        xp_value: 533162911730, 
+        description: "来自【灰暗领】战场的强者们，信奉唯快不破的神话。这才算有点小队的样子……越两级外加一个加号！", 
+        rank: 4511,
+        image: "image/enemy/E4511.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 + [x10]</b></span>",
+        spec: [6,61],
+        spec_value:{29:1e12},
+        stats: {health: 130e12, attack: 14000e8, agility:6500e8, attack_speed: 1.8, defense:6000e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.01},
+            {item_name: "灰暗军魂", chance:0.016},
+            {item_name: "亮青碎片", chance:0.015},
+            //2.8U
+        ],
+    });
+    enemy_templates["红野人战士"] = new Enemy({
+        name: "红野人战士",
+        xp_value: 225851433717, 
+        description: "似乎是某种量产型改造战士，能力全面。在同阶实力中规中矩。", 
+        rank: 4512,
+        image: "image/enemy/E4512.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        spec: [3],
+        stats: {health: 273.8e12, attack: 9300e8, agility:6750e8, attack_speed: 1.8, defense:4900e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.003},
+            {item_name: "C4·能量核心", chance:0.010},
+            {item_name: "鲜红碎片", chance:0.008},
+            //1.6U
+        ],
+    });
+    enemy_templates["品红野人战士"] = new Enemy({
+        name: "品红野人战士",
+        xp_value: 365435296162, 
+        description: "似乎是某种量产型改造战士，侧重暴力进攻。在同阶实力较强。", 
+        rank: 4513,
+        image: "image/enemy/E4513.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶 +</b></span>",
+        spec: [6],
+        stats: {health: 300e12, attack: 12000e8, agility:7000e8, attack_speed: 1.8, defense:1e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.010},
+            {item_name: "C4·能量核心", chance:0.020},
+            {item_name: "鲜红碎片", chance:0.012},
+            //2.8U
+        ],
+    });
+    enemy_templates["树莓龙勇士"] = new Enemy({
+        name: "树莓龙勇士",
+        xp_value: 225851433717, 
+        description: "你……哪来的自信把喵可捕捉来的？和污染敌人池子有什么区别……", 
+        rank: 4514,
+        image: "image/enemy/E4514.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        spec: [3],
+        stats: {health: 222e12, attack: 12250e8, agility:7250e8, attack_speed: 1.8, defense:4400e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.003},
+            {item_name: "灰暗军魂", chance:0.014},
+            //1.6U
+        ],
+    });
+    enemy_templates["鲑红腐殖质"] = new Enemy({
+        name: "鲑红腐殖质",
+        xp_value: 365435296162, 
+        description: "呜……这片大青王领地是地狱吗……怎么那么多恐怖的血肉生物……敏捷不足就会被顷刻间吞噬。", 
+        rank: 4515,
+        image: "image/enemy/E4515.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶 +</b></span>",
+        spec: [21,54],
+        spec_value:{21:9000e8},
+        stats: {health: 2000e12, attack: 12250e8, agility:7500e8, attack_speed: 1.8, defense:4400e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.010},
+            {item_name: "血凝晶", chance:0.012},
+            {item_name: "C4·能量核心", chance:0.020},
+            //2.8U
+        ],
+    });
+    enemy_templates["红巨人番队"] = new Enemy({
+        name: "红巨人番队",
+        xp_value: 1258626902500, 
+        description: "一大片乌泱泱的巨人之海。攻击看似疼，实则一点也不轻松。", 
+        rank: 4516,
+        image: "image/enemy/E4516.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶 [x100]</b></span>",
+        spec: [64,26],
+        stats: {health: 304.2e12, attack: 12800e8, agility:7750e8, attack_speed: 1.8, defense:6500e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.010},
+            {item_name: "灰暗军魂", chance:0.024},
+            //2.8U
+        ],
+    });
+    enemy_templates["撼瀚野熊"] = new Enemy({
+        name: "撼瀚野熊",
+        xp_value: 591286729879, 
+        description: "按照攻防和标准你可以定3+巅峰/4+初期了……但血太薄了！还没机制！驳回~憨憨野熊！", 
+        rank: 4517,
+        image: "image/enemy/E4517.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶 ++</b></span>",
+        spec: [],
+        stats: {health: 40e12, attack: 100000e8, agility:8000e8, attack_speed: 1.8, defense:5000e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.025},
+            {item_name: "血凝晶", chance:0.019},
+            {item_name: "亮青碎片", chance:0.031},
+            //5U
+        ],
+    });
+    enemy_templates["大红蜕钳蝎"] = new Enemy({
+        name: "大红蜕钳蝎",
+        xp_value: 365435296162, 
+        description: "我的天呐，死线大人……本来还想要把红仆小恶魔搬过来的，现在估计没必要了。其实如果你攻击太低，不破防就不会中招了(?", 
+        rank: 4518,
+        image: "image/enemy/E4518.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶 +</b></span>",
+        spec: [62],
+        stats: {health: 466e12, attack: 16000e8, agility:8250e8, attack_speed: 1.8, defense:9000e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.010},
+            {item_name: "血凝晶", chance:0.02},
+            //2.8U
+        ],
+    });
+    enemy_templates["红白闪"] = new Enemy({
+        name: "红白闪",
+        xp_value: 365435296162, 
+        description: "如果破不了灵闪大概就不破防了……看似上面那个卡攻击，其实是我红白姬哒！", 
+        rank: 4519,
+        image: "image/enemy/E4519.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶 +</b></span>",
+        spec: [23],
+        stats: {health: 81.92e12, attack: 10240e8, agility:8500e8, attack_speed: 1.8, defense:7700e8}, //血量200%
+        loot_list: [
+            {item_name: "神话绿宝石", chance:0.010},
+            {item_name: "C4·能量核心", chance:0.056},
+            //2.8U
+        ],
+    });
+    
     /*
-    蓝   红   绿
-B4+ 3.6% 0.6%      28D
-B5  1.2% 3.0%      50D
-B5+      3.6% 0.6% 90D
-B3 922'7465  /1493'0352  exp
-B4 2415'7817 /3908'8169  exp
-B5 6324'5986 /1'0233'4155exp
-冰山石灵开始是5阶+
+
+["亮青水晶","难缠的红蝙蝠","翩然蝶仙","红宝石近卫","心火红茸茸"]
+["亮青水晶","报春红食人花","报春红食人花","红角邪恶触触","蓝泽追光者"]
+["亮青水晶","炽热幽闻藤","红甲射箭小队","灰暗双剑小队","红野人战士"]
+["鲜红水晶","品红野人战士","树莓龙勇士","树莓龙勇士","红巨人番队"]
+["鲜红水晶","撼瀚野熊","鲑红腐殖质","大红蜕钳蝎","红白闪"]
+
+除3固定光环外共19只，补2只上区的。
+
+C1 125'8626'9025          /203'6501'1074          exp
+C2 329'5128'0099          /533'1629'1173          exp
+C3 862'6757'1272          /1395'8386'2445         exp
+C4 225851433717/365435296162/591286729879
+
+1.6U/2.8U/5.0U
+光环5%-25%
+
+云霄4+线2.854z攻防和
+云霄4++线4.408z攻防和
+强力技能可以适当抵扣
+
+
+
+
+
 */    
 })();
 
@@ -6014,7 +9327,512 @@ B5 6324'5986 /1'0233'4155exp
             {item_name: "天空兽角", chance:4},
         ],
     });
+    enemy_templates["探险者的怨恨[BOSS]"] = new Enemy({
+        name: "探险者的怨恨[BOSS]", 
+        description: "虽然有时封和200%血量，但是0防在普攻倍率面前~不堪一击！。", 
+        xp_value: 102334155, 
+        rank: 3397,
+        image: "image/boss/B3301.png",
+        realm: "<span class=realm_sky><b>天空级五阶 +</b></span>",
+        size: "small",
+        spec: [12],
+        spec_value:{},
+        tags: [],
+        stats: {health: 18e8, attack: 39690e4, agility: 9000e4, attack_speed: 1.5, defense:0e4}, //血量200%
+        loot_list: [
+            {item_name: "万载冰髓锭", chance:2},
+            {item_name: "史诗绿宝石", chance:1},
+        ],
+    });
+    enemy_templates["敌意猎兵[BOSS]"] = new Enemy({
+        name: "敌意猎兵[BOSS]", 
+        description: "其实本来也不算特别强……但是它们六只来群殴你耶。", 
+        xp_value: 102334155, 
+        rank: 3398,
+        image: "image/boss/B3302.png",
+        realm: "<span class=realm_sky><b>天空级五阶 +</b></span>",
+        size: "small",
+        spec: [],
+        spec_value:{},
+        tags: [],
+        stats: {health: 60.5e8, attack: 2.2e8, agility: 1.2e8, attack_speed: 1.2, defense:1.1e8}, //血量200%
+        loot_list: [
+        ],
+    });
+    enemy_templates["敌意女巫[BOSS]"] = new Enemy({
+        name: "敌意女巫[BOSS]", 
+        description: "躲在一大群猎兵后面来偷袭你！好屑啊……", 
+        xp_value: 165580141, 
+        rank: 3399,
+        image: "image/boss/B3303.png",
+        realm: "<span class=realm_sky><b>天空级六阶</b></span>",
+        size: "small",
+        spec: [0],
+        spec_value:{},
+        tags: [],
+        stats: {health: 134.48e8, attack: 2.16e8, agility: 1.4e8, attack_speed: 1.5, defense:1.08e8}, //血量200%
+        loot_list: [
+            {item_name: "史诗绿宝石", chance:2},
+        ],
+    });
+    enemy_templates["敌意老人[BOSS]"] = new Enemy({
+        name: "敌意老人[BOSS]", 
+        description: "相当耐揍，但是也只剩下耐揍了。", 
+        xp_value: 267914296, 
+        rank: 3499,
+        image: "image/boss/B3401.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +</b></span>",
+        size: "small",
+        spec: [5],
+        spec_value:{},
+        tags: [],
+        stats: {health: 326.7e8, attack: 4.5e8, agility: 3.9e8, attack_speed: 1.4, defense:3.0e8}, //血量300%
+        loot_list: [
+            //280D
+        ],
+    });
+    enemy_templates["竺虎[BOSS]"] = new Enemy({
+        name: "竺虎[BOSS]", 
+        description: "在同阶里称得上实力强悍，但想要逆伐喵可是不是搞错了什么？", 
+        xp_value: 267914296, 
+        rank: 3595,
+        image: "image/boss/B3501.png",
+        realm: "<span class=realm_sky><b>天空级五阶 +++</b></span>",
+        size: "small",
+        spec: [23],
+        spec_value:{},
+        tags: [],
+        stats: {health: 1012.5e8, attack: 8.5e8, agility: 4.5e8, attack_speed: 1.4, defense:2.4e8}, //血量500%
+        loot_list: [
+            {item_name: "传说黄宝石", chance:1},
+        ],
+    });
+    enemy_templates["莫尔[BOSS]"] = new Enemy({
+        name: "莫尔[BOSS]", 
+        description: "水牢里的好人。真是让人感动啊……", 
+        xp_value: 433494437, 
+        rank: 3596,
+        image: "image/boss/B3502.png",
+        realm: "<span class=realm_sky><b>天空级六阶 ++</b></span>",
+        size: "small",
+        spec: [50],
+        spec_value:{50:0.16e8},
+        tags: [],
+        stats: {health: 1624.5e8, attack: 7.7e8, agility: 6.0e8, attack_speed: 1.2, defense:3.3e8}, //血量500%
+        loot_list: [
+            {item_name: "传说黄宝石", chance:2},
+        ],
+    });
+    enemy_templates["秋兴[BOSS]"] = new Enemy({
+        name: "秋兴[BOSS]", 
+        description: "强榜强者【落叶刀】。暂列第三——当你看到这个提示就不是了。", 
+        xp_value: 701408733, 
+        rank: 3597,
+        image: "image/boss/B3503.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +++</b></span>",
+        size: "small",
+        spec: [46,32],
+        tags: [],
+        stats: {health: 1250e8, attack: 10.5e8, agility: 9.0e8, attack_speed: 1.4, defense:8.4e8}, //血量500%
+        loot_list: [
+        ],
+    });
+    enemy_templates["蓝柒[放水 ver.][BOSS]"] = new Enemy({
+        name: "蓝柒[放水 ver.][BOSS]", 
+        description: "强榜的发布者，拥有着碾压般的实力。虽然这里三重领域只用了一重……", 
+        xp_value: 701408733, 
+        rank: 3598,
+        image: "image/boss/B3504.png",
+        realm: "<span class=realm_sky><b>天空级六阶 +++</b></span>",//真正实力：天空级六阶 [IV].(3个加号以上换用罗马数字)
+        size: "small",
+        spec: [0],
+        tags: [],
+        stats: {health: 1512.5e8, attack: 12.25e8, agility: 10.8e8, attack_speed: 1.6, defense:6.76e8}, //血量500%
+        loot_list: [
+            {item_name: "传说红宝石", chance:2,ignore_luck:true},
+        ],
+    });
+    enemy_templates["蓝柒[BOSS]"] = new Enemy({
+        name: "蓝柒[BOSS]", 
+        description: "强榜的发布者，拥有着碾压般的实力。领域齐出的她强的可怕，甚至超越了3+之境……", 
+        xp_value: 1134903170, 
+        rank: 3599,
+        image: "image/boss/B3504.png",
+        realm: "<span class=realm_sky><b>天空级六阶 [IV]</b></span>",
+        size: "small",
+        spec: [0,7,42],
+        tags: [],
+        stats: {health: 4356e8, attack: 17.64e8, agility: 14.4e8, attack_speed: 1.7, defense:10.24e8}, //血量10x
+        loot_list: [
+            {item_name: "传说红宝石", chance:4,ignore_luck:true},
+        ],
+    });
+    enemy_templates["怪物手册[BOSS]"] = new Enemy({
+        name: "怪物手册[BOSS]", 
+        description: "为什么怪物手册会成精啊！另外，不觉得压制比牵制还要容易成为负累吗……", 
+        xp_value: 2971215073, 
+        rank: 3697,
+        image: "image/boss/B3601.png",
+        realm: "<span class=realm_sky><b>天空级八阶 ++</b></span>",
+        size: "small",
+        spec: [9,51],
+        tags: [],
+        stats: {health: 12340e8, attack: 36e8, agility: 21e8, attack_speed: 1.3, defense:21e8}, //血量10x
+        loot_list: [
+            {item_name: "传承水晶·橙", chance:2,ignore_luck:true},
+            {item_name: "传承水晶·白", chance:2,ignore_luck:true},
+            {item_name: "传承水晶·粉", chance:2,ignore_luck:true},
+            {item_name: "传承水晶·绿", chance:2,ignore_luck:true},
+            {item_name: "传承水晶·蓝", chance:2,ignore_luck:true},
+        ],
+    });
+    enemy_templates["心魔木偶[SP]"] = new Enemy({
+        name: "心魔木偶[SP]", 
+        description: "被高维存在注入力量的木偶。测试完压制·伪它就该下班了！", 
+        xp_value: 4807526976, 
+        rank: 3698,
+        image: "image/spec/fishmark.png",
+        realm: "<span class=realm_basic><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [52],
+        tags: [],
+        stats: {health: 9999e12, attack: 113.56e8, agility: 44.4e8, attack_speed: 1.0, defense:1e4}, 
+        loot_list: [
+            {item_name: "宇宙币", chance:168,ignore_luck:true},
+        ],
+    });
+    
+    enemy_templates["心魔[BOSS]"] = new Enemy({
+        name: "心魔[BOSS]", 
+        description: "我保留了一些同调，这样你才知道你打的是心魔。不过，它还是会被牵制领悟度欺负就是了！", 
+        xp_value: 2971215073, 
+        rank: 3699,
+        image: "image/boss/B3602.png",
+        realm: "<span class=realm_sky><b>天空级巅峰</b></span>",
+        size: "small",
+        spec: [33,52,53],
+        spec_value:{33:13},
+        tags: [],
+        stats: {health: 44440e8, attack: 1e4, agility: 44.4e8, attack_speed: 1.0, defense:1e4}, //血量10x
+        loot_list: [
+        ],
+    });
+    enemy_templates["喵咕啦[BOSS]"] = new Enemy({
+        name: "喵咕啦[BOSS]", 
+        description: "颜色和姐姐的衣服真的很像……现在不是想这种事情的时候！", 
+        xp_value: 4807526976, 
+        rank: 3791,
+        image: "image/boss/B3701.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [21],
+        spec_value:{21:60e8},
+        tags: [],
+        stats: {health: 22220e8, attack: 1e4, agility: 50e8, attack_speed: 1.5, defense:37.5e8}, //血量20x(x)原创属性！
+        loot_list: [
+        ],
+    });
+    enemy_templates["不可能三角B9[BOSS]"] = new Enemy({
+        name: "不可能三角B9[BOSS]", 
+        description: "单纯的数值怪。我猜可以打到这里应该不是很怕它了。", 
+        xp_value: 4807526976, 
+        rank: 3792,
+        image: "image/boss/B3702.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 60500e8, attack: 77e8, agility: 60e8, attack_speed: 1.6, defense:48e8}, //血量20x
+        loot_list: [
+        ],
+    });
+    enemy_templates["末世天骄[BOSS]"] = new Enemy({
+        name: "末世天骄[BOSS]", 
+        description: "末世秘境天才的一缕残魂。在漫长的时光中流失了99.9999%的力量，只剩下<span class=realm_sky><b>天空级巅峰 ++</b></span>的能级……", 
+        xp_value: 7778742049, 
+        rank: 3793,
+        image: "image/boss/B3703.png",
+        realm: "<span class=realm_cloudy><del><b>云霄级巅峰 [XII]</b><del>云霄级一阶 --</span>",
+        size: "small",
+        spec: [51,15,34],
+        tags: [],
+        stats: {health: 119960e8, attack: 120e8, agility: 70e8, attack_speed: 1.2, defense:20e8}, //血量20x
+        loot_list: [
+            {item_name: "传承水晶·粉", chance:60,ignore_luck:true},
+        ],
+    });
+    enemy_templates["狠咕兽[BOSS]"] = new Enemy({
+        name: "狠咕兽[BOSS]", 
+        description: "幸好不是大宝石版的特咕兽。又一只数值怪——平平常常，对吧？", 
+        xp_value: 7778742049, 
+        rank: 3794,
+        image: "image/boss/B3704.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 ++</b></span>",
+        size: "small",
+        spec: [],
+        tags: [],
+        stats: {health: 111110e8, attack: 110e8, agility: 75e8, attack_speed: 1.5, defense:55e8}, //血量20x
+        loot_list: [
+        ],
+    });
+    enemy_templates["心魔之主[BOSS]"] = new Enemy({
+        name: "心魔之主[BOSS]", 
+        description: "常规的云霄级一阶对应天空级巅峰 +++。很明显，这只心魔绝不是正常突破的……因此境界不稳，甚至在跌落的边缘。", 
+        xp_value: 7778742049, 
+        rank: 3795,
+        image: "image/boss/B3705.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶 -</b></span>",
+        size: "small",
+        spec: [36,52],
+        tags: [],
+        stats: {health: 162000e8, attack: 180e8, agility: 120e8, attack_speed: 1.5, defense:60e8}, //血量20x
+        loot_list: [
+        ],
+    });
+    enemy_templates["心之灵·禁锢[BOSS]"] = new Enemy({
+        name: "心之灵·禁锢[BOSS]", 
+        description: "被左阿作为【容器】备选的云霄级强者。", 
+        xp_value: 12586269025, 
+        rank: 3796,
+        image: "image/boss/B3706.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶</b></span>",
+        size: "small",
+        spec: [56,59],
+        tags: [],
+        stats: {health: 28800e8, attack: 160e8, agility: 150e8, attack_speed: 1.5, defense:130e8}, //血量20x
+        loot_list: [
+        ],
+    });
+    enemy_templates["心之灵·滋生[BOSS]"] = new Enemy({
+        name: "心之灵·滋生[BOSS]", 
+        description: "被左阿作为【容器】备选的云霄级强者。", 
+        xp_value: 12586269025, 
+        rank: 3797,
+        image: "image/boss/B3707.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶</b></span>",
+        size: "small",
+        spec: [55,57,59],
+        spec_value: {55:20e15},
+        tags: [],
+        stats: {health: 22400e8, attack: 210e8, agility: 180e8, attack_speed: 1.5, defense:124e8}, //血量20x
+        loot_list: [
+        ],
+    });
+    enemy_templates["心之灵·暴走[BOSS]"] = new Enemy({
+        name: "心之灵·暴走[BOSS]", 
+        description: "被左阿作为【容器】备选的云霄级强者。", 
+        xp_value: 12586269025, 
+        rank: 3798,
+        image: "image/boss/B3708.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶</b></span>",
+        size: "small",
+        spec: [55,58,59],
+        spec_value: {55:30e15},
+        tags: [],
+        stats: {health: 51000e8, attack: 180e8, agility: 180e8, attack_speed: 1.5, defense:128e8}, //血量20x
+        loot_list: [
+        ],
+    });
+    enemy_templates["左阿(垂死)[BOSS]"] = new Enemy({
+        name: "左阿(垂死)[BOSS]", 
+        description: "仅剩的一缕残魂也被封印的余下0.01%的力量。千算万算也没有算到这一步……对了。只有云霄级五阶的经验了。它现在太菜了。", 
+        xp_value: 591286729879, 
+        rank: 3799,
+        image: "image/boss/B3709.png",
+        realm: "<span class=realm_domain><b>领域级一阶 [-18]</b></span>",
+        size: "small",
+        spec: [34,17],
+        tags: [],
+        stats: {health: 3300000e8, attack: 365e8, agility: 220e8, attack_speed: 1.5, defense:144.4e8}, //血量500x
+        loot_list: [
+        ],
+    });
+    enemy_templates["左阿[BOSS]"] = new Enemy({
+        name: "左阿[BOSS]", 
+        description: "怎么看到这一句的？你丫作弊了吧。", 
+        xp_value: 591286729879, 
+        rank: 3799.9,
+        image: "image/boss/B3709.png",
+        realm: "<span class=realm_domain><b>领域级一阶 [-2]</b></span>",
+        size: "small",
+        spec: [34,17],
+        tags: [],
+        stats: {health: 3326730e12, attack: 367.9565e12, agility: 221.7821e12, attack_speed: 1.5, defense:145.5696e8}, //血量500x
+        loot_list: [
+        ],
+    });
+    enemy_templates["纳布[BOSS]"] = new Enemy({
+        name: "纳布[BOSS]", 
+        description: "柿子之蒸向来如此……老东西，你的时代结束了！", 
+        xp_value: 12586269025, 
+        rank: 4194,
+        image: "image/boss/B4101.png",
+        realm: "<span class=realm_cloudy><b>云霄级一阶</b></span>",
+        size: "small",
+        spec: [10],
+        tags: [],
+        stats: {health: 695000e8, attack: 625e8, agility: 337.5e8, attack_speed: 1.5, defense:220e8}, //属性5x(天空9)，血量额外50x
+        loot_list: [{item_name:"伊芙",chance:1.00,ignore_luck:true}],
+    });
+    
+    enemy_templates["百方[复仇 ver.][BOSS]"] = new Enemy({
+        name: "百方[复仇 ver.][BOSS]", 
+        description: "攻击攻速对于天空级也太高了，还带必中伤害。肯定是身上有好东西，此子断不可留……", 
+        xp_value: 4807526976, 
+        rank: 4195,
+        image: "image/boss/B4102.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 +++</b></span>",
+        size: "small",
+        spec: [34,43],
+        spec_value:{43:1000e8},
+        tags: [],
+        stats: {health: 777000e8, attack:512e8, agility: 300e8, attack_speed: 2.4, defense: 70e8}, 
+        loot_list: [{item_name:"C1镭射枪·残",chance:1.00,quality:200,ignore_luck:true}],
+    });//属性10000x 血量100x
+    //B4102
+    enemy_templates["薛奇[BOSS]"] = new Enemy({
+        name: "薛奇[BOSS]", 
+        description: "试图通过堵门不让任何人进来的可恨家伙！它甚至躲在天空级小队身后……", 
+        xp_value: 32951280099, 
+        rank: 4196,
+        image: "image/boss/B4103.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶</b></span>",
+        size: "small",
+        spec: [26,51],
+        tags: [],
+        stats: {health: 841000e8, attack: 780e8, agility: 450e8, attack_speed: 1.2, defense:350e8}, //血量100x
+        loot_list: [],
+    });
+    enemy_templates["燕岗威武小队[BOSS]"] = new Enemy({
+        name: "燕岗威武小队[BOSS]", 
+        description: "比起迅捷的攻击更擅长吸引火力的小队。生存属性强的离谱……", 
+        xp_value: 29712150730, 
+        rank: 4197,
+        image: "image/boss/B4104.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 [x10]</b></span>",
+        size: "small",
+        spec: [5,61],
+        tags: [],
+        stats: {health: 1300000e8, attack: 570e8, agility: 350e8, attack_speed: 1.0, defense:290e8}, //血量100x
+        loot_list: [],
+    });
+    enemy_templates["燕岗骑砍小队[BOSS]"] = new Enemy({
+        name: "燕岗骑砍小队[BOSS]", 
+        description: "用压倒性的攻击速度迫使敌人屈服的小队。不过大量攻击被压缩成一次穿透性更强的攻击，使面板攻速没有那么快。", 
+        xp_value: 29712150730, 
+        rank: 4198,
+        image: "image/boss/B4105.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 [x10]</b></span>",
+        size: "small",
+        spec: [5,61],
+        tags: [],
+        stats: {health: 720000e8, attack: 700e8, agility: 350e8, attack_speed: 3.6, defense:200e8}, //血量100x
+        loot_list: [],
+    });
+    enemy_templates["燕岗卫戍小队[BOSS]"] = new Enemy({
+        name: "燕岗卫戍小队[BOSS]", 
+        description: "偏重防御阵法的小队。防御力比薛奇甚至略强一线，但皮还是很脆的。", 
+        xp_value: 29712150730, 
+        rank: 4199,
+        image: "image/boss/B4106.png",
+        realm: "<span class=realm_sky><b>天空级巅峰 [x10]</b></span>",
+        size: "small",
+        spec: [61],
+        tags: [],
+        stats: {health: 169000e8, attack: 720e8, agility: 350e8, attack_speed: 1.8, defense:360e8}, //血量100x
+        loot_list: [],
+    });
+    enemy_templates["燕岗城警戒哨[BOSS]"] = new Enemy({
+        name: "燕岗城警戒哨[BOSS]", 
+        description: "一呼百应，导致每一回合的伤害都会越来越夸张。对了，纳可比较能惹事，一次惹到了3只~", 
+        xp_value: 53316291173, 
+        rank: 4299,
+        image: "image/boss/B4201.png",
+        realm: "<span class=realm_cloudy><b>云霄级二阶 +</b></span>",
+        size: "small",
+        spec: [12],
+        tags: [],
+        stats: {health: 176000e8, attack: 1360e8, agility: 720e8, attack_speed: 1.8, defense:680e8}, //血量20x[时封，不开太高了]
+        loot_list: [],
+    });
+    enemy_templates["枫杏红[BOSS]"] = new Enemy({
+        name: "枫杏红[BOSS]", 
+        description: "曾经在血魔海被纳家先祖纳鹰燃烧生命方才脱困。他从未忘却如此大恩，切磋之后即会说出中等进化结晶的制作法！", 
+        xp_value: 225851433717, 
+        rank: 4398,
+        image: "image/boss/B4301.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        size: "small",
+        spec: [9,16],
+        tags: [],
+        stats: {health: 4046000e8, attack: 8888e8, agility: 2400e8, attack_speed: 1.6, defense:1555e8}, //20x！
+        loot_list: [],
+    });
+    enemy_templates["变异尸狗王[BOSS]"] = new Enemy({
+        name: "变异尸狗王[BOSS]", 
+        description: "本是普通死狗，被古墓气息侵染着成为了亡灵。一身能力如同生前，移动极为敏捷，但毕竟是亡灵，生命力稍逊一筹。", 
+        xp_value: 139583862445, 
+        rank: 4399,
+        image: "image/boss/B4302.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶 -</b></span>",
+        size: "small",
+        spec: [65,20],//特殊属性:血遁
+        tags: [],
+        stats: {health: 196000e8, attack: 3300e8, agility: 972e8, attack_speed: 2.0, defense:800e8}, //原创属性/设定上利用反戈击败
+        loot_list: [{item_name:"中等进化结晶",chance:1.00,ignore_luck:true}],
+    });
+    
+    enemy_templates["飞飞茸茸[BOSS]"] = new Enemy({
+        name: "飞飞茸茸[BOSS]", 
+        description: "被红邪鬼抓过来凑数的可怜茸茸。灌注了少许生命精华，因此作战可以持久一些——或者说，抗更多伤害。", 
+        xp_value: 139583862445, 
+        rank: 4497,
+        image: "image/boss/B4401.png",
+        realm: "<span class=realm_cloudy><b>云霄级三阶 +</b></span>",
+        size: "small",
+        tags: [],
+        spec: [66],
+        stats: {health: 1000e12, attack: 4300e8, agility:2900e8, attack_speed: 1.8, defense:2100e8}, //血量20x
+        loot_list: [
+        ],
+    });
+    enemy_templates["红邪鬼[BOSS]"] = new Enemy({
+        name: "红邪鬼[BOSS]", 
+        description: "堕落的【翩然蝶仙】。因为为飞飞茸茸灌注了生命精华进入了虚弱期——不过它认为这无关紧要。", 
+        xp_value: 225851433717, 
+        rank: 4498,
+        image: "image/boss/B4402.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        size: "small",
+        tags: [],
+        spec: [66],
+        stats: {health: 2628e12, attack: 6570e8, agility:4900e8, attack_speed: 3.6, defense:2600e8}, //血量200x
+        loot_list: [
+        ],
+    });
+    enemy_templates["心火红茸茸[BOSS]"] = new Enemy({
+        name: "心火红茸茸[BOSS]", 
+        description: "好险，这区要没boss了。只好从下区拎一只小怪……你被强化了！快上！", 
+        xp_value: 225851433717, 
+        rank: 4499,
+        image: "image/boss/B4403.png",
+        realm: "<span class=realm_cloudy><b>云霄级四阶</b></span>",
+        size: "small",
+        tags: [],
+        spec: [13,27],
+        stats: {health: 2160e12, attack: 9000e8, agility:5400e8, attack_speed: 1.8, defense:5400e8}, //血量200x
+        loot_list: [
+        ],
+    });
+/*
 
+B8 11'3490'3170           /18'3631'1903           exp
+B9 29'7121'5073           /48'0752'6976           exp
+C1 125'8626'9025          /203'6501'1074          exp
+C2 329'5128'0099          /533'1629'1173          exp
+ 
+C3 862'6757'1272          /1395'8386'2445         exp
+*/
 
 
 

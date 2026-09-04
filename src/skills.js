@@ -206,7 +206,7 @@ class Skill {
                     if (gains.stats) {
                         Object.keys(gains.stats).forEach(stat => {
                             if(gains.stats[stat].flat) {
-                                message += `<br> +${gains.stats[stat].flat} ${stat_names[stat].replace("_"," ")}`;
+                                message += `<br> +${format_number(gains.stats[stat].flat)} ${stat_names[stat].replace("_"," ")}`;
                             }
                             if(gains.stats[stat].multiplier) {
                                 message += `<br> x${Math.round(100*gains.stats[stat].multiplier)/100} ${stat_names[stat].replace("_"," ")}`;
@@ -384,9 +384,9 @@ function format_skill_rewards(milestone){
         Object.keys(milestone.stats).forEach(stat => {
             if(milestone.stats[stat].flat) {
                 if(formatted) {
-                    formatted += `, +${milestone.stats[stat].flat} ${stat_names[stat]}`;
+                    formatted += `, +${format_number(milestone.stats[stat].flat)} ${stat_names[stat]}`;
                 } else {
-                    formatted = `+${milestone.stats[stat].flat} ${stat_names[stat]}`;
+                    formatted = `+${format_number(milestone.stats[stat].flat)} ${stat_names[stat]}`;
                 }
             }
             if(milestone.stats[stat].multiplier) {
@@ -688,14 +688,56 @@ function format_skill_rewards(milestone){
                                         }
                                     }
                                 });
+    
+     skills["ReflectStarVioletLight"] = new Skill({skill_id: "ReflectStarVioletLight", 
+                                    names: {0: "映星紫华",1:"映星紫华·小成",2:"映星紫华·精通",3:"映星紫华·大成",4:"映星紫华·圆满"}, 
+                                    parent_skill: "Stance mastery",
+                                    description: "【映星花】秘法的第二层大境界。可以大幅增强原始秘法的经验获取。", 
+                                    max_level_coefficient: 1.25,
+                                    base_xp_cost: 5000e16,
+                                    max_level: 4,
+                                    xp_scaling:20,
+                                    get_effect_description: ()=> {
+                                        return `增加基础经验获取量,额外增加【映星花】经验获取量`;
+                                    },
+                                    category: "Stance",
+                                    rewards: {
+                                        milestones: {
+                                            1: {
+                                                    xp_multipliers: {
+                                                        all: 2.0,
+                                                        "ReflectStarFlower": 2,
+                                                    }
+                                            },
+                                            2: {
+                                                    xp_multipliers: {
+                                                        all: 1.5,
+                                                        "ReflectStarFlower": 2,
+                                                    }
+                                            },
+                                            3: {
+                                                    xp_multipliers: {
+                                                        all: 1.3333,
+                                                        "ReflectStarFlower": 2,
+                                                    }
+                                            },
+                                            4: {
+                                                    xp_multipliers: {
+                                                        all: 1.25,
+                                                        "ReflectStarFlower": 2,
+                                                    }
+                                            },
+                                        }
+                                    }
+                                });
     skills["Neko_Realm"] = new Skill({skill_id: "Neko_Realm", 
-                                    names: {0: "Micro Flame", 10: "Flame-Searing Art", 20: "Fire Spirit Illusion Sea [Domain Stage 1]", 30: "Flame-Sea Frost Sky [Domain Stage 2]", 40: "Flame-Sea Frost Sky [Domain Stage 3]"}, 
+                                    names: {0: "微火",10:"燃灼术",20:"火灵幻海[领域一重]",30:"焰海霜天[领域二重]",35:"焰海霜天[领域三重]",40:"出云落月[领域四重]",45:"[出云落月[领域五重]",55:"出云落月[领域六重]"},
                                     parent_skill: "Stance mastery",
                                     description: "Neko's Domain (embryonic form). Each level grants base stats, each stage breakthrough grants new insights!", 
                                     max_level_coefficient: 1.25,
                                     base_xp_cost: 5000000,
                                     visibility_treshold: 1,
-                                    max_level: 49,
+                                    max_level: 59,
                                     xp_scaling:3,
                                     get_effect_description: ()=> {
                                         let R_value = 0;
@@ -703,12 +745,16 @@ function format_skill_rewards(milestone){
                                         if(R_level<10) R_value = 1000 * R_level;
                                         else if(R_level<20) R_value = 1.5e4 * (R_level - 8);
                                         else if(R_level<30) R_value = 15e4 * (R_level - 18);
-                                        else if(R_level<40) R_value = 121.5e4 * (R_level - 24);
-                                        else if(R_level<50) R_value = 486e4 * (R_level - 34);
-                                        return `Base Attack, Defense + ${format_number(R_value)}`;
+                                        else if(R_level<35) R_value = 121.5e4 * (R_level - 24);
+                                        else if(R_level<40) R_value = 486e4 * (R_level - 29);
+                                        else if(R_level<45) R_value = 2.048e8 * (R_level - 38);
+                                        else if(R_level<55) R_value = 20.28e8 * (R_level - 42);
+                                        else if(R_level<69) R_value = 324e8 * (R_level - 51);
+                                        return `基础攻击,防御,敏捷 + ${format_number(R_value)}`;
                                         //30w 729w 2916w
                                         //出云落月：4.096e
-                                        
+                                        //五重：基础60.84e(3级)
+                                        //六重：基础1296e(4级)
                                     },
                                     category: "Stance",
                                     rewards: {
@@ -718,7 +764,7 @@ function format_skill_rewards(milestone){
                                 });
     
     skills["WaterHeartless"] = new Skill({skill_id: "WaterHeartless", 
-                                    names: {0: "Waterless Mind", 5: "Waterless Mind: Minor", 15: "Waterless Mind: Proficient", 25: "Waterless Mind: Major", 30: "Waterless Mind: Perfect"}, 
+                                    names: {0: "水无心",10:"水无心·小成",20:"水无心·大成",30:"水无心·圆满"}, 
                                     parent_skill: "Stance mastery",
                                     description: "Sword technique Neko comprehended by the Qingye Waterfall. Has 3 modes of use.", 
                                     max_level_coefficient: 1.25,
@@ -727,19 +773,31 @@ function format_skill_rewards(milestone){
                                     max_level: 30,
                                     related_stances: ["WH_Power","WH_Speed","WH_Multi"],
                                     get_effect_description: ()=> {
-                                        return `Improves [Waterless Mind] stance effectiveness`;
+                                        return `增加[水无心]系秘法的使用效果`;
                                     }});   
     skills["ReflectStarFlower"] = new Skill({skill_id: "ReflectStarFlower", 
-                                    names: {0: "Starlight Bloom", 10: "Starlight Bloom: Minor", 20: "Starlight Bloom: Proficient", 30: "Starlight Bloom: Major", 40: "Starlight Bloom: Perfect"}, 
+                                    names: {0: "映星花",10:"映星花·精通",20:"映星花·小成",30:"映星花·大成",40:"映星花·圆满"}, 
                                     parent_skill: "Stance mastery",
                                     description: "Advanced arcane art taught by Brother Feng. Seems usable for a very long time.", 
                                     max_level_coefficient: 1.25,
                                     base_xp_cost: 1000e12,
                                     category: "Stance",
-                                    max_level: 50,
+                                    max_level: 40,
                                     related_stances: ["SF_Power","SF_Lucky","SF_Multi"],
                                     get_effect_description: ()=> {
-                                        return `Improves [Starlight Bloom] stance effectiveness`;
+                                        return `增加[映星花]系秘法的使用效果`;
+                                    }});          
+    skills["ReflectStarSkyRainbow"] = new Skill({skill_id: "ReflectStarSkyRainbow", 
+                                    names: {0: "映星天彩",10:"映星天彩·入门",20:"映星天彩·精通",30:"映星天彩·小成",40:"映星天彩·大成",50:"映星天彩·圆满"}, 
+                                    parent_skill: "Stance mastery",
+                                    description: "【映星花】的升华形态。多出了5层的同时多出了吸血与连击的能力。", 
+                                    max_level_coefficient: 1.25,
+                                    base_xp_cost: 300e24,//计算秘法精通之后的39-40级映星花需要等效经验为370e24
+                                    category: "Stance",
+                                    max_level: 50,
+                                    related_stances: ["SR_Power","SR_Multi","SR_Double","SR_Blood"],
+                                    get_effect_description: ()=> {
+                                        return `增加[映星天彩]系秘法的使用效果`;
                                     }});          
                                     
                                     
@@ -931,6 +989,57 @@ function format_skill_rewards(milestone){
         category: "Environmental",
         get_effect_description: () => {
             return `Reduces penalty from cold locations`;
+        }
+    });
+    skills["Toxic resistance"] = new Skill({
+        skill_id: "Toxic resistance",
+        names: {0: "毒液抗性",10:"毒液抗性·精通",20:"毒液抗性·圆满"},
+        description: "对常见蚊虫毒液的免疫能力。",
+        base_xp_cost: 1800e4,
+        max_level: 20,
+        xp_scaling: 1.6,
+        category: "Environmental",
+        rewards: {
+            milestones: {
+            4: {
+                stats: {
+                    agility: {
+                        flat:5e8
+                    },
+                    },
+                },
+            8: {
+                stats: {
+                    agility: {
+                        flat:10e8
+                    },
+                    },
+                },
+                12: {
+                stats: {
+                    agility: {
+                        flat:15e8
+                    },
+                    },
+                },
+                16: {
+                stats: {
+                    agility: {
+                        flat:20e8
+                    },
+                    },
+                },
+                20: {
+                stats: {
+                    agility: {
+                        flat:30e8
+                    },
+                    },
+                }
+            }
+        },
+        get_effect_description: () => {
+            return `毒液伤害削弱到原来的${100-skills["Toxic resistance"].current_level*5}%,<br>再因为【坚韧皮肤】削弱到原来的${(100*(0.99**skills["Iron skin"].current_level)).toFixed(2)}%.<br>毒液防御惩罚^${(1-skills["Toxic resistance"].current_level*0.05).toFixed(2)}`;
         }
     });
 
@@ -1337,13 +1446,13 @@ Multiplies AP with daggers by ${Math.round((skills["Daggers"].get_coefficient("m
 //non-work activity related
 (function(){
     skills["Sleeping"] = new Skill({skill_id: "Sleeping",
-                                    names: {0: "Sleep"}, 
-                                    description: "Good and regular sleep patterns are the foundation of good health",
+                                    names: {0: "睡眠",10: "冥想",25: "修炼",50:"时间跳跃"}, 
+                                    description: "良好且规律的作息是好身体的基础,也是修炼技能的基石。到了满级或许可以扭曲时间？",
                                     base_xp_cost: 1000,
                                     visibility_treshold: 300,
                                     xp_scaling: 2,
                                     category: "Activity",
-                                    max_level: 10,
+                                    max_level: 50,
                                     max_level_coefficient: 2.5,    
                                     rewards: {
                                         milestones: {
@@ -1396,7 +1505,67 @@ Multiplies AP with daggers by ${Math.round((skills["Daggers"].get_coefficient("m
                                                 xp_multipliers: {
                                                     all: 1.1,
                                                 }
-                                            }
+                                            },
+                                            15: {
+                                                stats: {
+                                                    "max_health": {
+                                                        multiplier: 1.05,
+                                                    }
+                                                },
+                                                xp_multipliers: {
+                                                    all: 1.05,
+                                                }
+                                            },
+                                            20: {
+                                                stats: {
+                                                    "max_health": {
+                                                        multiplier: 1.05,
+                                                    }
+                                                },
+                                                xp_multipliers: {
+                                                    all: 1.05,
+                                                }
+                                            },
+                                            25: {
+                                                stats: {
+                                                    "max_health": {
+                                                        multiplier: 1.1,
+                                                    }
+                                                },
+                                                xp_multipliers: {
+                                                    all: 1.1,
+                                                }
+                                            },
+                                            30: {
+                                                stats: {
+                                                    "max_health": {
+                                                        multiplier: 1.05,
+                                                    }
+                                                },
+                                                xp_multipliers: {
+                                                    all: 1.05,
+                                                }
+                                            },
+                                            40: {
+                                                stats: {
+                                                    "max_health": {
+                                                        multiplier: 1.05,
+                                                    }
+                                                },
+                                                xp_multipliers: {
+                                                    all: 1.05,
+                                                }
+                                            },
+                                            50: {
+                                                stats: {
+                                                    "max_health": {
+                                                        multiplier: 1.1,
+                                                    }
+                                                },
+                                                xp_multipliers: {
+                                                    all: 1.1,
+                                                }
+                                            },
                                         }
                                     }
                                 });
@@ -1528,12 +1697,82 @@ Multiplies AP with daggers by ${Math.round((skills["Daggers"].get_coefficient("m
           },
       }
     },
+
+    
     get_effect_description: ()=> {
       let value = skills["Swimming"].get_coefficient("multiplicative");
       return `Multiplies max HP by ${format_number(value)}`;
     },
     
     });
+
+
+
+
+    
+    skills["AquaElement"] = new Skill({skill_id: "AquaElement",
+    description: "感应水元素，加快对领域的感悟！(领域三重巅峰[lv.39]前有效)",
+    names: {0: "水元素亲和",10:"水元素精通"},
+    max_level: 18,
+    xp_scaling: 1.6,
+    category: "Activity",
+    base_xp_cost: 10e4,
+    max_level_coefficient: 10000,
+    rewards: {
+      milestones: {
+      }
+    },
+    get_effect_description: ()=> {
+      let value = skills["AquaElement"].get_coefficient("multiplicative");
+      return `将领域感悟速度乘以 ${format_number(value)} [Lv.39后将^0.25]`;
+    },
+    
+    });
+
+
+    skills["GrassCutting"] = new Skill({skill_id: "GrassCutting",
+    description: "更好地收割绝音蕨！",
+    names: {0: "收割",10:"收割·精通",20:"收割·大师"},
+    max_level: 20,
+    xp_scaling: 1.6,
+    category: "Activity",
+    base_xp_cost: 40e4,
+    max_level_coefficient: 10000,
+    rewards: {
+      milestones: {
+      }
+    },
+    get_effect_description: ()=> {
+      let value = skills["GrassCutting"].current_level + ((character.equipment.sickle?.name == "死神之镰")?4:0);
+      return `收割半径 ${format_number(15+1.5*value)}px ,生成速度 ${format_number(0.5+0.1*value)}/s,<br>容量上限 ${format_number(Math.floor((value + 1) ** 1.5 * 10))},【噬芒兰】概率 :${format_number(value ** 0.7 / 20)}% <br>${(character.equipment.sickle?.name == "死神之镰")?"<span style='violet'><b>[死神之镰已激活 / 有效等级+4]</b></span>":""}`;
+    },
+    
+    });
+
+    skills["GroundDigging"] = new Skill({skill_id: "GroundDigging",
+    description: "更好地钻探地层！",
+    names: {0: "钻探",10:"钻探·精通",20:"钻探·大师"},
+    max_level: 20,
+    xp_scaling: 1.6,
+    category: "Activity",
+    base_xp_cost: 2000e4,
+    max_level_coefficient: 10000,
+    rewards: {
+      milestones: {
+      }
+    },
+    get_effect_description: ()=> {
+      let value = skills["GroundDigging"].current_level;
+      return `钩爪抓取半径 ${format_number(16+0.5*value)}px ,摆动速度 ${format_number(0.2+0.02*value)}次/s,回收速度提升${format_number(10*value)}%, 发现新宝藏耗时 ${format_number(3-0.1*value)}s.<br><br>${format_number(character.stats.full.agility)}敏捷 -> ${format_number((character.stats.full.agility/1e8)**(2/3))} px/s 钩爪速度`;
+    },
+    
+    });
+
+
+
+
+
+
     skills["Meditation"] = new Skill({skill_id: "Meditation",
                                 names: {0: "Meditation"}, 
                                 description: "Focus your mind",
@@ -1747,8 +1986,8 @@ Multiplies AP with daggers by ${Math.round((skills["Daggers"].get_coefficient("m
     });
 
     skills["Fishing"] = new Skill({skill_id: "Fishing", 
-        names: {0: "Fishing"}, 
-        description: "Increases fishing proficiency, improving chances of catching larger fish [Level 3: Blue Flower Fish / Level 10: Ice Pillar Fish]",
+        names: {0: "钓鱼"}, 
+        description: "增加钓鱼的熟练度,提高大鱼上钩的概率[3级出现青花鱼/10级出现冰柱鱼]<br>幻境核心:0.75x长度[13级出现血莲鱼，21级出现冰柱鱼王]",
         category: "Activity",
         base_xp_cost: 80,
         visibility_treshold: 4,
@@ -1850,12 +2089,12 @@ Multiplies AP with daggers by ${Math.round((skills["Daggers"].get_coefficient("m
     skills["Iron skin"] = new Skill({
         skill_id: "Iron skin",
         category: "Combat",
-        names: {0: "Tough Skin", 5: "Iron Skin", 10: "Steel Skin", 15: "Copper Skin", 20: "Dungeon Skin", 25: "Charged Skin", 30: "Pulse Skin", 35: "Sea Green Skin", 40: "Red Steel Skin", 45: "Mithril Skin", 50: "Melody Skin", 55: "Ice Marrow Skin"},
-        description: "What doesn't kill me makes me stronger",
+        names: {0: "坚韧皮肤", 5: "铁制皮肤", 10: "精钢皮肤",15:"紫铜皮肤",20:"地宫皮肤",25:"充能皮肤",30:"脉冲皮肤",35:"海绿皮肤",40:"红钢皮肤",45:"秘银皮肤",50:"旋律皮肤",55:"冰髓皮肤",60:"晶化皮肤",65:"水素皮肤",70:"宝石皮肤",75:"魂晶皮肤",80:"盖亚皮肤",85:"远古皮肤",90:"源金皮肤"},
+        description: "杀不死我的，都将使我更强大",
         base_xp_cost: 100,
         xp_scaling: 2.0,
-        max_level: 100,
-        max_level_bonus: 1.00,
+        max_level: 200,
+        max_level_bonus: 2.00,
         get_effect_description: ()=> {
             return `Increases base defense by ${Math.round(100*skills["Iron skin"].get_level_bonus())} %`;
         },
