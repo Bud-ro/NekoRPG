@@ -3681,11 +3681,11 @@ function update_displayed_family_members(){
             //console.log('reached');
     family_member.innerHTML = 
     `<tr class="stance_list_entry member_list_header">
-        <th class="member_list_header member_list_realm">境界</th>
-        <th class="member_list_header member_list_num">人数</th>
-        <th class="member_list_header member_list_change" style='color:lightgreen'>突破</th>
-        <th class="member_list_header member_list_change" style='color:lightcoral'>死亡</th>
-        <th class="member_list_header member_list_alti ">培养策略</th>
+        <th class="member_list_header member_list_realm">Realm</th>
+        <th class="member_list_header member_list_num">Count</th>
+        <th class="member_list_header member_list_change" style='color:lightgreen'>Breakthroughs</th>
+        <th class="member_list_header member_list_change" style='color:lightcoral'>Deaths</th>
+        <th class="member_list_header member_list_alti ">Training Strategy</th>
     </tr>`;
     family_mem_divs = [];
     for(let r=0;r<=99;r+=1){
@@ -3699,11 +3699,11 @@ function update_displayed_family_members(){
             const mem_die = `<td class="member_list member_list_change" style='color:lightcoral'><b>${format_mem_change(family_data.mem[r].die)}</b></td>`;
             const mem_alt = `<td class="member_list member_list_change">
             <select id="${r<=9?'0':''}${r}_family_ali" class='family_ali'>
-            <option value='1' ${family_data.mem[r].ali==1?"selected":""}>[1]常规工作</option>
-            <option value='2' ${family_data.mem[r].ali==2?"selected":""}>[2]家族试炼</option>
-            <option value='3' ${family_data.mem[r].ali==3?"selected":""}>[3]秘境探险</option>
-            <option value='4' ${family_data.mem[r].ali==4?"selected":""}>[4]战场厮杀</option>
-            <option value='5' ${family_data.mem[r].ali==5?"selected":""}>[5]九死一生</option>
+            <option value='1' ${family_data.mem[r].ali==1?"selected":""}>[1]Regular Work</option>
+            <option value='2' ${family_data.mem[r].ali==2?"selected":""}>[2]Family Trials</option>
+            <option value='3' ${family_data.mem[r].ali==3?"selected":""}>[3]Secret Realm Expedition</option>
+            <option value='4' ${family_data.mem[r].ali==4?"selected":""}>[4]Battlefield Slaughter</option>
+            <option value='5' ${family_data.mem[r].ali==5?"selected":""}>[5]Nine Deaths, One Life</option>
             </select></td>`;
             //console.log((r<=9?'0':'')+String(r)+'_family_ali');
             //console.log(document.getElementById((r<=9?'0':'')+String(r)+'_family_ali'));

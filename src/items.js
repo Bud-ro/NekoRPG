@@ -3401,7 +3401,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "long blade",
         value: 6e12,
         component_tier: 13,
-        name_prefix: "晶化",
+        name_prefix: "Crystallized",
         attack_value: 12960000,
         stats: {
             crit_rate: {flat: 0.15,},
@@ -3413,7 +3413,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "triple blade",
         value: 18e12,
         component_tier: 13,
-        name_prefix: "晶化",
+        name_prefix: "Crystallized",
         attack_value: 16200000,
         stats: {
             crit_rate: {flat: 0.10,},
@@ -3609,7 +3609,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "wheel head",
         value: 36e12,
         component_tier: 13,
-        name_prefix: "晶化",
+        name_prefix: "Crystallized",
         attack_value: 2400e4,
         stats: {
             crit_rate: {
@@ -3625,7 +3625,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "wheel head",
         value: 248.4e12,
         component_tier: 14,
-        name_prefix: "水素",
+        name_prefix: "Hydro",
         attack_value: 7200e4,
         stats: {
             crit_rate: {
@@ -3700,7 +3700,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "wheel head",
         value: 7290e12,
         component_tier: 16,
-        name_prefix: "魂晶",
+        name_prefix: "Soul Crystal",
         attack_value: 47040e4,
         stats: {
             crit_rate: {
@@ -3716,7 +3716,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "wheel head",
         value: 48210e12,
         component_tier: 17,
-        name_prefix: "盖亚",
+        name_prefix: "Gaia",
         attack_value: 141120e4,
         stats: {
             crit_rate: {
@@ -3732,7 +3732,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "wheel head",
         value: 388.8e15,
         component_tier: 18,
-        name_prefix: "远古",
+        name_prefix: "Ancient",
         attack_value: 38.88e8,
         stats: {
             crit_rate: {
@@ -3748,7 +3748,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "wheel head",
         value: 1380e15,
         component_tier: 19,
-        name_prefix: "源金",
+        name_prefix: "Primal Gold",
         attack_value: 77.76e8,
         stats: {
             crit_rate: {
@@ -3764,7 +3764,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "wheel head",
         value: 2430e15,
         component_tier: 20,
-        name_prefix: "红钨",
+        name_prefix: "Red Tungsten",
         attack_value: 155.52e8,
         stats: {
             crit_rate: {
@@ -3780,7 +3780,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "wheel head",
         value: 3999e15,
         component_tier: 21,
-        name_prefix: "血钻",
+        name_prefix: "Blood Diamond",
         attack_value: 311.04e8,
         stats: {
             crit_rate: {
@@ -4832,7 +4832,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "helmet exterior",
         value: 41.4e12,
         component_tier: 14,
-        full_armor_name: "水素头盔",
+        full_armor_name: "Hydro Helmet",
         defense_value: 1728e4,
         stats: {
             attack_mul: {
@@ -4846,7 +4846,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "chestplate exterior",
         value: 55.2e12,
         component_tier: 14,
-        full_armor_name: "水素胸甲",
+        full_armor_name: "Hydro Chestplate",
         defense_value: 2304e4,
         stats: {
             attack_mul: {
@@ -4860,7 +4860,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "leg armor exterior",
         value: 55.2e12,
         component_tier: 14,
-        full_armor_name: "水素腿甲",
+        full_armor_name: "Hydro Leg Armor",
         defense_value: 2304e4,
         stats: {
             attack_mul: {
@@ -4874,7 +4874,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "shoes exterior",
         value: 27.6e12,
         component_tier: 14,
-        full_armor_name: "水素战靴",
+        full_armor_name: "Hydro Battle Boots",
         defense_value: 1152e4,
         stats: {
             attack_mul: {
@@ -4889,7 +4889,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "helmet exterior",
         value: 2025e12,
         component_tier: 16,
-        full_armor_name: "魂晶头盔",
+        full_armor_name: "Soul Crystal Helmet",
         defense_value: 1.08e8,
         stats: {
             attack_mul: {
@@ -4903,7 +4903,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "chestplate exterior",
         value: 3240e12,
         component_tier: 16,
-        full_armor_name: "魂晶胸甲",
+        full_armor_name: "Soul Crystal Chestplate",
         defense_value: 1.728e8,
         stats: {
             attack_mul: {
@@ -4917,7 +4917,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "leg armor exterior",
         value: 2835e12,
         component_tier: 16,
-        full_armor_name: "魂晶腿甲",
+        full_armor_name: "Soul Crystal Leg Armor",
         defense_value: 1.512e8,
         stats: {
             attack_mul: {
@@ -4931,7 +4931,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "shoes exterior",
         value: 1620e12,
         component_tier: 16,
-        full_armor_name: "魂晶战靴",
+        full_armor_name: "Soul Crystal Battle Boots",
         defense_value: 0.864e8,
         stats: {
             attack_mul: {
@@ -4946,7 +4946,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "helmet exterior",
         value: 54e15,
         component_tier: 18,
-        full_armor_name: "远古头盔",
+        full_armor_name: "Ancient Helmet",
         defense_value: 5.4e8,
         stats: {
             attack_mul: {
@@ -4962,7 +4962,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "chestplate exterior",
         value: 86.4e15,
         component_tier: 18,
-        full_armor_name: "远古胸甲",
+        full_armor_name: "Ancient Chestplate",
         defense_value: 8.64e8,
         stats: {
             attack_mul: {
@@ -4978,7 +4978,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "leg armor exterior",
         value: 75.6e15,
         component_tier: 18,
-        full_armor_name: "远古腿甲",
+        full_armor_name: "Ancient Leg Armor",
         defense_value: 7.56e8,
         stats: {
             attack_mul: {
@@ -4994,7 +4994,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "shoes exterior",
         value: 43.2e15,
         component_tier: 18,
-        full_armor_name: "远古战靴",
+        full_armor_name: "Ancient Battle Boots",
         defense_value: 4.32e8,
         stats: {
             attack_mul: {
@@ -5011,7 +5011,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "helmet exterior",
         value: 337.5e15,
         component_tier: 20,
-        full_armor_name: "红钨头盔",
+        full_armor_name: "Red Tungsten Helmet",
         defense_value: 27e8,
         stats: {
             attack_mul: {
@@ -5027,7 +5027,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "chestplate exterior",
         value: 540e15,
         component_tier: 20,
-        full_armor_name: "红钨胸甲",
+        full_armor_name: "Red Tungsten Chestplate",
         defense_value: 43.2e8,
         stats: {
             attack_mul: {
@@ -5043,7 +5043,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "leg armor exterior",
         value: 472.5e15,
         component_tier: 20,
-        full_armor_name: "红钨腿甲",
+        full_armor_name: "Red Tungsten Leg Armor",
         defense_value: 37.8e8,
         stats: {
             attack_mul: {
@@ -5059,7 +5059,7 @@ item_templates["Twist liek a snek"] = new Book({
         component_type: "shoes exterior",
         value: 270e15,
         component_tier: 20,
-        full_armor_name: "红钨战靴",
+        full_armor_name: "Red Tungsten Battle Boots",
         defense_value: 21.6e8,
         stats: {
             attack_mul: {

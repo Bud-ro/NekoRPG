@@ -690,7 +690,7 @@ function format_skill_rewards(milestone){
                                 });
     
      skills["ReflectStarVioletLight"] = new Skill({skill_id: "ReflectStarVioletLight", 
-                                    names: {0: "映星紫华",1:"映星紫华·小成",2:"映星紫华·精通",3:"映星紫华·大成",4:"映星紫华·圆满"}, 
+                                    names: {0: "Starlight Violet Radiance",1:"Starlight Violet Radiance: Minor",2:"Starlight Violet Radiance: Proficient",3:"Starlight Violet Radiance: Major",4:"Starlight Violet Radiance: Perfect"},
                                     parent_skill: "Stance mastery",
                                     description: "The second major realm of the [Starlight Bloom] arcane art. Greatly boosts XP gain for the original art.", 
                                     max_level_coefficient: 1.25,
@@ -731,7 +731,7 @@ function format_skill_rewards(milestone){
                                     }
                                 });
     skills["Neko_Realm"] = new Skill({skill_id: "Neko_Realm", 
-                                    names: {0: "微火",10:"燃灼术",20:"火灵幻海[领域一重]",30:"焰海霜天[领域二重]",35:"焰海霜天[领域三重]",40:"出云落月[领域四重]",45:"[出云落月[领域五重]",55:"出云落月[领域六重]"},
+                                    names: {0: "Micro Flame",10:"Flame-Searing Art",20:"Fire Spirit Illusion Sea [Domain Stage 1]",30:"Flame-Sea Frost Sky [Domain Stage 2]",35:"Flame-Sea Frost Sky [Domain Stage 3]",40:"Rising Cloud, Falling Moon [Domain Stage 4]",45:"Rising Cloud, Falling Moon [Domain Stage 5]",55:"Rising Cloud, Falling Moon [Domain Stage 6]"},
                                     parent_skill: "Stance mastery",
                                     description: "Neko's Domain (embryonic form). Each level grants base stats, each stage breakthrough grants new insights!", 
                                     max_level_coefficient: 1.25,
@@ -764,7 +764,7 @@ function format_skill_rewards(milestone){
                                 });
     
     skills["WaterHeartless"] = new Skill({skill_id: "WaterHeartless", 
-                                    names: {0: "水无心",10:"水无心·小成",20:"水无心·大成",30:"水无心·圆满"}, 
+                                    names: {0: "Waterless Mind",10:"Waterless Mind: Minor",20:"Waterless Mind: Major",30:"Waterless Mind: Perfect"},
                                     parent_skill: "Stance mastery",
                                     description: "Sword technique Neko comprehended by the Qingye Waterfall. Has 3 modes of use.", 
                                     max_level_coefficient: 1.25,
@@ -776,7 +776,7 @@ function format_skill_rewards(milestone){
                                         return `Increases the effect of [Waterless Mind] arcane arts`;
                                     }});   
     skills["ReflectStarFlower"] = new Skill({skill_id: "ReflectStarFlower", 
-                                    names: {0: "映星花",10:"映星花·精通",20:"映星花·小成",30:"映星花·大成",40:"映星花·圆满"}, 
+                                    names: {0: "Starlight Bloom",10:"Starlight Bloom: Proficient",20:"Starlight Bloom: Minor",30:"Starlight Bloom: Major",40:"Starlight Bloom: Perfect"},
                                     parent_skill: "Stance mastery",
                                     description: "Advanced arcane art taught by Brother Feng. Seems usable for a very long time.", 
                                     max_level_coefficient: 1.25,
@@ -788,7 +788,7 @@ function format_skill_rewards(milestone){
                                         return `Increases the effect of [Starlight Bloom] arcane arts`;
                                     }});          
     skills["ReflectStarSkyRainbow"] = new Skill({skill_id: "ReflectStarSkyRainbow", 
-                                    names: {0: "映星天彩",10:"映星天彩·入门",20:"映星天彩·精通",30:"映星天彩·小成",40:"映星天彩·大成",50:"映星天彩·圆满"}, 
+                                    names: {0: "Starlight Skyhue",10:"Starlight Skyhue: Initiate",20:"Starlight Skyhue: Proficient",30:"Starlight Skyhue: Minor",40:"Starlight Skyhue: Major",50:"Starlight Skyhue: Perfect"},
                                     parent_skill: "Stance mastery",
                                     description: "The sublimated form of [Starlight Bloom]. Gains 5 extra layers along with lifesteal and combo abilities.", 
                                     max_level_coefficient: 1.25,
@@ -993,7 +993,7 @@ function format_skill_rewards(milestone){
     });
     skills["Toxic resistance"] = new Skill({
         skill_id: "Toxic resistance",
-        names: {0: "毒液抗性",10:"毒液抗性·精通",20:"毒液抗性·圆满"},
+        names: {0: "Venom Resistance",10:"Venom Resistance: Proficient",20:"Venom Resistance: Perfect"},
         description: "Immunity to common insect venom.",
         base_xp_cost: 1800e4,
         max_level: 20,
@@ -1446,7 +1446,7 @@ Multiplies AP with daggers by ${Math.round((skills["Daggers"].get_coefficient("m
 //non-work activity related
 (function(){
     skills["Sleeping"] = new Skill({skill_id: "Sleeping",
-                                    names: {0: "睡眠",10: "冥想",25: "修炼",50:"时间跳跃"}, 
+                                    names: {0: "Sleep",10: "Meditation",25: "Cultivation",50:"Time Skip"},
                                     description: "A good, regular routine is the foundation of a healthy body and the cornerstone of cultivation. At max level, maybe you can bend time?",
                                     base_xp_cost: 1000,
                                     visibility_treshold: 300,
@@ -1712,7 +1712,7 @@ Multiplies AP with daggers by ${Math.round((skills["Daggers"].get_coefficient("m
     
     skills["AquaElement"] = new Skill({skill_id: "AquaElement",
     description: "Sense the water element to speed up Domain comprehension! (Effective before Domain Stage 3 Pinnacle [lv.39])",
-    names: {0: "水元素亲和",10:"水元素精通"},
+    names: {0: "Water Element Affinity",10:"Water Element Mastery"},
     max_level: 18,
     xp_scaling: 1.6,
     category: "Activity",
@@ -1732,7 +1732,7 @@ Multiplies AP with daggers by ${Math.round((skills["Daggers"].get_coefficient("m
 
     skills["GrassCutting"] = new Skill({skill_id: "GrassCutting",
     description: "Harvest Silent Fern better!",
-    names: {0: "收割",10:"收割·精通",20:"收割·大师"},
+    names: {0: "Harvesting",10:"Harvesting: Proficient",20:"Harvesting: Master"},
     max_level: 20,
     xp_scaling: 1.6,
     category: "Activity",
@@ -1751,7 +1751,7 @@ Multiplies AP with daggers by ${Math.round((skills["Daggers"].get_coefficient("m
 
     skills["GroundDigging"] = new Skill({skill_id: "GroundDigging",
     description: "Drill strata better!",
-    names: {0: "钻探",10:"钻探·精通",20:"钻探·大师"},
+    names: {0: "Drilling",10:"Drilling: Proficient",20:"Drilling: Master"},
     max_level: 20,
     xp_scaling: 1.6,
     category: "Activity",
@@ -2089,7 +2089,7 @@ Multiplies AP with daggers by ${Math.round((skills["Daggers"].get_coefficient("m
     skills["Iron skin"] = new Skill({
         skill_id: "Iron skin",
         category: "Combat",
-        names: {0: "坚韧皮肤", 5: "铁制皮肤", 10: "精钢皮肤",15:"紫铜皮肤",20:"地宫皮肤",25:"充能皮肤",30:"脉冲皮肤",35:"海绿皮肤",40:"红钢皮肤",45:"秘银皮肤",50:"旋律皮肤",55:"冰髓皮肤",60:"晶化皮肤",65:"水素皮肤",70:"宝石皮肤",75:"魂晶皮肤",80:"盖亚皮肤",85:"远古皮肤",90:"源金皮肤"},
+        names: {0: "Tough Skin", 5: "Iron Skin", 10: "Steel Skin",15:"Copper Skin",20:"Dungeon Skin",25:"Charged Skin",30:"Pulse Skin",35:"Sea Green Skin",40:"Red Steel Skin",45:"Mithril Skin",50:"Melody Skin",55:"Ice Marrow Skin",60:"Crystallized Skin",65:"Hydro Skin",70:"Gem Skin",75:"Soul Crystal Skin",80:"Gaia Skin",85:"Ancient Skin",90:"Primal Gold Skin"},
         description: "What doesn't kill me makes me stronger",
         base_xp_cost: 100,
         xp_scaling: 2.0,

@@ -5857,7 +5857,7 @@ function update_displayed_engine(){
 
 
     piston_div.style.left = Math.round(120 * (1+Math.cos(3.1415927*(1+inf_combat.FE.piston))) + 64) + 'px';
-    let modemap = {0:"摸鱼ing",1:"压缩内部气体",2:"内部气体自由膨胀",3:"向内部充入气体",4:"释放内部气体"};
+    let modemap = {0:"Slacking off",1:"Compressing internal gas",2:"Free expansion of internal gas",3:"Injecting internal gas",4:"Releasing internal gas"};
     piston_mode.innerText = modemap[inf_combat.FE.piston_mode];
     piston_temp.innerText = inf_combat.FE.IA.temp.toFixed(2);
     let pres = inf_combat.FE.IA.pressure;
