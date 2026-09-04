@@ -30,7 +30,7 @@ const stat_names = {"strength": "str",
                     "health_regeneration_flat": "HP Regen", //same as for "health"
                     "agility": "agility",
                     "dexterity": "dex",
-                    "defense": "防御",
+                    "defense": "Defense",
                     "UK1": "UK1",
                     "attack_speed": "Attack Speed",
                     "attack_power": "Attack",
@@ -44,7 +44,7 @@ const stat_names = {"strength": "str",
                     "evasion": "EP",
                     "evasion_points": "EP",
                     "attack_points": "AP",
-                    "SCGV": "宝石耐性",
+                    "SCGV": "Gem Tolerance",
                 };
 
 function get_hit_chance(attack_agi, evasion_agi) {

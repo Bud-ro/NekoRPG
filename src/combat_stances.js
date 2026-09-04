@@ -249,9 +249,9 @@ stances["SF_Lucky"] = new Stance({
 });
 
 stances["SR_Power"] = new Stance({
-    name: "映星天彩·纯色",
+    name: "Starlight Skyhue: Pure",
     id: "映星天彩·纯色",
-    description: "强大的单体攻击秘法。0级状态即为【映星花·巨星】的极限。",
+    description: "A powerful single-target arcane art. At level 0 it already equals the limit of [Starlight Bloom: Giant Star].",
     related_skill: "ReflectStarSkyRainbow",
     stat_multipliers: {
         attack_speed: 1.80,
@@ -262,9 +262,9 @@ stances["SR_Power"] = new Stance({
     max_bonus: 1.6667,//2.5=1.5*1.6667
 });
 stances["SR_Multi"] = new Stance({
-    name: "映星天彩·虹彩",
+    name: "Starlight Skyhue: Iridescent",
     id: "映星天彩·虹彩",
-    description: "群体攻击秘法。0级即为【映星花·繁星】的极限，且不存在无法命中4个目标的虚弱期。",
+    description: "An area-attack arcane art. Level 0 already equals the limit of [Starlight Bloom: Starfield], with no weak period where it can't hit 4 targets.",
     related_skill: "ReflectStarSkyRainbow",
     stat_multipliers: {
         attack_speed: 1.40,
@@ -274,9 +274,9 @@ stances["SR_Multi"] = new Stance({
     max_bonus: 1.6,
 });
 stances["SR_Double"] = new Stance({
-    name: "映星天彩·双虹",
+    name: "Starlight Skyhue: Double Rainbow",
     id: "映星天彩·双红",
-    description: "附带有2连击效果的秘法。代价则是基础数值的缺失。此外，【烈日祝福·艮】或【A9·回风药剂】(没有幸运真的撑得到4-4吗)会覆盖它的效果。",
+    description: "An arcane art with a Double Strike effect, at the cost of lower base values. Also, [Blazing Sun Blessing: Gen] or [A9 Whirlwind Potion] (can you really reach 4-4 without Luck?) will override its effect.",
     related_skill: "ReflectStarSkyRainbow",
     stat_multipliers: {
         attack_speed: 1.10,
@@ -286,9 +286,9 @@ stances["SR_Double"] = new Stance({
     max_bonus: 4,
 });
 stances["SR_Blood"] = new Stance({
-    name: "映星天彩·血杀",
+    name: "Starlight Skyhue: Blood Slaughter",
     id: "映星天彩·血杀",
-    description: "附带有吸血效果的秘法。吸血倍率为1%+0.1%x【映星天彩】等级，无法超过自身生命上限。基础数值和【双虹】类似。注意只能吸到实际存在的血——让敌人倒欠你一管血并不能增加你的恢复量。",
+    description: "An arcane art with lifesteal. Lifesteal rate is 1% + 0.1% x [Starlight Skyhue] level, capped at your max HP. Base values similar to [Double Rainbow]. Note it only drains HP that actually exists — putting an enemy into negative HP doesn't increase your recovery.",
     related_skill: "ReflectStarSkyRainbow",
     stat_multipliers: {
         attack_speed: 1.10,

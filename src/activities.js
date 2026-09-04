@@ -121,8 +121,8 @@ class Gathering extends Training {
     });
     activities["AquaElement"] = new Training({
         name: "AquaElement",
-        action_text: "感应水元素",
-        description: "八大基础元素之一的亲和力，暂时只能作用于领域经验",
+        action_text: "Sense the water element",
+        description: "Affinity with one of the eight basic elements; for now it only affects Domain XP",
         base_skills_names: ["AquaElement"],
         is_unlocked: true,
     });

@@ -553,11 +553,11 @@
                                 </div>
                             </div>
                             <div id = "fish_font_div">
-                                少<br><br>
-                                &emsp; 女<br><br>
-                                &emsp; &emsp; 钓<br><br>
-                                &emsp; &emsp; &emsp; 鱼<br><br>
-                                &emsp; &emsp; &emsp; &emsp; 中<br><br>
+                                F<br><br>
+                                &emsp; I<br><br>
+                                &emsp; &emsp; S<br><br>
+                                &emsp; &emsp; &emsp; H<br><br>
+                                &emsp; &emsp; &emsp; &emsp; ↓<br><br>
                                 &emsp; &emsp; &emsp; &emsp; &emsp; ...
                             </div>
                         </div>
@@ -590,8 +590,8 @@
                         
                         <div id = "reactor_div">
                             <div id = "reactor_info_div">
-                                <b>= 核心反应堆 = </b> 超高品质凝胶剑柄的最佳选择！<br>
-                                <span style="color:red">警告：反应堆温度达到9999°C时会熔毁,摧毁其中的一切.</span><br>
+                                <b>= Core Reactor = </b> The best way to craft ultra-high-quality Gel Grips!<br>
+                                <span style="color:red">WARNING: The reactor will melt down at 9999°C, destroying everything inside.</span><br>
                             </div>
                             <div id = "B1_core_div">
                                 <div id = "reactor_B1_bar_max"> 
@@ -599,7 +599,7 @@
                                     </div>
                                 </div>
                                 <span style="color:#CFFEE3">
-                                    <b>B1·能量核心</b>:<span id="B1_core_num">0</span>
+                                    <b>B1 Energy Core</b>:<span id="B1_core_num">0</span>
                                 <span id="B1_core_diff">0</span>
                                 <br>
                                     <span class="money_button" onclick = "reactor(1,1)">[+1]</span>
@@ -615,7 +615,7 @@
                                     </div>
                                 </div>
                                 <span style="color:#FBD6FB">
-                                    <b>A7·能量核心</b>:<span id="A7_core_num">0</span>
+                                    <b>A7 Energy Core</b>:<span id="A7_core_num">0</span>
                                 <span id="A7_core_diff">0</span>
                                 <br>
                                     <span class="money_button" onclick = "reactor(2,1)">[+1]</span>
@@ -630,7 +630,7 @@
                                     </div>
                                 </div>
                                 <span style="color:#0066FF">
-                                    <b>雷电加护</b>:<span id="LD_core_num">0</span>
+                                    <b>Thunder Shield</b>:<span id="LD_core_num">0</span>
                                     <span class="money_button" onclick = "reactor(3,1)">[+1]</span>
                                     <span class="money_button" onclick = "reactor(3,10)">[+10]</span>
                                     <span class="money_button" onclick = "reactor(3,100)">[+100]</span>
@@ -644,7 +644,7 @@
                                     </div>
                                 </div>
                                 <span style="color:#808080">
-                                    <b>高能凝胶 </b>:<span id="ER_core_num">0</span>
+                                    <b>High-Energy Gel </b>:<span id="ER_core_num">0</span>
                                     <span class="money_button" onclick = "reactor(4,1)">[+1]</span>
                                     <span class="money_button" onclick = "reactor(4,10)">[+10]</span>
                                     <span class="money_button" onclick = "reactor(4,100)">[+100]</span>
@@ -659,7 +659,7 @@
                                     </div>
                                 </div>
                                 <span style="color:#ffb0b0">
-                                    <b>反应堆温度 </b>:<span id="temp_num">5600</span>°C
+                                    <b>Reactor Temperature </b>:<span id="temp_num">5600</span>°C
                                     
                                     <span id="temp_diff">0</span>
                                 </span> 
@@ -671,40 +671,40 @@
                                     </div>
                                 </div>
                                 <span style="color:#d0ffc0">
-                                    <b>总吸收原能 </b>:<span id="rad_num">0</span>
+                                    <b>Total Absorbed Energy </b>:<span id="rad_num">0</span>
                                     <span id="rad_diff">0</span>
-                                    (品质:<span id="rad_quality">160</span>%)
+                                    (Quality:<span id="rad_quality">160</span>%)
                                 </span> 
                                 <br>
                             </div>
 
                             <div id="reactor_exit">
-                                <span class="money_button_wide" onclick = "extract_reactor()" style="color:#808080"><b>[提取凝胶剑柄]</b></span>
-                                <span class="money_button_wider" onclick = "extract_evolve()" style="color:#80FF80" id="reactor_evolve"><b>[凝聚进化结晶(100万原能)]</b></span>
-                                <span class="money_button" onclick = "leave_reactor()"><b>[离开]</b></span>
+                                <span class="money_button_wide" onclick = "extract_reactor()" style="color:#808080"><b>[Extract Gel Grip]</b></span>
+                                <span class="money_button_wider" onclick = "extract_evolve()" style="color:#80FF80" id="reactor_evolve"><b>[Condense Evolution Crystal (1M Energy)]</b></span>
+                                <span class="money_button" onclick = "leave_reactor()"><b>[Leave]</b></span>
                             </div>
                         </div>
                         
                         <div id = "grass_div">
                             <div id = "grass_info_div">
-                                <b>= 绝音蕨 = </b> Tier 16内甲与轮芯的必需品！ <br>
-                                <span style="color:lime">小概率获取噬芒兰！概率与收割技能相关.</span><br>
+                                <b>= Silent Fern =</b>A must-have for Tier 16 inner linings and wheel cores!<br>
+                                <span style="color:lime">Small chance to obtain a Light-Devouring Orchid! Chance depends on the Harvesting skill.</span><br>
                             </div>
                             <div id = "grass_stat_div">
                                 <span style="font-size:large;color:#c0ffc0;left:10px"><b>
-                                <span id='grassfield_current'> 0</span> / <span id='grassfield_cap'>10</span> (<span id='grasstimer_current'>0.00</span> / <span id='grasstimer_cap'>2.00</span> s) ~ 已收割:<span id='grass_harvested'>0</span>
+                                <span id='grassfield_current'> 0</span> / <span id='grassfield_cap'>10</span> (<span id='grasstimer_current'>0.00</span> / <span id='grasstimer_cap'>2.00</span>s) ~ Harvested:<span id='grass_harvested'>0</span>
                                 </b></span>
                             </div>
                             <div id = "grassfield_div">
                                 <canvas id="grassCanvas" width="384" height="320"></canvas>
                             </div>
                             <div id="grass_exit">
-                                <span class="money_button" onclick = "leave_grass()"><b>[离开]</b></span>
+                                <span class="money_button" onclick = "leave_grass()"><b>[Leave]</b></span>
                             </div>
                         </div>
                         <div id = "digging_div">
                             <div id = "digging_info_div">
-                                <b>= 地层钻探 = </b> <br>瞄准有用的物品，点击纳可驱动钩爪，抓上来！ <br><span class="money_button" onclick = "leave_digging()"><b>[离开]</b></span>
+                                <b>= Stratum Drilling =</b> <br>Aim at something useful, click Neko to fire the grapple, and haul it up!<br><span class="money_button" onclick = "leave_digging()"><b>[Leave]</b></span>
                                 
                             </div>
                             <div id = "digging_neko_div">
@@ -752,16 +752,16 @@
                         <div id = "trade_control_div">
 
                             <div id = "trader_cost_mult">
-                                <div id = "trader_cost_mult_text">价格:</div>
+                                <div id = "trader_cost_mult_text">Price:</div>
                                 <div id = "trader_cost_mult_value"> </div>
                             </div>
                             
                             <div id = "trade_price_div">
-                                <div id = "trade_price_text">总计: </div>
+                                <div id = "trade_price_text">Total:</div>
                                 <div id = "trade_price_value"> 0C </div>
                             </div>
                             <div id = "trade_time_div">
-                                <div id = "trade_time_text">刷新: </div>
+                                <div id = "trade_time_text">Refresh:</div>
                                 <div id = "trade_time_value"> 1d </div>
                             </div>
 
@@ -787,12 +787,12 @@
                         </div>
                         <div class="crafting_category" data-crafting_category="crafting">
                             <div class="crafting_subpage_buttons activable_buttons">
-                                <div class="crafting_subpage_button crafting_subpage_button_6 active_selection_button" onclick="switchCraftingRecipesSubpage('crafting', 'items')">第一幕</div>
-                                <div class="crafting_subpage_button crafting_subpage_button_6 active_selection_button" onclick="switchCraftingRecipesSubpage('crafting', 'items2')">第二幕</div>
-                                <div class="crafting_subpage_button crafting_subpage_button_6 active_selection_button" onclick="switchCraftingRecipesSubpage('crafting', 'items3')">第三幕</div>
-                                <div class="crafting_subpage_button crafting_subpage_button_6 active_selection_button" onclick="switchCraftingRecipesSubpage('crafting', 'items4')">第四幕</div>
-                                <div class="crafting_subpage_button crafting_subpage_button_6" onclick="switchCraftingRecipesSubpage('crafting', 'components')">部件</div>
-                                <div class="crafting_subpage_button crafting_subpage_button_6" onclick="switchCraftingRecipesSubpage('crafting', 'equipment')">装备</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_6 active_selection_button" onclick="switchCraftingRecipesSubpage('crafting', 'items')">Act I</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_6 active_selection_button" onclick="switchCraftingRecipesSubpage('crafting', 'items2')">Act II</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_6 active_selection_button" onclick="switchCraftingRecipesSubpage('crafting', 'items3')">Act III</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_6 active_selection_button" onclick="switchCraftingRecipesSubpage('crafting', 'items4')">Act IV</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_6" onclick="switchCraftingRecipesSubpage('crafting', 'components')">Components</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_6" onclick="switchCraftingRecipesSubpage('crafting', 'equipment')">Equipment</div>
                             </div>
                             <div class="crafting_category crafting_recipe_list" data-crafting_category="crafting" data-crafting_subcategory="items">
                                 
@@ -812,7 +812,7 @@
                         </div>
                         <div class="crafting_category" data-crafting_category="cooking"  style="display:none">
                             <div class="crafting_subpage_buttons activable_buttons">
-                                <div class="crafting_subpage_button crafting_subpage_button_4 active_selection_button" onclick="switchCraftingRecipesSubpage('cooking', 'items')">第一幕</div><div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('cooking', 'items2')">第二幕</div><div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('cooking', 'items3')">第三幕</div><div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('cooking', 'items4')">第四幕</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_4 active_selection_button" onclick="switchCraftingRecipesSubpage('cooking', 'items')">Act I</div><div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('cooking', 'items2')">Act II</div><div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('cooking', 'items3')">Act III</div><div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('cooking', 'items4')">Act IV</div>
                             </div>
                             <div class="crafting_category crafting_recipe_list" data-crafting_category="cooking" data-crafting_subcategory="items">
                                 
@@ -826,10 +826,10 @@
                         </div>
                         <div class="crafting_category" data-crafting_category="smelting"  style="display:none">
                             <div class="crafting_subpage_buttons activable_buttons">
-                                <div class="crafting_subpage_button crafting_subpage_button_4 active_selection_button" onclick="switchCraftingRecipesSubpage('smelting', 'items')">第一幕</div>
-                                <div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('smelting', 'items2')">第二幕</div>
-                                <div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('smelting', 'items3')">第三幕</div>
-                                <div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('smelting', 'items4')">第四幕</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_4 active_selection_button" onclick="switchCraftingRecipesSubpage('smelting', 'items')">Act I</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('smelting', 'items2')">Act II</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('smelting', 'items3')">Act III</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('smelting', 'items4')">Act IV</div>
                             </div>
                             <div class="crafting_category crafting_recipe_list" data-crafting_category="smelting" data-crafting_subcategory="items">
                             </div>
@@ -859,10 +859,10 @@
                         </div>
                         <div class="crafting_category" data-crafting_category="alchemy"  style="display:none">
                             <div class="crafting_subpage_buttons activable_buttons">
-                                <div class="crafting_subpage_button crafting_subpage_button_4 active_selection_button" onclick="switchCraftingRecipesSubpage('alchemy', 'items')">第一幕</div>
-                                <div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('alchemy', 'items2')">第二幕</div>
-                                <div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('alchemy', 'items3')">第三幕</div>
-                                <div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('alchemy', 'items4')">第四幕</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_4 active_selection_button" onclick="switchCraftingRecipesSubpage('alchemy', 'items')">Act I</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('alchemy', 'items2')">Act II</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('alchemy', 'items3')">Act III</div>
+                                <div class="crafting_subpage_button crafting_subpage_button_4" onclick="switchCraftingRecipesSubpage('alchemy', 'items4')">Act IV</div>
                             </div>
                             <div class="crafting_category crafting_recipe_list" data-crafting_category="alchemy" data-crafting_subcategory="items">
 
@@ -899,20 +899,20 @@
                     </div>
                     <div id = "family_div">
                         <span id = "family_locked">
-                        家族系统~纳可现在还不是家主！<br>
-                        通过<b>区域 3 - 7</b>后击败<span class='realm_cloudy'>纳布(宝库)</span>解锁！
+                        Family system~ Neko isn't the clan head yet!<br>
+                        Clear <b>Zone 3 - 7</b> then defeat <span class='realm_cloudy'>Nabu (Treasury)</span> to unlock!
                         </span>
                         <div id = "family_system">
-                        <span style='color:lightyellow'>⌚️下一血洛日:</span> <span id= "family_timer_game">180h</span> ( 现实 <span id= "family_timer_real">99</span> )<br>
+                        <span style='color:lightyellow'>⌚️ Next Xuelo day:</span> <span id= "family_timer_game">180h</span>( real time<span id= "family_timer_real">99</span> )<br>
 
                         
-                        <span style='color:lightcyan'>次日<span class='realm_basic'>微尘级初级</span>新生儿数 : </span><input type = "text" id = "baby_born_num"> <br>
-                        <span style='color:lightcoral'>每日养育耗费 : </span><span id="family_baby_cost"></span><br>
+                        <span style='color:lightcyan'>next day<span class='realm_basic'>Dust Rank: Novice</span>Newborns:</span><input type = "text" id = "baby_born_num"> <br>
+                        <span style='color:lightcoral'>Daily upkeep:</span><span id="family_baby_cost"></span><br>
                         <span style="color:yellow" id="baby_scale1"></span>
                         <span style="color:orange" id="baby_scale2"></span>
                         <span style="color:red" id="baby_scale3"></span>
-                        <span style='color:lightgreen'>每日家族赚取: </span><span id="family_re_gain"></span><br>
-                        <span style='color:lightskyblue'>纳家影响力:<span id="family_influ">0</span><img src='image/item/B9_soul.png'>(<span id="family_re_influ">0</span><img src='image/item/B9_soul.png'>/d)</span>
+                        <span style='color:lightgreen'>Daily clan income:</span><span id="family_re_gain"></span><br>
+                        <span style='color:lightskyblue'>Nayaka influence:<span id="family_influ">0</span><img src='image/item/B9_soul.png'>(<span id="family_re_influ">0</span><img src='image/item/B9_soul.png'>/d)</span>
                         <br><br>
                         
                         <table id = "family_member_list">
@@ -927,7 +927,7 @@
                             Stances
                         </div>
                         <div id="show_family" class="skill_stance_control_button" onclick="showFamily()">
-                            家族
+                            Family
                         </div>
                     </div>
                 </div>
@@ -939,30 +939,30 @@
                     <div id = "engine_container_stats">
                         <b>
                         <span style="color:rgb(154, 255, 255)">
-                            冰原超流体 : <span id="container_sf">25</span> m³ / <span id="container_sf_S">25</span> m²
+                            Glacial Superfluid: <span id="container_sf">25</span> m³ / <span id="container_sf_S">25</span> m²
                             <span class="money_button" onclick = "engine(1,5)">[+5]</span>
                             <span class="money_button" onclick = "engine(1,50)">[+50]</span>
                             <span class="money_button" onclick = "engine(1,500)">[+500]</span>
                             <span class="money_button" onclick = "engine(1,-1)">[+ALL]</span>
                         </span><br>
                         <span style="color:rgb(94, 255, 207)">
-                            温度 : <span id="container_temp">240</span> K ( <span id="container_temp_change">0</span> K/s)
+                            Temperature: <span id="container_temp">240</span> K ( <span id="container_temp_change">0</span> K/s)
                         </span><br>
                         <span style="color:rgb(94, 183, 255)">
-                            多孔冰晶 : <span id="container_isolate">15</span> pts / <span id="container_isolate_thickness">0.0416</span> m  
+                            Porous Ice Crystal: <span id="container_isolate">15</span> pts / <span id="container_isolate_thickness">0.0416</span> m  
                             <span class="money_button" onclick = "engine(2,10)">[+10]</span>
                             <span class="money_button" onclick = "engine(2,100)">[+100]</span>
                             <span class="money_button" onclick = "engine(2,-1)">[+ALL]</span>
                             <span class="money_button" onclick = "engine(2,-2)">[-ALL]</span>
                         </span><br>
                         <span style="color:rgb(94, 124, 255)">
-                            冰元素 : <span id="container_element">0</span> / <span id="container_element_max">25000</span> pts (<span id="container_element_speed">0</span>pts/s) <br>
+                            Ice element: <span id="container_element">0</span> / <span id="container_element_max">25000</span> pts (<span id="container_element_speed">0</span>pts/s) <br>
                             
                             <div id = "engine_element_bar_max"> 
                                 <div id = "engine_element_bar_current">
                                 </div>
                             </div>
-                            预计时间 : <span id="container_element_time">10000 年</span>.
+                            Estimated time: <span id="container_element_time">10000 years</span>.
                         </span><br>
                         </b>
                     </div>
@@ -970,25 +970,25 @@
                     <div id = "engine_result_stats">
                         <b>
                         <span style="color:rgb(0, 255, 255)">
-                            提取 [<span id="engine_result_name">冰原超流体</span>] : <br>
+                            Extract [<span id="engine_result_name">Arctic Superfluid</span>] : <br>
                             <span class="money_button" onclick = "engine_r(1,5)">[-5]</span>
                             <span class="money_button" onclick = "engine_r(1,50)">[-50]</span>
                             <span class="money_button" onclick = "engine_r(1,500)">[-500]</span>
                             <span class="money_button" onclick = "engine_r(1,-1)">[-ALL]</span>
                         </span><br>
                         <span style="color:cyan; -webkit-text-stroke:0.5px blue">
-                            玄冰果实 : <span id="engine_result_fruit_status">未放入</span>
-                            <span class="money_button" onclick = "engine_f(1)">[放入]</span>
-                            <span class="money_button" onclick = "engine_f(2)">[取出]</span>
+                            Black Ice Fruit: <span id="engine_result_fruit_status">Empty</span>
+                            <span class="money_button" onclick = "engine_f(1)">[Insert]</span>
+                            <span class="money_button" onclick = "engine_f(2)">[Remove]</span>
                         </span><br>
                         <span style="color:rgb(94, 183, 255)">
-                            环境 : <span id="engine_result_temp">240</span><br>
-                            <span class="money_button" onclick = "engine_e(240)" style="color:rgb(209, 255, 240)">[冰原]</span>
-                            <span id="engine_env1" class="money_button" onclick = "engine_e(960)" style="color:rgb(255, 94, 0)">[焰海]</span>
-                            <span id="engine_env2" class="money_button" onclick = "engine_e(180)" style="color:rgb(20, 228, 255)">[霜天]</span>
+                            Environment: <span id="engine_result_temp">240</span><br>
+                            <span class="money_button" onclick = "engine_e(240)" style="color:rgb(209, 255, 240)">[Glacial Plain]</span>
+                            <span id="engine_env1" class="money_button" onclick = "engine_e(960)" style="color:rgb(255, 94, 0)">[Flame Sea]</span>
+                            <span id="engine_env2" class="money_button" onclick = "engine_e(180)" style="color:rgb(20, 228, 255)">[Frost Sky]</span>
                         </span><br>
                         
-                        <span style="background: linear-gradient(to bottom right,cyan,white,cyan);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;" onclick="engine_e(-1)">[将飞船之心转化为材料版]</span><br>
+                        <span style="background: linear-gradient(to bottom right,cyan,white,cyan);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;" onclick="engine_e(-1)">[Convert Spaceship Heart to material version]</span><br>
                         </b>
                     </div>
                     <div id = "engine_piston">
@@ -1000,28 +1000,28 @@
                             <img src="image/spec/piston_pt2.png" style="transform: scale(1.2); transform-origin: top left; image-rendering: pixelated; display: block;">
                         </div>
                         <div id = "piston_buttons">
-                            <div id="piston_compress" onclick="changePistonMode(1)">压缩</div>
-                            <div id="piston_expand"   onclick="changePistonMode(2)">膨胀</div>
-                            <div id="piston_fill"     onclick="changePistonMode(3)">充气</div>
-                            <div id="piston_defill"   onclick="changePistonMode(4)">放气</div>
+                            <div id="piston_compress" onclick="changePistonMode(1)">Compress</div>
+                            <div id="piston_expand"   onclick="changePistonMode(2)">Expand</div>
+                            <div id="piston_fill"     onclick="changePistonMode(3)">Inflate</div>
+                            <div id="piston_defill"   onclick="changePistonMode(4)">Deflate</div>
                         </div>
                         <div id = "piston_stats">
                             <b><span style="color:antiquewhite">
-                            活塞工作状态 : <span id="piston_mode">摸鱼ing</span>
+                            Piston status: <span id="piston_mode">Slacking...</span>
                             </span><br><span style="color:lightskyblue">
-                            内部气体温度 : <span id="piston_temp">240</span> K
+                            Internal gas temperature: <span id="piston_temp">240</span> K
                             </span><br><span style="color:pink">
-                            内部气体压强 : <span id="piston_pressure">9977.4MPa</span>
+                            Internal gas pressure: <span id="piston_pressure">9977.4MPa</span>
                             </span><br><span style="color:lemonchiffon">
-                            冰原空气体积 : <span id="piston_volume">30</span> / 30.000 m³
+                            Glacial air volume: <span id="piston_volume">30</span> / 30.000 m³
                             </span><br><span style="color:lightsalmon">
-                            喵可做功功率 : <span id="neko_power">0</span> GW
+                            Neko's work output: <span id="neko_power">0</span> GW
                             </span><br>
                         </b>
                         </div>
                     </div>
-                    <div id = "piston_change" onclick="changePistonStatus()"><i class="material-icons">sync</i>移动活塞</div>
-                    <div id = "leave_engine" onclick="engine_l()"><i class="material-icons">directions</i>离开极寒相变引擎</div>
+                    <div id = "piston_change" onclick="changePistonStatus()"><i class="material-icons">sync</i>Move piston</div>
+                    <div id = "leave_engine" onclick="engine_l()"><i class="material-icons">directions</i>Leave the Frigid Phase-Change Engine</div>
                 </div>
 
                 <div id = "journal_div" class = "box_div">
@@ -1339,11 +1339,11 @@
                 </div>
                 <div class="options_choice">
                     <input type="checkbox" id="options_combat_filter" name="options_combat_filter" value="options_combat_filter" onclick = "option_combat_filter()"/>
-                    <label for="options_combat_filter">战斗日志过滤器[闪避/0伤/击杀]</label>
+                    <label for="options_combat_filter">Combat log filter [dodge / 0 dmg / kills]</label>
                 </div>
                 <div class="options_choice">
                     <input type="checkbox" id="options_format_change" name="options_format_change" value="options_format_change" onclick = "option_format_change()"/>
-                    <label for="options_format_change">科学计数法[刷新以全部生效]</label>
+                    <label for="options_format_change">Scientific notation [refresh to fully apply]</label>
                 </div>
             </div>
             <div id="close_options" onclick="closeOptions()"> X </div>
@@ -2214,14 +2214,14 @@
                                 //
                                 let chara_result = Math.round(Math.max(1,Math.pow(10,lgresult)));
                                 if(chara_result > 1){
-                                    log_message("[纱雪]哈?卖掉峰大哥?","sayuki");
-                                    log_message("[纱雪]为了防止他把你揍死，帮你取消交易了哦~","sayuki");
+                                    log_message("[Sayuki] Huh? Selling off Big Bro Feng?","sayuki");
+                                    log_message("[Sayuki] To prevent him from beating you to death, I've cancelled the trade for you~","sayuki");
                                     return;
                                 }
                                 else{
                                     
-                                    log_message("[纱雪]虽然不知道都燕岗领第一了峰大哥怎么还在你身上……","sayuki");
-                                    log_message("[纱雪]但是没关系！既然你那么努力，这些钱就给你了啦。","sayuki");
+                                    log_message("[Sayuki] No idea how Big Bro Feng is still on you when you're already #1 in Yangang Territory...","sayuki");
+                                    log_message("[Sayuki] But whatever! Since you worked so hard, the money's yours.","sayuki");
                                     total_price += add_to_selling_list({item_key: selected_item, count: number_to_move})
                                 }
 

@@ -273,7 +273,7 @@ class TradeItem {
         act:3,
     });
     traders["冰宫商人"] = new Trader({
-        name: "冰宫商人",
+        name: "Ice Palace Merchant",
         inventory_template: "Sky II",
         is_unlocked: false,
         location_name: "极寒冰宫",
@@ -282,7 +282,7 @@ class TradeItem {
         act:3,
     });
     traders["窥秘商人"] = new Trader({
-        name: "窥秘商人",
+        name: "Secret-Peeping Merchant",
         inventory_template: "Sky III",
         is_unlocked: false,
         location_name: "传承幻境",
@@ -291,7 +291,7 @@ class TradeItem {
         act:3,
     });
     traders["声望商人"] = new Trader({
-        name: "声望商人",
+        name: "Reputation Merchant",
         inventory_template: "Cloudy I",
         is_unlocked: false,
         location_name: "狩猎大赛·城门战",
@@ -300,7 +300,7 @@ class TradeItem {
         act:4,
     });
     traders["声望商人·二代"] = new Trader({
-        name: "声望商人·二代",
+        name: "Reputation Merchant II",
         inventory_template: "Cloudy II",
         is_unlocked: false,
         location_name: "狩猎大赛·古墓战",

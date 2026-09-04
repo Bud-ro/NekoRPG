@@ -227,7 +227,7 @@ character.add_xp = function ({xp_to_add, use_bonus = true},ignore_cap) {
                         //character.xp.total_xp -= character.xp.current_xp - 99999999 ;
                         if(ignore_cap <= 2){
                                 character.xp.current_xp = 99.9999e16;
-                                return `<b>被<span class="realm_cloudy">云霄级瓶颈</span>限制 - 经验已锁定</b>`
+                                return `<b>Limited by the <span class="realm_cloudy">Nimbus Rank bottleneck</span> - XP locked</b>`
                         }
                         else character.upgrade_effects(29);
                 }
@@ -258,10 +258,10 @@ character.add_xp = function ({xp_to_add, use_bonus = true},ignore_cap) {
                 character.xp_bonuses.multiplier.levels.all_skill = (character.xp_bonuses.multiplier.levels.all_skill || 1) * total_skill_xp_multiplier;
 
                 //显示-提高属性
-                gains += `攻击提高了${format_number(this_realm[2] * 2)}<br>`;
-                gains += `防御,敏捷提高了${format_number(this_realm[2])}<br>`;
-                gains += `生命上限提高了${format_number(this_realm[3])}<br>`;
-                if(realm_spd_gain != 0) gains += `小阶段突破，攻击速度额外增加${realm_spd_gain}<br>`;
+                gains += `Attack increased by ${format_number(this_realm[2] * 2)}<br>`;
+                gains += `Defense, Agility increased by ${format_number(this_realm[2])}<br>`;
+                gains += `Max HP increased by ${format_number(this_realm[3])}<br>`;
+                if(realm_spd_gain != 0) gains += `Minor stage breakthrough, Attack Speed additionally increased by ${realm_spd_gain}<br>`;
                 if(this_realm[0]==9)
                 {
                         //add_to_character_inventory([{item: item_templates["微火"], count: 1}]);
@@ -287,32 +287,32 @@ character.add_xp = function ({xp_to_add, use_bonus = true},ignore_cap) {
                                 gains += `You've already broken through this threshold. Way too much grinding.<br>`;
                         }
                         add_xp_to_skill({skill: skills["Neko_Realm"], xp_to_add: 9999e12,should_info:true,use_bonus:false},);
-                        gains += `角色属性<span style="color:#ffee11">【幸运】</span>现已解锁！<br>`;
-                        gains += `同时，【暴击】属性被浓缩了！<br>【暴击概率】降低为四分之一，【暴击伤害】提高了四倍！<br>`;
+                        gains += `Character stat <span style="color:#ffee11">[Luck]</span> is now unlocked!<br>`;
+                        gains += `Also, [Crit] stats have been concentrated!<br>[Crit Rate] reduced to one-quarter, [Crit Damage] quadrupled!<br>`;
                         character.stats.multiplier.level.crit_rate = 0.25;
                         character.stats.multiplier.level.crit_multiplier = 4;
-                        gains += `心之境界二重 - 贪婪之神 现已解锁！<br>`;
-                        gains += `基础时间流速: 6min -> 48min!<br>`;
+                        gains += `Heart-Realm Stage 2 - God of Greed is now unlocked!<br>`;
+                        gains += `Base time flow: 6min -> 48min!<br>`;
                 }
                 if(this_realm[0]==29)
                 {
                         if(skills["Neko_Realm"].current_level <= 44){
-                                gains += `大境界突破，【出云落月[领域四重]】获取了9999秭经验！<br>`;
+                                gains += `Major Realm Breakthrough, [Rising Cloud, Falling Moon [Domain Stage 4]] gained 9999Sp XP!<br>`;
                         }
                         else{
-                                gains += `大境界突破，【出云落月[领域五重]】获取了9999秭经验...?<br>`;
-                                gains += `怎么领悟已经突破了哇。也太能刷了叭。<br>`;
+                                gains += `Major Realm Breakthrough, [Rising Cloud, Falling Moon [Domain Stage 5]] gained 9999Sp XP...?<br>`;
+                                gains += `You've already broken through this threshold. Way too much grinding.<br>`;
                         }
                         add_xp_to_skill({skill: skills["Neko_Realm"], xp_to_add: 9999e24,should_info:true,use_bonus:false},);
-                        gains += `所有状态效果已清除！<br>`;
+                        gains += `All status effects cleared!<br>`;
 
                         Object.keys(active_effects).forEach(key => {
                         delete active_effects[key];
                         });
 
-                        gains += `角色属性<span style="color:#ff11dd">【宝石软上限起始倍率(SCGV)】</span>现已解锁！<br>`;
-                        gains += `心之境界三重 - 信仰祭坛 现已解锁！ <br>`;
-                        gains += `基础时间流速: 48min -> 288min!<br>`;
+                        gains += `Character stat <span style="color:#ff11dd">[Gem soft-cap starting multiplier (SCGV)]</span> is now unlocked!<br>`;
+                        gains += `Heart-Realm Stage 3 - Altar of Faith is now unlocked! <br>`;
+                        gains += `Base time flow: 48min -> 288min!<br>`;
                 }
 
 
@@ -327,7 +327,7 @@ character.add_xp = function ({xp_to_add, use_bonus = true},ignore_cap) {
                 {
                         let SCGV_gain = (this_realm[0]==29?4:2);
                         character.stats.flat.level.SCGV = ( character.stats.flat.level.SCGV || 0) + SCGV_gain;
-                        gains += `<span style="color:#ff11dd"> SCGV </span>增加了${SCGV_gain.toFixed(2)}<br>`;
+                        gains += `<span style="color:#ff11dd"> SCGV </span>increased by ${SCGV_gain.toFixed(2)}<br>`;
                 }
 
 
@@ -730,27 +730,27 @@ character.take_damage = function (enemy_spec = [0],{damage_value, can_faint = tr
         }
 
         
-        if(active_effects["坚固 A9"]!=undefined && damage_taken > character.stats.full.max_health * 0.05)
+        if(active_effects["Fortify A9"]!=undefined && damage_taken > character.stats.full.max_health * 0.05)
         {
                 log_message(`Fortify potion blocked ${format_number(damage_taken - character.stats.full.max_health * 0.05)} overflow damage!`,"enemy_enhanced")
                 damage_taken = character.stats.full.max_health * 0.0500001;
         }
         if(active_effects["烈日祝福·坤"]!=undefined && damage_taken > character.stats.full.max_health * 0.08)
         {
-                log_message(`烈日祝福·坤 抵挡了溢出的 ${format_number(damage_taken - character.stats.full.max_health * 0.08)} 伤害！`,"enemy_enhanced")
+                log_message(`Blazing Sun Blessing: Kun blocked ${format_number(damage_taken - character.stats.full.max_health * 0.08)} overflow damage!`,"enemy_enhanced")
                 damage_taken = character.stats.full.max_health * 0.0800001;
         }
 
 
         if(active_effects["死线"]!=undefined && damage_taken != 0){
                 
-                if(character.equipment.props?.name == "凝滞力场"){
+                if(character.equipment.props?.name == "Stasis Field"){
                         damage_taken *= 2;
-                        log_message(`[死线·凝滞]受到的伤害x2！`,"enemy_enhanced");
+                        log_message(`[Deadline: Stasis] Damage taken x2!`,"enemy_enhanced");
                 }
                 else{
                         damage_taken *= 5;
-                        log_message(`[死线]受到的伤害x5！`,"enemy_enhanced");
+                        log_message(`[Deadline] Damage taken x5!`,"enemy_enhanced");
                 }
         }//死线(2/3)
 

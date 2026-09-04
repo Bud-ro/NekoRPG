@@ -135,8 +135,8 @@ effect_templates["Weakness"] = new ActiveEffect({
 
 
 
-effect_templates["饱食 IV"] = new ActiveEffect({
-    name: "饱食 IV",
+effect_templates["Satiated IV"] = new ActiveEffect({
+    name: "Satiated IV",
     effects: {
         stats: {
             health_regeneration_flat: {flat: 2000},
@@ -239,8 +239,8 @@ effect_templates["Scatter B9"] = new ActiveEffect({
     name: "Scatter B9",
     effects: {stats: {health_regeneration_percent: {flat: -1}}}
 });
-effect_templates["反戈 B9"] = new ActiveEffect({
-    name: "反戈 B9",
+effect_templates["Reversal B9"] = new ActiveEffect({
+    name: "Reversal B9",
     effects: {stats: {attack_mul: {multiplier: 0.8}}}
 });
 effect_templates["Void Gate B9"] = new ActiveEffect({
@@ -287,12 +287,12 @@ effect_templates["Radiation"] = new ActiveEffect({
 });
 
 effect_templates["灵感"] = new ActiveEffect({
-    name: "灵感",
+    name: "Inspiration",
     effects: {stats: {luck:{multiplier: 1.2}}}
 });
 
-effect_templates["恢复 B1"] = new ActiveEffect({
-    name: "恢复 B1",
+effect_templates["Recovery B1"] = new ActiveEffect({
+    name: "Recovery B1",
     effects: {
         stats: {
             health_regeneration_flat: {flat: 4800000},
@@ -312,7 +312,7 @@ effect_templates["Recovery B4"] = new ActiveEffect({
 
 
 effect_templates["恢复 B8"] = new ActiveEffect({
-    name: "恢复 B8",
+    name: "Recovery B8",
     effects: {
         stats: {
             health_regeneration_flat: {flat: 16.72e8},
@@ -321,7 +321,7 @@ effect_templates["恢复 B8"] = new ActiveEffect({
     }
 });
 effect_templates["强化 B8"] = new ActiveEffect({
-    name: "强化 B8",
+    name: "Enhance B8",
     effects: {
         stats: {
             attack_power:{flat:2.88e8},
@@ -334,7 +334,7 @@ effect_templates["强化 B8"] = new ActiveEffect({
 
 
 effect_templates["饱食 IX"] = new ActiveEffect({
-    name: "饱食 IX",
+    name: "Satiety IX",
     effects: {
         stats: {
             health_regeneration_flat: {flat: 84.8e8},
@@ -347,7 +347,7 @@ effect_templates["饱食 IX"] = new ActiveEffect({
 
 
 effect_templates["恢复 C2"] = new ActiveEffect({
-    name: "恢复 C2",
+    name: "Recovery C2",
     effects: {
         stats: {
             health_regeneration_flat: {flat: 327.68e8},
@@ -356,7 +356,7 @@ effect_templates["恢复 C2"] = new ActiveEffect({
 });
 
 effect_templates["饱食 X"] = new ActiveEffect({
-    name: "饱食 X",
+    name: "Satiety X",
     effects: {
         stats: {
             health_regeneration_flat: {flat: 168.56e8},
@@ -370,7 +370,7 @@ effect_templates["饱食 X"] = new ActiveEffect({
 
 
 effect_templates["恢复 C3"] = new ActiveEffect({
-    name: "恢复 C3",
+    name: "Recovery C3",
     effects: {
         stats: {
             health_regeneration_flat: {flat: 491.52e8},
@@ -379,7 +379,7 @@ effect_templates["恢复 C3"] = new ActiveEffect({
     }
 });
 effect_templates["恢复 C4"] = new ActiveEffect({
-    name: "恢复 C4",
+    name: "Recovery C4",
     effects: {
         stats: {
             health_regeneration_flat: {flat: 983.04e8},
@@ -389,7 +389,7 @@ effect_templates["恢复 C4"] = new ActiveEffect({
 });
 
 effect_templates["强化 C3"] = new ActiveEffect({
-    name: "强化 C3",
+    name: "Enhance C3",
     effects: {
         stats: {
             attack_power:{flat:162e8},
@@ -399,7 +399,7 @@ effect_templates["强化 C3"] = new ActiveEffect({
     }
 });
 effect_templates["强化 C3G"] = new ActiveEffect({
-    name: "强化 C3G",
+    name: "Enhance C3G",
     effects: {
         stats: {
             attack_power:{flat:216e8},
@@ -416,69 +416,69 @@ effect_templates["强化 C3G"] = new ActiveEffect({
 
 
 effect_templates["烈日祝福·乾"] = new ActiveEffect({
-    name: "烈日祝福·乾",
+    name: "Blazing Sun Blessing: Qian",
     effects: {stats: {max_health: {multiplier: 1.8}}}
 });
 effect_templates["烈日祝福·兑"] = new ActiveEffect({
-    name: "烈日祝福·兑",
+    name: "Blazing Sun Blessing: Dui",
     effects: {stats: {health_regeneration_percent: {flat: 1.5}}}
 });
 effect_templates["烈日祝福·离"] = new ActiveEffect({
-    name: "烈日祝福·离",
+    name: "Blazing Sun Blessing: Li",
     effects: {stats: {attack_power: {multiplier: 1.2}}}
 });
 effect_templates["烈日祝福·震"] = new ActiveEffect({
-    name: "烈日祝福·震",
+    name: "Blazing Sun Blessing: Zhen",
     effects: {stats: {attack_speed: {multiplier: 1.15}}}
 });
 effect_templates["烈日祝福·巽"] = new ActiveEffect({
-    name: "烈日祝福·巽",
+    name: "Blazing Sun Blessing: Xun",
     effects: {stats: {}}
     //牵制(80%效力)
 });
 effect_templates["烈日祝福·坎"] = new ActiveEffect({
-    name: "烈日祝福·坎",
+    name: "Blazing Sun Blessing: Kan",
     effects: {stats: {}}
     //魔攻(20%效力)
 });
 effect_templates["烈日祝福·艮"] = new ActiveEffect({
-    name: "烈日祝福·艮",
+    name: "Blazing Sun Blessing: Gen",
     effects: {stats: {attack_mul: {multiplier: 0.8}}}
     //回风(普攻倍率80%)
 });
 effect_templates["烈日祝福·坤"] = new ActiveEffect({
-    name: "烈日祝福·坤",
+    name: "Blazing Sun Blessing: Kun",
     effects: {stats: {}}
     //坚固(无副作用/8%)
 });
 
 
 effect_templates["迟缓"] = new ActiveEffect({
-    name: "迟缓",
+    name: "Sluggish",
     effects: {stats: {attack_speed: {multiplier: 0.8}}}
 });
 effect_templates["灵魂之力 I"] = new ActiveEffect({
-    name: "灵魂之力 I",
+    name: "Soul Power I",
     effects: {stats: {max_health: {multiplier: 1.2}}}
 });
 effect_templates["灵魂之力 II"] = new ActiveEffect({
-    name: "灵魂之力 II",
+    name: "Soul Power II",
     effects: {stats: {max_health: {multiplier: 1.2}}}
 });
 effect_templates["灵魂之力 III"] = new ActiveEffect({
-    name: "灵魂之力 III",
+    name: "Soul Power III",
     effects: {stats: {
             attack_power:{flat:1e8},
             defense:{flat:1e8},
             agility:{flat:1e8},}}});
 effect_templates["灵魂之力 IV"] = new ActiveEffect({
-    name: "灵魂之力 IV",
+    name: "Soul Power IV",
     effects: {stats: {
             attack_power:{flat:1e8},
             defense:{flat:1e8},
             agility:{flat:1e8},}}});
 effect_templates["灵魂之力 V"] = new ActiveEffect({
-    name: "灵魂之力 V",
+    name: "Soul Power V",
     effects: {stats: {
             attack_power:{flat:5e8},
             defense:{flat:5e8},
@@ -489,25 +489,25 @@ effect_templates["灵魂之力 V"] = new ActiveEffect({
 
 
 effect_templates["死线"] = new ActiveEffect({
-    name: "死线",
+    name: "Deadline",
     effects: {stats: {}}
 });
 
 
 effect_templates["吹火 C6"] = new ActiveEffect({
-    name: "吹火 C6",
+    name: "Fire-Blowing C6",
     effects: {stats: {attack_speed: {multiplier: 0.7}}}
 });
 effect_templates["硬化 C6"] = new ActiveEffect({
-    name: "硬化 C6",
+    name: "Hardening C6",
     effects: {stats: {attack_mul: {multiplier: 0.4}}}
 });
 effect_templates["血遁 C6"] = new ActiveEffect({
-    name: "血遁 C6",
+    name: "Blood Evasion C6",
     effects: {stats: {health_regeneration_percent: {flat: -1},}}
 });
 effect_templates["压制 C6"] = new ActiveEffect({
-    name: "压制 C6",
+    name: "Oppression C6",
     effects: {stats: {}}
 });
 export {effect_templates, ActiveEffect};
