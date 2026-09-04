@@ -102,10 +102,10 @@ class Enemy {
         let droprate_modifier = this.loot_multi;
         droprate_modifier *= character.stats.full.luck;
         /*
-        if(enemy_killcount[this.name] >= 999) {
+        if(enemy_killcount[this.id] >= 999) {
             droprate_modifier = 0.1;
-        } else if(enemy_killcount[this.name]) {
-            droprate_modifier = 111/(111+enemy_killcount[this.name]);
+        } else if(enemy_killcount[this.id]) {
+            droprate_modifier = 111/(111+enemy_killcount[this.id]);
         }
         */
         return droprate_modifier;
@@ -2690,7 +2690,7 @@ class Enemy {
             //应为1.6Z
         ],
     });
-    enemy_templates["Traveling Merchant"] = new Enemy({
+    enemy_templates["行脚商人"] = new Enemy({
         name: "Traveling Merchant",
         description: "Seems to be the leader of those sailors from before. He's also opened a shop nearby... worth a visit~",
         xp_value: 17711, 
@@ -9884,8 +9884,8 @@ C3 862'6757'1272          /1395'8386'2445         exp
 })()
 
 Object.keys(enemy_templates).forEach((enemy_key) => {
-    if(!enemy_templates[enemy_key].id) {
-        enemy_templates[enemy_key].id = enemy_key;
+    if(!enemy_templates[enemy_key].id || enemy_templates[enemy_key].id === enemy_templates[enemy_key].name) {
+        enemy_templates[enemy_key].id = enemy_key; // upstream key; used for bestiary/killcount so saves stay in upstream format
     }
 });
 

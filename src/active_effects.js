@@ -49,7 +49,7 @@ effect_templates["Slight food poisoning"] = new ActiveEffect({
 
 //NekoRPG effects below
 
-effect_templates["Satiated"] = new ActiveEffect({
+effect_templates["饱食"] = new ActiveEffect({
     name: "Satiated",
     effects: {
         stats: {
@@ -58,7 +58,7 @@ effect_templates["Satiated"] = new ActiveEffect({
     }
 });
 
-effect_templates["Satiated II"] = new ActiveEffect({
+effect_templates["饱食 II"] = new ActiveEffect({
     name: "Satiated II",
     effects: {
         stats: {
@@ -67,7 +67,7 @@ effect_templates["Satiated II"] = new ActiveEffect({
     }
 });
 
-effect_templates["Satiated III"] = new ActiveEffect({
+effect_templates["饱食 III"] = new ActiveEffect({
     name: "Satiated III",
     effects: {
         stats: {
@@ -80,7 +80,7 @@ effect_templates["Satiated III"] = new ActiveEffect({
 });
 
 
-effect_templates["Recovery A1"] = new ActiveEffect({
+effect_templates["恢复 A1"] = new ActiveEffect({
     name: "Recovery A1",
     effects: {
         stats: {
@@ -90,7 +90,7 @@ effect_templates["Recovery A1"] = new ActiveEffect({
 });
 
 
-effect_templates["Enhance A1"] = new ActiveEffect({
+effect_templates["强化 A1"] = new ActiveEffect({
     name: "Enhance A1",
     effects: {
         stats: {
@@ -101,7 +101,7 @@ effect_templates["Enhance A1"] = new ActiveEffect({
         }
     }
 });
-effect_templates["Recovery A8"] = new ActiveEffect({
+effect_templates["恢复 A8"] = new ActiveEffect({
     name: "Recovery A8",
     effects: {
         stats: {
@@ -111,7 +111,7 @@ effect_templates["Recovery A8"] = new ActiveEffect({
 });
 
 
-effect_templates["Enhance A8"] = new ActiveEffect({
+effect_templates["强化 A8"] = new ActiveEffect({
     name: "Enhance A8",
     effects: {
         stats: {
@@ -124,7 +124,7 @@ effect_templates["Enhance A8"] = new ActiveEffect({
 });
 
 
-effect_templates["Weakness"] = new ActiveEffect({
+effect_templates["虚弱"] = new ActiveEffect({
     name: "Weakness",
     effects: {
         stats: {
@@ -135,7 +135,7 @@ effect_templates["Weakness"] = new ActiveEffect({
 
 
 
-effect_templates["Satiated IV"] = new ActiveEffect({
+effect_templates["饱食 IV"] = new ActiveEffect({
     name: "Satiated IV",
     effects: {
         stats: {
@@ -147,7 +147,7 @@ effect_templates["Satiated IV"] = new ActiveEffect({
     }
 });
 
-effect_templates["Satiated V"] = new ActiveEffect({
+effect_templates["饱食 V"] = new ActiveEffect({
     name: "Satiated V",
     effects: {
         stats: {
@@ -158,7 +158,7 @@ effect_templates["Satiated V"] = new ActiveEffect({
         }
     }
 });
-effect_templates["Satiated VI"] = new ActiveEffect({
+effect_templates["饱食 VI"] = new ActiveEffect({
     name: "Satiated VI",
     effects: {
         stats: {
@@ -171,7 +171,7 @@ effect_templates["Satiated VI"] = new ActiveEffect({
 });
 
 
-effect_templates["Satiated VII"] = new ActiveEffect({
+effect_templates["饱食 VII"] = new ActiveEffect({
     name: "Satiated VII",
     effects: {
         stats: {
@@ -183,7 +183,7 @@ effect_templates["Satiated VII"] = new ActiveEffect({
     }
 });
 
-effect_templates["Satiated VIII"] = new ActiveEffect({
+effect_templates["饱食 VIII"] = new ActiveEffect({
     name: "Satiated VIII",
     effects: {
         stats: {
@@ -196,7 +196,7 @@ effect_templates["Satiated VIII"] = new ActiveEffect({
 });
 
 
-effect_templates["Magic Attack A9"] = new ActiveEffect({
+effect_templates["魔攻 A9"] = new ActiveEffect({
     name: "Magic Attack A9",
     effects: {
         stats: {
@@ -205,7 +205,7 @@ effect_templates["Magic Attack A9"] = new ActiveEffect({
     }
 });
 
-effect_templates["Suppression A9"] = new ActiveEffect({
+effect_templates["牵制 A9"] = new ActiveEffect({
     name: "Suppression A9",
     effects: {
         stats: {
@@ -213,7 +213,7 @@ effect_templates["Suppression A9"] = new ActiveEffect({
     }
 });
 
-effect_templates["Whirlwind A9"] = new ActiveEffect({
+effect_templates["回风 A9"] = new ActiveEffect({
     name: "Whirlwind A9",
     effects: {
         stats: {
@@ -222,7 +222,7 @@ effect_templates["Whirlwind A9"] = new ActiveEffect({
     }
 });
 
-effect_templates["Fortify A9"] = new ActiveEffect({
+effect_templates["坚固 A9"] = new ActiveEffect({
     name: "Fortify A9",
     effects: {
         stats: {
@@ -231,57 +231,57 @@ effect_templates["Fortify A9"] = new ActiveEffect({
     }
 });
 
-effect_templates["Spirit Flash B9"] = new ActiveEffect({
+effect_templates["灵闪 B9"] = new ActiveEffect({
     name: "Spirit Flash B9",
     effects: {stats: {}}
 });
-effect_templates["Scatter B9"] = new ActiveEffect({
+effect_templates["散华 B9"] = new ActiveEffect({
     name: "Scatter B9",
     effects: {stats: {health_regeneration_percent: {flat: -1}}}
 });
-effect_templates["Reversal B9"] = new ActiveEffect({
+effect_templates["反戈 B9"] = new ActiveEffect({
     name: "Reversal B9",
     effects: {stats: {attack_mul: {multiplier: 0.8}}}
 });
-effect_templates["Void Gate B9"] = new ActiveEffect({
+effect_templates["异界之门 B9"] = new ActiveEffect({
     name: "Void Gate B9",
     effects: {stats: {attack_mul: {multiplier: 0.1}}}
 });
 
 
-effect_templates["Moonlight Blessing: New Moon"] = new ActiveEffect({
+effect_templates["皎月祝福·新月"] = new ActiveEffect({
     name: "Moonlight Blessing: New Moon",
     effects: {stats: {health_regeneration_percent: {flat: 1}}}
 });
-effect_templates["Moonlight Blessing: Crescent Moon"] = new ActiveEffect({
+effect_templates["皎月祝福·蛾眉月"] = new ActiveEffect({
     name: "Moonlight Blessing: Crescent Moon",
     effects: {stats: {max_health: {multiplier: 1.5}}}
 });
-effect_templates["Moonlight Blessing: First Quarter"] = new ActiveEffect({
+effect_templates["皎月祝福·上弦月"] = new ActiveEffect({
     name: "Moonlight Blessing: First Quarter",
     effects: {stats: {crit_multiplier: {multiplier: 1.6}}}
 });
-effect_templates["Moonlight Blessing: Waxing Gibbous"] = new ActiveEffect({
+effect_templates["皎月祝福·盈凸月"] = new ActiveEffect({
     name: "Moonlight Blessing: Waxing Gibbous",
     effects: {stats: {attack_mul: {multiplier: 1.4}}}
 });
-effect_templates["Moonlight Blessing: Full Moon"] = new ActiveEffect({
+effect_templates["皎月祝福·满月"] = new ActiveEffect({
     name: "Moonlight Blessing: Full Moon",
     effects: {stats: {attack_power: {multiplier: 1.1}}}
 });
-effect_templates["Moonlight Blessing: Waning Gibbous"] = new ActiveEffect({
+effect_templates["皎月祝福·亏凸月"] = new ActiveEffect({
     name: "Moonlight Blessing: Waning Gibbous",
     effects: {stats: {defense: {multiplier: 1.2}}}
 });
-effect_templates["Moonlight Blessing: Last Quarter"] = new ActiveEffect({
+effect_templates["皎月祝福·下弦月"] = new ActiveEffect({
     name: "Moonlight Blessing: Last Quarter",
     effects: {stats: {agility: {multiplier: 1.2}}}
 });
-effect_templates["Moonlight Blessing: Waning Crescent"] = new ActiveEffect({
+effect_templates["皎月祝福·残月"] = new ActiveEffect({
     name: "Moonlight Blessing: Waning Crescent",
     effects: {stats: {attack_speed: {multiplier: 1.1}}}
 });
-effect_templates["Radiation"] = new ActiveEffect({
+effect_templates["辐射"] = new ActiveEffect({
     name: "Radiation",
     effects: {stats: {max_health: {multiplier: 0.5},health_regeneration_percent:{flat:-8}}}
 });
@@ -291,7 +291,7 @@ effect_templates["灵感"] = new ActiveEffect({
     effects: {stats: {luck:{multiplier: 1.2}}}
 });
 
-effect_templates["Recovery B1"] = new ActiveEffect({
+effect_templates["恢复 B1"] = new ActiveEffect({
     name: "Recovery B1",
     effects: {
         stats: {
@@ -300,7 +300,7 @@ effect_templates["Recovery B1"] = new ActiveEffect({
         }
     }
 });
-effect_templates["Recovery B4"] = new ActiveEffect({
+effect_templates["恢复 B4"] = new ActiveEffect({
     name: "Recovery B4",
     effects: {
         stats: {

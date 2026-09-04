@@ -5438,7 +5438,7 @@ item_templates["Twist liek a snek"] = new Book({
         name: "Blue Flower Fish",
         description: "Another type of Barrier Lake fish. Its gluttonous nature makes it relatively agile, requiring more effort to catch at the same cultivation level.",
         value: 84e6,
-        effects: [{effect: "Satiated VI", duration: 90}],
+        effects: [{effect: "饱食 VI", duration: 90}],
         realmcap:18,
         image: "image/item/cyan_fish.png",
     });
@@ -5447,7 +5447,7 @@ item_templates["Twist liek a snek"] = new Book({
         name: "Ice Pillar Fish",
         description: "The king-like existence among Barrier Lake fish. Small but extremely difficult to handle, legend has it there are records of Sky-rank Ice Pillar Fish leaping from the water.",
         value: 216e6,
-        effects: [{effect: "Satiated VI", duration: 540}],
+        effects: [{effect: "饱食 VI", duration: 540}],
         realmcap:20,
         image: "image/item/ice_fish.png",
     });
@@ -5555,7 +5555,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "Cooked young wild beast steak. Restores 40 HP per second for 60 seconds when consumed.",//血药模版
         value: 20,
         realmcap:5,
-        effects: [{effect: "Satiated", duration: 60}],
+        effects: [{effect: "饱食", duration: 60}],
         image: "image/item/O1_cooked_meat.png",
     });
     item_templates["万物·凶兽肉排"] = new UsableItem({
@@ -5563,14 +5563,14 @@ item_templates["Twist liek a snek"] = new Book({
         description: "The color is strange but it's truly edible! Restores 80 HP per second for 60 seconds when consumed.",
         value: 240,
         realmcap:7,
-        effects: [{effect: "Satiated II", duration: 60}],
+        effects: [{effect: "饱食 II", duration: 60}],
         image: "image/item/O5_cooked_meat.png",
     });
     item_templates["潮汐·凶兽肉排"] = new UsableItem({
         name: "Tidal·Beast Steak",
         description: "Tidal-rank wild beast meat. Not only restores HP, but also slightly increases comprehension!",
         value: 6000,
-        effects: [{effect: "Satiated III", duration: 60}],
+        effects: [{effect: "饱食 III", duration: 60}],
         realmcap:8,
         image: "image/item/O8_cooked_meat.png",
     });
@@ -5578,7 +5578,7 @@ item_templates["Twist liek a snek"] = new Book({
         name: "Dungeon Recovery Potion",
         description: "Not particularly tasty. Sadly, dungeon monster meat tastes even worse...",
         value: 210e3,
-        effects: [{effect: "Recovery A1", duration: 60}],
+        effects: [{effect: "恢复 A1", duration: 60}],
         realmcap:11,
         image: "image/item/A1_medicine.png",
     });
@@ -5587,14 +5587,14 @@ item_templates["Twist liek a snek"] = new Book({
         description: "Can greatly enhance your strength for a short time. Well, there are just a few side effects...",
         value: 420e3,
         realmcap:11,
-        effects: [{effect: "Enhance A1", duration: 30},{effect: "Weakness", duration: 90}],
+        effects: [{effect: "强化 A1", duration: 30},{effect: "虚弱", duration: 90}],
         image: "image/item/A1_booster.png",
     });
     item_templates["地宫·荒兽肉排"] = new UsableItem({
         name: "Dungeon·Wild Beast Steak",
         description: "Earth-rank wild beast meat. Thank goodness, there's finally something edible in the deep dungeon.",
         value: 500e3,
-        effects: [{effect: "Satiated IV", duration: 90}],
+        effects: [{effect: "饱食 IV", duration: 90}],
         realmcap:11,
         image: "image/item/A2_cooked_meat.png",
     });
@@ -5602,7 +5602,7 @@ item_templates["Twist liek a snek"] = new Book({
         name: "Forest·Wild Beast Steak",
         description: "Mid-tier Earth-rank wild beast meat. Outside the dungeon, the wild beasts taste much better.",
         value: 1.8e6,
-        effects: [{effect: "Satiated V", duration: 60}],
+        effects: [{effect: "饱食 V", duration: 60}],
         realmcap:14,
         image: "image/item/A4_cooked_meat.png",
     });//
@@ -5612,7 +5612,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "Provides 10% magic attack, at the cost of -10% normal attack multiplier.",
         value: 240e6,
         realmcap:18,
-        effects: [{effect: "Magic Attack A9", duration: 120}],
+        effects: [{effect: "魔攻 A9", duration: 120}],
         image: "image/item/A9_magic.png",
     });
     item_templates["A9·牵制药剂"] = new UsableItem({
@@ -5620,7 +5620,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "Provides 60% effective suppression, capped at 3x damage amplification.",
         value: 240e6,
         realmcap:18,
-        effects: [{effect: "Suppression A9", duration: 120}],
+        effects: [{effect: "牵制 A9", duration: 120}],
         image: "image/item/A9_contain.png",
     });
     item_templates["A9·回风药剂"] = new UsableItem({
@@ -5628,7 +5628,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "Allows 0.8 and 1.2 unequal dual strikes, at the cost of 1% bleed effect.",
         value: 240e6,
         realmcap:18,
-        effects: [{effect: "Whirlwind A9", duration: 120}],
+        effects: [{effect: "回风 A9", duration: 120}],
         image: "image/item/A9_rewind.png",
     });
     item_templates["A9·坚固药剂"] = new UsableItem({
@@ -5636,7 +5636,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "Limits damage taken per round to 5% of max HP, at the cost of 1% bleed effect.",
         value: 240e6,
         realmcap:18,
-        effects: [{effect: "Fortify A9", duration: 120}],
+        effects: [{effect: "坚固 A9", duration: 120}],
         image: "image/item/A9_hard.png",
     });
     
@@ -5644,7 +5644,7 @@ item_templates["Twist liek a snek"] = new Book({
         name: "Ruin Recovery Potion",
         description: "A potion commonly kept by Lanling City explorers. Seemingly brewed in a cauldron.",
         value: 180e6,
-        effects: [{effect: "Recovery A8", duration: 60}],
+        effects: [{effect: "恢复 A8", duration: 60}],
         realmcap:21,
         image: "image/item/A8_medicine.png",
     });
@@ -5653,7 +5653,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "A potion commonly kept by Lanling City explorers. Why use a cauldron? Because high-energy gel would destroy fragile alchemy equipment.",
         value: 360e6,
         realmcap:21,
-        effects: [{effect: "Enhance A8", duration: 30},{effect: "Weakness", duration: 90}],
+        effects: [{effect: "强化 A8", duration: 30},{effect: "虚弱", duration: 90}],
         image: "image/item/A8_booster.png",
     });
 
@@ -5662,7 +5662,7 @@ item_templates["Twist liek a snek"] = new Book({
         name: "Battlefield·Wild Beast Steak",
         description: "Late-tier Earth-rank wild beast meat. Compared to fish, its greater advantage is mass production potential...",
         value: 540e6,
-        effects: [{effect: "Satiated VII", duration: 60}],
+        effects: [{effect: "饱食 VII", duration: 60}],
         realmcap:21,
         image: "image/item/A8_cooked_meat.png",
     });//
@@ -5673,7 +5673,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "After intense purification, a potion effective for below B5 tier. The duration is greatly reduced though.",
         value: 120e9,
         realmcap:23,
-        effects: [{effect: "Fortify A9", duration: 30}],
+        effects: [{effect: "坚固 A9", duration: 30}],
         image: "image/item/B3_hard.png",
     });
 
@@ -5682,7 +5682,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "A potion that temporarily suppresses [Sublimation] by releasing vitality outward. To prevent fatal overdose, it also includes a vitality recovery function.",
         value: 3e9,
         realmcap:24,
-        effects: [{effect: "Recovery B1", duration: 90}],
+        effects: [{effect: "恢复 B1", duration: 90}],
         image: "image/item/B1_life_medicine.png",
     });
 
@@ -5691,7 +5691,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "Conceals a portion of life, thereby increasing life [capacity].",
         value: 3e12,
         realmcap:28,
-        effects: [{effect: "Recovery B4", duration: 90}],
+        effects: [{effect: "恢复 B4", duration: 90}],
         image: "image/item/B4_medicine.png",
     });
     
@@ -5699,7 +5699,7 @@ item_templates["Twist liek a snek"] = new Book({
         name: "Swamp·Wild Beast Steak",
         description: "Early-tier Sky-rank wild beast meat. Unlike the previous meats, this one is deep-fried!",
         value: 160e9,
-        effects: [{effect: "Satiated VIII", duration: 90}],
+        effects: [{effect: "饱食 VIII", duration: 90}],
         realmcap:24,
         image: "image/item/B3_cooked_meat.png",
     });//
@@ -5711,7 +5711,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "Reflects 75% of damage back at the enemy, ignoring defense! The cost is -20% Normal Attack Multiplier, and reflected damage can't kill (leaves 1 HP)", 
         value: 8.4e12,
         realmcap:28,
-        effects: [{effect: "Reversal B9", duration: 120}],
+        effects: [{effect: "反戈 B9", duration: 120}],
         image: "image/item/B9_reflect.png",
     });
     item_templates["B9·灵闪药剂"] = new UsableItem({
@@ -5719,7 +5719,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "If the enemy's attack is less than 2x the character's, damage taken is reduced by half of (character DEF / enemy DEF). Otherwise, it's increased by twice (character DEF / enemy DEF). This effect won't reduce damage below 0 or raise it above 100x.", 
         value: 8.4e12,
         realmcap:28,
-        effects: [{effect: "Spirit Flash B9", duration: 120}],
+        effects: [{effect: "灵闪 B9", duration: 120}],
         image: "image/item/B9_spiritdodge.png",
     });
     item_templates["B9·散华药剂"] = new UsableItem({
@@ -5727,7 +5727,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "The enemy's attack is weakened by (character HP / enemy HP)^0.5 × 10 (in %), but causes 1% HP drain. This effect cannot reduce enemy base attack below 0.",
         value: 8.4e12,
         realmcap:28,
-        effects: [{effect: "Scatter B9", duration: 120}],
+        effects: [{effect: "散华 B9", duration: 120}],
         image: "image/item/B9_sublimhealth.png",
     });
     item_templates["B9·异界药剂"] = new UsableItem({
@@ -5735,7 +5735,7 @@ item_templates["Twist liek a snek"] = new Book({
         description: "Base attack multiplier becomes 10%, but increases by 20%, 30%... with each hit. Pick this for long fights!", 
         value: 8.4e12,
         realmcap:28,
-        effects: [{effect: "Void Gate B9", duration: 120}],
+        effects: [{effect: "异界之门 B9", duration: 120}],
         image: "image/item/B9_portal.png",
     });
     item_templates["B9·??药剂"] = new UsableItem({

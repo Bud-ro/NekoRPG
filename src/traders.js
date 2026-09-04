@@ -200,14 +200,14 @@ class TradeItem {
         profit_margin: 3,
         act:1,
     });
-    traders["Vending Machine"] = new Trader({
+    traders["自动售货机"] = new Trader({
         name: "Vending Machine",
         inventory_template: "Basic I",
         is_unlocked: true,
         location_name: "纳家大厅",
         act:1,
     });
-    traders["Yangang General Store"] = new Trader({
+    traders["燕岗杂货铺"] = new Trader({
         name: "Yangang General Store",
         inventory_template: "Basic II",
         is_unlocked: false,
@@ -215,7 +215,7 @@ class TradeItem {
         profit_margin: 3,
         act:1,
     });
-    traders["Mine Market"] = new Trader({
+    traders["矿井集市"] = new Trader({
         name: "Mine Market",
         inventory_template: "Basic III",
         is_unlocked: true,
@@ -223,7 +223,7 @@ class TradeItem {
         profit_margin: 3.2,
         act:1,
     });
-    traders["Metal Wholesaler"] = new Trader({
+    traders["金属批发商"] = new Trader({
         name: "Metal Wholesaler",
         inventory_template: "Terra Palace",
         is_unlocked: false,
@@ -231,7 +231,7 @@ class TradeItem {
         profit_margin: 1.5,
         act:1,
     });
-    traders["Camp Shop"] = new Trader({
+    traders["营地商铺"] = new Trader({
         name: "Camp Shop",
         inventory_template: "Terra II",
         is_unlocked: true,
@@ -239,7 +239,7 @@ class TradeItem {
         profit_margin: 3.6,
         act:2,
     });
-    traders["Traveling Merchant"] = new Trader({
+    traders["行脚商人"] = new Trader({
         name: "Traveling Merchant",
         inventory_template: "Terra III",
         is_unlocked: false,
@@ -247,7 +247,7 @@ class TradeItem {
         profit_margin: 4.2,
         act:2,
     });
-    traders["Ruins Merchant"] = new Trader({
+    traders["废墟商人"] = new Trader({
         name: "Ruins Merchant",
         inventory_template: "Terra IV",
         is_unlocked: false,
@@ -255,7 +255,7 @@ class TradeItem {
         profit_margin: 4.8,
         act:2,
     });
-    traders["Airship Market"] = new Trader({
+    traders["飞船集市"] = new Trader({
         name: "Airship Market",
         inventory_template: "Terra V",
         is_unlocked: false,
@@ -263,7 +263,7 @@ class TradeItem {
         profit_margin: 5.4,
         act:2,
     });
-    traders["Treasure Pavilion"] = new Trader({
+    traders["百宝楼"] = new Trader({
         name: "Treasure Pavilion",
         inventory_template: "Sky I",
         is_unlocked: true,
@@ -308,7 +308,7 @@ class TradeItem {
         refresh_time: 5,
         act:4,
     });
-    traders["Storage Chest"] = new Trader({
+    traders["物品存储箱"] = new Trader({
         name: "Storage Chest",
         trade_text: `<span style="color:#c0ffe0"> <i class="material-icons">work_outline</i> Deposit/withdraw items from chest</span>`,
         inventory_template: "Box",

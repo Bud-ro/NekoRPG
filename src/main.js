@@ -265,6 +265,28 @@ const skill_save_key_aliases = {
     "讨价还价": "Haggling",
 };
 
+// Saves from the V2.22c English site (maxrau.github.io/NekoRPG) stored some entries under English
+// display names instead of upstream's Chinese keys. These resolve either form to the upstream key.
+function resolve_effect_key(saved_key) {
+    if(effect_templates[saved_key]) return saved_key;
+    const by_name = Object.keys(effect_templates).find((effect_key) => effect_templates[effect_key].name === saved_key);
+    return by_name || null;
+}
+
+function resolve_enemy_key(saved_key) {
+    if(enemy_templates[saved_key]) return saved_key;
+    saved_key = String(saved_key).replace(/(Cloud|Ascendant) Rank/g, "Nimbus Rank").replace("Na Ying", "Naying");
+    const by_name = Object.keys(enemy_templates).find((enemy_key) => enemy_templates[enemy_key].name === saved_key || enemy_templates[enemy_key].id === saved_key);
+    return by_name || null;
+}
+
+function resolve_location_key(saved_key) {
+    if(!saved_key) return saved_key;
+    if(locations[saved_key]) return saved_key;
+    const by_name = Object.keys(locations).find((location_key) => locations[location_key].name === saved_key || locations[location_key].id === saved_key);
+    return by_name || saved_key;
+}
+
 function resolve_trader_key(saved_key) {
     if(traders[saved_key]) {
         return saved_key;
@@ -570,7 +592,7 @@ function change_location(location_name) {
         chara_cd = 0;
         update_displayed_combat_location(current_location);
         if(!current_location.is_challenge) {
-            last_combat_location = current_location.name;
+            last_combat_location = current_location.id;
         }
         start_combat();
     }
@@ -768,7 +790,7 @@ function start_sleeping() {
     start_sleeping_display();
     is_sleeping = true;
 
-    last_location_with_bed = current_location.name;
+    last_location_with_bed = current_location.id;
 }
 
 function end_sleeping() {
@@ -2162,7 +2184,7 @@ function do_enemy_combat_action(enemy_id,spec_hint,E_atk_mul = 1,E_dmg_mul = 1) 
             return;
         }
     }//激光
-    if(active_effects["Spirit Flash B9"]!=undefined){
+    if(active_effects["灵闪 B9"]!=undefined){
         if(attacker.stats.attack < character.stats.full.attack_power * 2){
             spec_mul *= (1 - 0.5 *character.stats.full.defense / Math.min(1,attacker.stats.defense));
             spec_mul = Math.max(spec_mul,0);
@@ -2173,7 +2195,7 @@ function do_enemy_combat_action(enemy_id,spec_hint,E_atk_mul = 1,E_dmg_mul = 1) 
             spec_hint += '[Spirit Flash·Reverse]';
         }
     }
-    if(active_effects["Scatter B9"]!=undefined){
+    if(active_effects["散华 B9"]!=undefined){
         E_atk_mul_f *= Math.max(( 1 - ((character.stats.full.health/attacker.stats.health) ** 0.5) * 0.1),0);
         spec_hint += '[Scatter^1/2]';
     }
@@ -2282,7 +2304,7 @@ function do_enemy_combat_action(enemy_id,spec_hint,E_atk_mul = 1,E_dmg_mul = 1) 
     }//吹火掌
 
     if(fainted) faint(" was defeated");
-    else if(active_effects["Reversal B9"]!=undefined){
+    else if(active_effects["反戈 B9"]!=undefined){
         attacker.stats.health -= damage_taken * 0.75;
         log_message(attacker.name + " took " + format_number(damage_taken * 0.75)  + " rebound damage","hero_attacked");
         
@@ -2488,7 +2510,7 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
         let proto_d = damage_dealt;
         damage_dealt = Math.ceil(10*Math.max(damage_dealt - target.stats.defense,0))/10;
 
-        if(active_effects["Magic Attack A9"]!=undefined && damage_dealt < proto_d * 0.1)
+        if(active_effects["魔攻 A9"]!=undefined && damage_dealt < proto_d * 0.1)
         {
             damage_dealt = proto_d * 0.1;
             Spec_E += "[Magic ATK]";
@@ -2498,7 +2520,7 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
             damage_dealt = proto_d * 0.1;
             Spec_E += "[Magic Attack: Blessing]";
         }
-        if(active_effects["Suppression A9"]!=undefined)
+        if(active_effects["牵制 A9"]!=undefined)
         {
             sdmg_mul *= Math.min(character.stats.full.defense / (target.stats.defense + 0.0001) * 0.6,10);
             Spec_E += "[Suppression]";
@@ -2509,7 +2531,7 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
             Spec_E += "[Suppress: Blessing]";
         }
         
-        if(active_effects["Void Gate B9"]!=undefined)
+        if(active_effects["异界之门 B9"]!=undefined)
         {
             target.stats.spec_value ||= {};
             
@@ -2802,13 +2824,13 @@ function kill_enemy(target) {
     target.is_alive = false;
     const enemy_key = target.id || target.name;
     if(target.add_to_bestiary) {
-        if(enemy_killcount[target.name] >= 0) {
-            enemy_killcount[target.name] += 1;
-            update_bestiary_entry(target.name);
+        if(enemy_killcount[target.id] >= 0) {
+            enemy_killcount[target.id] += 1;
+            update_bestiary_entry(target.id);
         } else {
-            enemy_killcount[target.name] = 1;
-            create_new_bestiary_entry(target.name);
-            add_bestiary_zones(target.name);
+            enemy_killcount[target.id] = 1;
+            create_new_bestiary_entry(target.id);
+            add_bestiary_zones(target.id);
         }
     }
     const enemy_id = current_enemies.findIndex(enemy => enemy===target);
@@ -3013,7 +3035,7 @@ function get_spec_rewards(money){
     character.money += Math.floor(RNG_M * money);
     update_displayed_money();
     if(money >= 1e9) return;
-    const trader = traders["Ruins Merchant"];
+    const trader = traders["废墟商人"];
     if(!trader.is_unlocked) {
         if(Math.random() >= money * 2e-7) {//4% 8% 12% 16% 20%
             trader.is_unlocked = true;
@@ -3871,7 +3893,10 @@ function create_save() {
         save_data["character"] = {
                                 name: character.name, titles: character.titles, 
                                 bonus_skill_levels:  character.bonus_skill_levels,
-                                inventory: {}, equipment: character.equipment,
+                                inventory: {}, equipment: Object.fromEntries(Object.entries(character.equipment).map(([slot, item]) => {
+                                    // Upstream keys items by their Chinese name; keep saves in that format so they load in the original game too.
+                                    return [slot, (item && item.id) ? {...item, name: item.id} : item];
+                                })),
                                 money: character.money, 
                                 C_scaling: character.C_scaling,
                                 xp: {
@@ -3901,7 +3926,7 @@ function create_save() {
             }
         }); //only save total xp of each skill, again in case of any changes
         
-        save_data["current location"] = current_location.name;
+        save_data["current location"] = current_location.id;
 
         save_data["locations"] = {};
         Object.keys(locations).forEach(function(key) { 
@@ -4095,8 +4120,8 @@ function load(save_data) {
     character.bonus_skill_levels = save_data.character.bonus_skill_levels;
     character.stats.flat.gems = save_data.gem_stats;
 
-    last_location_with_bed = save_data.last_location_with_bed;
-    last_combat_location = save_data.last_combat_location;
+    last_location_with_bed = resolve_location_key(save_data.last_location_with_bed);
+    last_combat_location = resolve_location_key(save_data.last_combat_location);
 
     options.uniform_text_size_in_action = save_data.options?.uniform_text_size_in_action;
     option_uniform_textsize(options.uniform_text_size_in_action);
@@ -4736,7 +4761,12 @@ function load(save_data) {
     //load active effects if save is not from before their rework
     if(compare_game_version(save_data["game version"], "v0.4.4") >= 0){
         Object.keys(save_data.active_effects).forEach(function(effect) {
-            active_effects[effect] = save_data.active_effects[effect];
+            const effect_key = resolve_effect_key(effect);
+            if(!effect_key) {
+                console.warn(`Skipped unknown active effect "${effect}"`);
+                return;
+            }
+            active_effects[effect_key] = save_data.active_effects[effect];
         });
     }
     
@@ -4771,8 +4801,13 @@ function load(save_data) {
     if(save_data["enemy_killcount"]) {
         
         add_bestiary_lines(11);
-        Object.keys(save_data["enemy_killcount"]).forEach(enemy_name => {
-            enemy_killcount[enemy_name] = save_data["enemy_killcount"][enemy_name];
+        Object.keys(save_data["enemy_killcount"]).forEach(saved_enemy_name => {
+            const enemy_name = resolve_enemy_key(saved_enemy_name);
+            if(!enemy_name) {
+                console.warn(`Skipped bestiary entry for unknown enemy "${saved_enemy_name}"`);
+                return;
+            }
+            enemy_killcount[enemy_name] = (enemy_killcount[enemy_name] || 0) + save_data["enemy_killcount"][saved_enemy_name];
             create_new_bestiary_entry(enemy_name);
             add_bestiary_zones(enemy_name);
 
@@ -5636,7 +5671,7 @@ function start_reactor_minigame()
         {
             reactor_able = false;
             log_message("The reactor has melted down due to excessive temperature!!!","enemy_attacked_critically");
-            active_effects["Radiation"] = new ActiveEffect({...effect_templates["Radiation"], duration:Math.round(100 * inf_combat.RT.ER ** 0.333)});
+            active_effects["辐射"] = new ActiveEffect({...effect_templates["辐射"], duration:Math.round(100 * inf_combat.RT.ER ** 0.333)});
             update_displayed_effects();
             character.stats.add_active_effect_bonus();
             update_character_stats();

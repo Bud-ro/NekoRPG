@@ -730,7 +730,7 @@ character.take_damage = function (enemy_spec = [0],{damage_value, can_faint = tr
         }
 
         
-        if(active_effects["Fortify A9"]!=undefined && damage_taken > character.stats.full.max_health * 0.05)
+        if(active_effects["坚固 A9"]!=undefined && damage_taken > character.stats.full.max_health * 0.05)
         {
                 log_message(`Fortify potion blocked ${format_number(damage_taken - character.stats.full.max_health * 0.05)} overflow damage!`,"enemy_enhanced")
                 damage_taken = character.stats.full.max_health * 0.0500001;

@@ -571,7 +571,7 @@ class Textline {
                 "The nearest one is the chain store \"Yangang General Store\"<br>"+"Walk another half mile to the east and you'll find it",
 
                 unlocks: {
-                    traders: ["Yangang General Store"],
+                    traders: ["燕岗杂货铺"],
                 },
                 locks_lines: ["shop"],
             }), 

@@ -58,8 +58,10 @@ The `english` branch (translation of upstream V2.22c) was merged with upstream `
 ### Code changes beyond strings
 
 - `get_enemy_realm()` rewritten to parse the English realm label (`Dust/Myriad/Tidal/Earth/Sky/Nimbus/Domain/World`, `Stage N`, `Pinnacle`, `Breakthrough`, `Novice/Adept/Expert`).
-- `resolve_enemy_template()` in display.js: bestiary lookups accept a template key **or** an English display name. `enemy_killcount` is keyed by display name (as on the V2.22c site), so old saves load unchanged.
-- Bed / quick-return logic uses `resolve_location_ref()` (key or name). Every `locations[key]` gets `.id = key` at module end; enemies already did.
+- **Save format is upstream's.** All table keys (`item_templates`, `enemy_templates`, `locations`, `traders`, `effect_templates`, `dialogues`, `skills`, `stances`) are identical to upstream V3.43c, and saves are written with upstream keys: `enemy_killcount` by enemy key, `current location` / `last_location_with_bed` / `last_combat_location` by location key, equipment `name` written as the item key. An export from this fork loads in the unmodified Chinese game (verified headless) and vice versa.
+- **Legacy import** of the V2.22c English-site format (which stored bestiary, traders, effects and location refs by English display name): `resolve_enemy_key()`, `resolve_effect_key()`, `resolve_location_key()` and MaxRau's `resolve_trader_key()` in main.js accept a key or a display name (and normalize the two renamed terms) at load time.
+- Template `.id` = upstream key for every enemy and location (the old "assign if missing" loop never fired because the constructor defaults `id` to `name`); combat instances copy the template id.
+- `add_bestiary_zones()` restored to upstream (compares keys).
 - `ZoneNameMap` in display.js translated; `ZoneTpMap` (location keys) intentionally left Chinese.
 - `烈日祝福·<trigram>` effect keys stay Chinese (built dynamically in main.js); only their `name:` is English.
 
