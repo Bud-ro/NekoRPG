@@ -537,3 +537,146 @@ All translation work must reference this document. Never deviate from establishe
 | 燕岗杂货铺 | Yangang General Store |
 | 秘法石碑 | Arcane Stele |
 | 路人甲 | Passerby |
+
+---
+
+## Additions for V3.43c (Acts III–IV content)
+
+Terms introduced when the translation was rebased from V2.22c onto upstream V3.43c. Existing terms above take precedence; two inconsistencies that existed on the V2.22c site were standardized (Cloud/Ascendant Rank → Nimbus Rank; Na Ying → Naying).
+
+### Realm Tiers
+
+| Chinese | English |
+|---------|---------|
+| 云霄级 | Nimbus Rank |
+| 领域级 | Domain Rank |
+| 世界级 | World Rank |
+| 云霄级一阶 … 八阶 | Nimbus Rank: Stage 1 … Stage 8 |
+| 云霄级巅峰 | Nimbus Rank: Pinnacle |
+| 云霄级瓶颈 | Nimbus Rank bottleneck |
+| 领域一重 … 六重 (Domain item stages) | Domain Stage 1 … Stage 6 |
+
+### Characters & Factions
+
+| Chinese | English |
+|---------|---------|
+| 溪月 / 冰溪月 | Xiyue / Bing Xiyue |
+| 蓝柒 / 冰蓝 | Lanqi / Binglan |
+| 冰家 | Bing Clan |
+| 秋兴 (落叶刀) | Qiuxing (Fallen Leaf Blade) |
+| 莫尔 | Mo'er |
+| 竺虎 | Zhu Hu |
+| 左阿 | Zuo'a |
+| 混元门 | Hunyuan Sect |
+| 时光殿 | Hall of Time |
+| 心魔 / 心魔之主 | Inner Demon / Lord of Inner Demons |
+| 心之灵 (禁锢/滋生/暴走) | Heart Spirit (Confinement / Proliferation / Rampage) |
+| 喵咕啦 | Meowgula |
+| 枫杏红 | Feng Xinghong |
+| 石风雄 (城主) | Shi Fengxiong (City Lord) |
+| 薛奇 | Xue Qi |
+| 大青王 尤斯纳 | Great Blue King Yusna |
+| 十三斧 | Thirteen Axes |
+| 血杀殿 | Blood Slaughter Hall |
+| 城主府 | City Lord Mansion |
+| 灰暗领 | Gloom Territory |
+| 清波领 | Qingbo Territory |
+| 强榜 | Power Ranking |
+| 声望商人 | Reputation Merchant |
+| 冰宫商人 | Ice Palace Merchant |
+| 窥秘商人 | Secret-Peeping Merchant |
+
+### Locations
+
+| Chinese | English |
+|---------|---------|
+| 纯白冰原 | Pure White Arctic Tundra (existing) |
+| 冰霜门户 | Frost Portal |
+| 极寒冰城 / 极寒冰宫 | Frigid Ice City / Frigid Ice Palace |
+| 时封水牢 | Time-Locked Water Prison |
+| 水牢洞府 / 水牢深处 / 水牢走廊 | Water Prison Cave Dwelling / Depths / Corridor |
+| 传承幻境 | Inheritance Realm (existing) |
+| 幻境核心 (·地宫/·结界湖/·战场/·飞船/·森林/·现世/·决战/·出口) | Illusion Core (: Underground Palace / Barrier Lake / Battlefield / Spaceship / Forest / Reality / Final Battle / Exit) |
+| 纳家宝库 | Nayaka Treasury |
+| 狩猎大赛 | Hunting Tournament |
+| 城门战 / 密林战 / 古墓战 | Gate Battle / Thicket Battle / Ancient Tomb Battle |
+| 狩猎大赛·补给点 | Hunting Tournament: Supply Point |
+| 毬毬山谷 / 山谷秘境 | Puffball Valley / Valley Secret Realm |
+| 鲜血峰 | Blood Peak |
+| 飞云阁 | Feiyun Pavilion (existing) |
+| 歧路 (zone suffix) | Detour |
+
+### Systems & Mechanics
+
+| Chinese | English |
+|---------|---------|
+| 压制 / 压制·伪 | Oppression / Pseudo-Oppression |
+| 牵制 (spec) / 牵制领悟度 | Suppress / Suppression comprehension |
+| 同调 / 同调·魔 | Sync / Sync·Magic |
+| 反击 | Counter |
+| 生命限制 | HP Limit |
+| 贪婪·改 | Greed+ |
+| 败移 | Defeat Shift |
+| 小队 / 大队 | Squad / Battalion |
+| 死线 / 死线·凝滞 | Deadline / Deadline: Stasis |
+| 硬化 | Hardening |
+| 血遁 | Blood Evasion |
+| 吹火掌 / 吹火 C6 | Fire-Blowing Palm / Fire-Blowing C6 |
+| 血杀 (·正/·逆) | Blood Slaughter (: Forward / Reverse) |
+| 散华·改 | Scattered Petals+ |
+| 冰封术 | Ice Seal |
+| 追光 | Chase Light (existing) |
+| 光环 | Aura (existing) |
+| 烈日祝福·乾…坤 | Blazing Sun Blessing: Qian / Dui / Li / Zhen / Xun / Kan / Gen / Kun |
+| 灵魂之力 | Soul Power |
+| 灵感 | Inspiration |
+| 迟缓 | Sluggish |
+| 宝石耐性 / SCGV | Gem Tolerance / SCGV |
+| 心之境界 (宝石吞噬者/贪婪之神/信仰祭坛) | Heart-Realm (Gem Devourer / God of Greed / Altar of Faith) |
+| 家族系统 / 影响力 | Family System / Influence |
+| 培养策略 | Training strategy |
+| 极寒相变引擎 | Frigid Phase-Change Engine |
+| 冰原超流体 / 冰原空气 / 多孔冰晶 | Glacial Superfluid / Glacial Air / Porous Ice Crystal |
+| 万载冰髓 | Ten-Thousand-Year Ice Marrow |
+| 玄冰果实(·觉醒) | (Awakened) Black Ice Fruit |
+| 焰海 / 霜天 (engine environments) | Flame Sea / Frost Sky |
+| 十连扭蛋机 | Ten-Pull Gacha Machine |
+| 地层钻探 | Stratum Drilling |
+| 绝音蕨 / 噬芒兰 | Silent Fern / Light-Devouring Orchid |
+| 沼泽辐射扩散 | Swamp Radiation Spread |
+| 血洛日 | Xuelo day |
+| 纪元 | Era |
+
+### Arcane Arts / Domains / Stances
+
+| Chinese | English |
+|---------|---------|
+| 映星紫华 | Starlight Violet Radiance |
+| 映星天彩 (·纯色/·虹彩/·双虹/·血杀) | Starlight Skyhue (: Pure / Iridescent / Double Rainbow / Blood Slaughter) |
+| 出云落月[领域四重…六重] | Rising Cloud, Falling Moon [Domain Stage 4…6] |
+| 水元素亲和 | Water Element Affinity |
+
+### Items (selection)
+
+| Chinese | English |
+|---------|---------|
+| 冰原之心 / 幻境之心 | Glacial Plain Heart / Illusion Heart |
+| 飞船之心·材 / 冰原之心·材 | Spaceship Heart (Material) / Glacial Plain Heart (Material) |
+| 伊芙 | Eve |
+| 传承水晶·橙/白/绿/蓝/粉/彩 | Inheritance Crystal: Orange / White / Green / Blue / Pink / Prismatic |
+| 中等进化结晶(碎片) | Intermediate Evolution Crystal (Shard) |
+| 晶化 / 水素 / 魂晶 / 盖亚 / 远古 / 源金 / 红钨 / 血钻 (material prefixes) | Crystallized / Hydro / Soul Crystal / Gaia / Ancient / Primal Gold / Red Tungsten / Blood Diamond |
+| 极寒 / 幻符 / 密林 / 冰棉 (inner-lining prefixes) | Frigid / Phantom Rune / Thicket / Ice Cotton |
+| 光环法杖 / 虹彩灯球 / 凝滞力场 / 血灵骨网 / 力场发生器 | Aura Staff / Iridescent Disco Ball / Stasis Field / Blood Spirit Bone Net / Force Field Generator |
+| 血峰限制器 / 血峰增幅器 | Blood Peak Limiter / Blood Peak Amplifier |
+| 死神之镰 / 晶化钻头 | Reaper's Scythe / Crystallized Drill |
+| 冰家玉简 | Bing Clan Jade Slip |
+| 城门之星 | Gate Star |
+| 宇宙币 | Cosmic Coin |
+| 传说/神话 X宝石 | Legendary / Mythic X Gem |
+| C6·吹火/血遁/硬化/压制药剂 | C6 Fire-Blowing / Blood Evasion / Hardening / Oppression Potion |
+
+### Enemy name conventions
+
+- 出芽X茸战士 → Budding X Fluffy Warrior; 敌意X → Hostile X; 水牢X → Water Prison X; 幻境X → Illusion X; 燕岗X小队/大队 → Yangang X Squad/Battalion.
+- Suffixes `[BOSS]`, `[SP]`, `[x10]`, `[放水 ver.]` → `[BOSS]`, `[SP]`, `[x10]`, `[Holding Back ver.]`.
