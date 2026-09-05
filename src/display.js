@@ -3864,9 +3864,15 @@ function create_new_bestiary_entry(enemy_name) {
                                 .forEach(node=>bestiary_list.appendChild(node));
 }
 
+//entry divs may be registered under the Chinese key or the English display name, depending on creation path
+function resolve_bestiary_entry_div(enemy_name, enemy) {
+    return bestiary_entry_divs[enemy_name] || bestiary_entry_divs[enemy?.id] || bestiary_entry_divs[enemy?.name];
+}
+
 function add_bestiary_tooltip(enemy_name){
 
     const enemy = resolve_enemy_template(enemy_name);
+    if(!enemy || !resolve_bestiary_entry_div(enemy_name, enemy)) return;
     const bestiary_tooltip = document.createElement("div");
     const tooltip_xp = document.createElement("div"); //base xp enemy gives
     tooltip_xp.innerHTML = enemy.description;
@@ -4034,7 +4040,7 @@ function add_bestiary_tooltip(enemy_name){
         loot_chance_base.classList.add("loot_chance_base");
         loot_chance_current.classList.add("loot_chance_current");
 
-        loot_name.innerHTML = `${enemy.loot_list[i].item_name}`;
+        loot_name.innerHTML = `${item_templates[enemy.loot_list[i].item_name]?.getName?.() ?? enemy.loot_list[i].item_name}`;
         loot_chance_base.innerHTML = `[${format_numberL(enemy.loot_list[i].chance)}]`;
         loot_chance_current.innerHTML = `${enemy.loot_list[i].ignore_luck?("[Fixed]"):(format_numberL(enemy.loot_list[i].chance*enemy.get_droprate_modifier()))}`;
         loot_chance.append(loot_chance_current, loot_chance_base);
@@ -4059,11 +4065,12 @@ function add_bestiary_tooltip(enemy_name){
     bestiary_tooltip.appendChild(tooltip_value);
 
 
-    bestiary_entry_divs[enemy_name].appendChild(bestiary_tooltip);
+    resolve_bestiary_entry_div(enemy_name, enemy).appendChild(bestiary_tooltip);
 }
 
 function clear_bestiary_tooltip(enemy_name){
-    bestiary_entry_divs[enemy_name].querySelectorAll('.bestiary_entry_tooltip').forEach(el => el.remove());
+    const entry_div = resolve_bestiary_entry_div(enemy_name, resolve_enemy_template(enemy_name));
+    if(entry_div) entry_div.querySelectorAll('.bestiary_entry_tooltip').forEach(el => el.remove());
 }
 
 
@@ -4188,8 +4195,13 @@ function create_new_levelary_entry(level_name) {
 }
 
 
+function resolve_levelary_entry_div(level_name, level) {
+    return levelary_entry_divs[level_name] || levelary_entry_divs[level?.id] || levelary_entry_divs[level?.name];
+}
+
 function add_levelary_tooltip(level_name) {
-    const level = locations[level_name];
+    const level = locations[level_name] || Object.values(locations).find(l => l?.name === level_name);
+    if(!level || !resolve_levelary_entry_div(level_name, level)) return;
     const levelary_tooltip = document.createElement("div");
     levelary_tooltip.classList.add("bestiary_entry_tooltip");
     const tooltip_xp = document.createElement("div"); //base xp enemy gives
@@ -4274,7 +4286,7 @@ function add_levelary_tooltip(level_name) {
             if(lootlist[I_name] == undefined)
             {
                 lootlist[I_name] = 1;
-                tooltip_loots.innerHTML += `[ ${I_name} ] - ${format_numberL(I_list[I_name] * character.stats.full.luck / level.enemies_list.length)} <br>`
+                tooltip_loots.innerHTML += `[ ${item_templates[I_name]?.getName?.() ?? I_name} ] - ${format_numberL(I_list[I_name] * character.stats.full.luck / level.enemies_list.length)}<br>`
             }
         }
         //tooltip_enemies.innerHTML += `<img src=${enemy_templates[level.enemies_list[j]].image}>`;
@@ -4286,11 +4298,13 @@ function add_levelary_tooltip(level_name) {
     levelary_tooltip.appendChild(tooltip_enemies);
     levelary_tooltip.appendChild(tooltip_loots);
     levelary_tooltip.appendChild(value_loots);
-    levelary_entry_divs[level_name].appendChild(levelary_tooltip);
+    resolve_levelary_entry_div(level_name, level).appendChild(levelary_tooltip);
 }
 
 function clear_levelary_tooltip(level_name) {
-    levelary_entry_divs[level_name].querySelectorAll('.bestiary_entry_tooltip').forEach(el => el.remove());
+    const level = locations[level_name] || Object.values(locations).find(l => l?.name === level_name);
+    const entry_div = resolve_levelary_entry_div(level_name, level);
+    if(entry_div) entry_div.querySelectorAll('.bestiary_entry_tooltip').forEach(el => el.remove());
 }
 
 

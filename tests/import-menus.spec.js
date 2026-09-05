@@ -129,3 +129,40 @@ test('family newborn input is initialized (not undefined) after legacy import', 
   }
   expect(errors, `errors: ${errors.join('\n')}`).toHaveLength(0);
 });
+
+test('bestiary enemy hover shows a tooltip with stats', async ({ page }) => {
+  const errors = collectErrors(page);
+  await loadGameAndImport(page);
+  await page.click('#journal_show_bestiary');
+  await page.waitForTimeout(400);
+
+  // hover the first real enemy row (zone header rows are wrapped in <b> and skipped)
+  const idx = await page.evaluate(() =>
+    [...document.querySelectorAll('#bestiary_box_div .bestiary_entry_div')]
+      .findIndex(d => d.children[0] && !d.children[0].innerHTML.includes('<b>')));
+  expect(idx).toBeGreaterThanOrEqual(0);
+  await page.mouse.move(5, 5);
+  await page.locator('#bestiary_box_div .bestiary_entry_div').nth(idx).hover();
+  await page.waitForTimeout(400);
+
+  const tip = await page.locator('#bestiary_box_div .bestiary_entry_tooltip').first().innerText();
+  expect(tip).toContain('Stats:');
+  expect(CJK.test(tip), `tooltip has Chinese: ${tip.slice(0, 150)}`).toBe(false);
+  expect(errors, `errors: ${errors.join('\n')}`).toHaveLength(0);
+});
+
+test('zone guide hover shows a tooltip with the zone description', async ({ page }) => {
+  const errors = collectErrors(page);
+  await loadGameAndImport(page);
+  await page.click('#journal_show_levelary');
+  await page.waitForTimeout(400);
+
+  await page.mouse.move(5, 5);
+  await page.locator('#levelary_box_div .bestiary_entry_div').first().hover();
+  await page.waitForTimeout(400);
+
+  const tip = await page.locator('#levelary_box_div .bestiary_entry_tooltip').first().innerText();
+  expect(tip.trim().length).toBeGreaterThan(0);
+  expect(CJK.test(tip), `tooltip has Chinese: ${tip.slice(0, 150)}`).toBe(false);
+  expect(errors, `errors: ${errors.join('\n')}`).toHaveLength(0);
+});
