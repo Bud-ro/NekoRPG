@@ -3651,9 +3651,9 @@ function update_displayed_family() {
         let time_speed = get_time_passed();
         document.getElementById("family_timer_real").innerText = Math.ceil(re_time / time_speed) + 's'
         document.getElementById("family_baby_cost").innerHTML = format_money(get_baby_cost(family_data.baby));
-        document.getElementById("baby_scale1").innerHTML = family_data.baby>1e4?"新生儿超过1万，花费受到一重软上限限制(^1.5)<br>":""
-        document.getElementById("baby_scale2").innerHTML = family_data.baby>1e8?"新生儿超过1亿，花费受到二重软上限限制(^1.75)<br>":""
-        document.getElementById("baby_scale3").innerHTML = family_data.baby>1e12?"新生儿超过1兆，花费受到三重软上限限制(^2.0)<br>":""
+        document.getElementById("baby_scale1").innerHTML = family_data.baby>1e4?"Newborns above 10K: cost is under the first soft cap (^1.5)<br>":""
+        document.getElementById("baby_scale2").innerHTML = family_data.baby>1e8?"Newborns above 100M: cost is under the second soft cap (^1.75)<br>":""
+        document.getElementById("baby_scale3").innerHTML = family_data.baby>1e12?"Newborns above 1T: cost is under the third soft cap (^2.0)<br>":""
     }
     else{
         family_locked.style.display='block';
@@ -3666,7 +3666,7 @@ let family_mem_divs = [];
 function format_mem_change(mem_data){
     if(mem_data > 0) return format_number(mem_data);
     if(mem_data == 0 ) return 'N/A';
-    return mem_data + 'd';
+    return `0 (${-mem_data}d)`; //negative values count the days since the last event
 }//正数代表数目，负数代表时间
 function update_displayed_family_members(){
 

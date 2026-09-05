@@ -4116,6 +4116,7 @@ function load(save_data) {
     total_crafting_successes = save_data.total_crafting_successes || 0;
     inf_combat = save_data.inf_combat || {"A6":{cur:6,cap:8},"A7":{cur:0},"VP":{num:0}};//无限秘境
     family_data = save_data.family_data || {};
+    if(!Array.isArray(family_data.mem) || !family_data.mem[0]) init_family(); //saves from before the family system (or corrupted ones) lack the structure
     name_field.value = save_data.character.name;
     character.name = save_data.character.name;
     character.bonus_skill_levels = save_data.character.bonus_skill_levels;
@@ -4155,7 +4156,7 @@ function load(save_data) {
 
     update_displayed_family();
     update_displayed_family_members();
-    document.getElementById("baby_born_num").value = family_data.baby;
+    document.getElementById("baby_born_num").value = family_data.baby ?? 0;
     //重载家族
 
     character.money = (save_data.character.money || 0) * ((is_from_before_eco_rework == 1)*10 || 1);
@@ -6254,8 +6255,10 @@ function init_family(){
     for(let r = 1; r <= 99 ; r += 1){ family_data.mem[r] = {vis:false,num:0.0,break:0,die:0,ali:2};}
     //console.log(family_data.mem[r])}
     //console.log(family_data);
-    family_data.mem[0]={vis:true,num:0.0,break:-1,die:-1,ali:2}; 
+    family_data.mem[0]={vis:true,num:0.0,break:-1,die:-1,ali:2};
     //console.log(family_data);
+    const baby_input = document.getElementById("baby_born_num");
+    if(baby_input) baby_input.value = family_data.baby;
 }
 function update_family_data_sign(num,realm,op)//num当前【出事】人数，realm境界，op:1突破2暴毙
 {
@@ -6287,6 +6290,7 @@ let ali_data = [[],
 function update_family_daily(){
     //realm_rate;//0突破率 1暴毙率 2赚钱率
     //每个境界先计算暴毙，再计算突破:
+    if(!Array.isArray(family_data.mem) || !family_data.mem[0]) init_family();
     family_data.mem[0].break -= 1;
     for(let r=0;r<=99;r+=1){
         if(family_data.mem[r].vis){

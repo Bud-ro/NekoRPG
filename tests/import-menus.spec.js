@@ -109,3 +109,23 @@ test('Realm tab renders quest content after refresh (regression)', async ({ page
   expect(journal).toContain('Gem Devourer');
   expect(errors, `errors: ${errors.join('\n')}`).toHaveLength(0);
 });
+
+test('family newborn input is initialized (not undefined) after legacy import', async ({ page }) => {
+  const errors = collectErrors(page);
+  await loadGameAndImport(page);
+
+  // the legacy save predates the family system entirely
+  const babyValue = await page.locator('#baby_born_num').inputValue();
+  expect(babyValue).not.toBe('undefined');
+  expect(Number(babyValue)).toBe(0);
+
+  const family = await page.evaluate(async () => {
+    const m = await import('./src/main.js');
+    return { hasMem: Array.isArray(m.family_data?.mem), mem0: m.family_data?.mem?.[0] ?? null };
+  }).catch(() => null);
+  if (family) {
+    expect(family.hasMem).toBe(true);
+    expect(family.mem0).not.toBeNull();
+  }
+  expect(errors, `errors: ${errors.join('\n')}`).toHaveLength(0);
+});
