@@ -722,8 +722,8 @@ function start_activity(selected_activity) {
 }
 
 function end_activity() {
-    let ActivityEndMap = {"Running":"Running","Swimming":"Swimming","mining":"Mining","woodcutting":"Woodcutting","fishing":"Fishing","AquaElement":"Water Element Sensing"}
-    log_message(`${character.name} finished ${ActivityEndMap[current_activity.activity_name]}`, "activity_finished");
+    let ActivityEndMap = {"Running":"Running","Swimming":"Swimming","mining":"Mining","woodcutting":"Woodcutting","fishing":"Fishing","AquaElement":"Water Element Sensing","weightlifting":"Weightlifting","meditating":"Meditating","patrolling":"Patrolling","balancing":"Balancing","herbalism":"Herbalism","animal care":"Animal Care","fieldwork":"Fieldwork"}
+    log_message(`${character.name} finished ${ActivityEndMap[current_activity.activity_name] || current_activity.activity_name}`, "activity_finished");
     if(current_activity.exp_scaling)
     {
         character.C_scaling[current_activity.scaling_id] = current_activity.done_actions;
@@ -1702,8 +1702,8 @@ let cd_needed = [0,0,0,0,0,0,0,0];
 let cur_cd = [0,0,0,0,0,0,0,0];
 function do_enemy_attack_loop(enemy_id, count, E_round = 1,isnew = false) {//E_round:回合数
     count = count || 0;
-    if(!current_enemies[enemy_id].is_alive || !current_enemies[enemy_id]){
-        clear_enemy_attack_loop(current_enemies[enemy_id]);
+    if(!current_enemies || !current_enemies[enemy_id] || !current_enemies[enemy_id].is_alive){
+        if(current_enemies?.[enemy_id]) clear_enemy_attack_loop(current_enemies[enemy_id]);
         return;
     }
     //update_enemy_attack_bar(enemy_id, 0);
@@ -3440,6 +3440,7 @@ function use_recipe_max(target) {
                     const key = item_templates[selected_recipe.materials[i].material_id].getInventoryKey();
                     max_todo = Math.min(max_todo,Math.floor((character.inventory[key]?.count || 0) / selected_recipe.materials[i].count));
                 } //检查批量数量
+                if(max_todo < 1 || !Number.isFinite(max_todo)) return;
                 for(let i = 0; i < selected_recipe.materials.length; i++) {
                     const key = item_templates[selected_recipe.materials[i].material_id].getInventoryKey();
                     remove_from_character_inventory([{item_key: key, item_count: selected_recipe.materials[i].count * max_todo}]);
@@ -3626,7 +3627,7 @@ function use_item(item_key,stated = false){
             
             update_displayed_character_inventory({was_anything_new_added:true});
         }
-        else if(I_spec = "HeartDemon_nerf"){
+        else if(I_spec == "HeartDemon_nerf"){
             global_flags["qz_percent"] = (global_flags["qz_percent"] || 0) + 1;
             if(global_flags["qz_percent"]>100) global_flags["qz_percent"] = 100;
             log_message(`Suppression comprehension rose to ${global_flags["qz_percent"]}%!`,"gather_loot");
@@ -5850,7 +5851,7 @@ const engine_env2 = document.getElementById("engine_env2");
 
 function update_displayed_engine(){
     engine_result_name.innerText = (inf_combat.FE.SF.num * 999.999 - inf_combat.FE.SF.ice < 0)?"万载冰髓锭":"Arctic Superfluid";
-    engine_result_fruit_status.innerText = (inf_combat.FE.fruit == -1)?"未放入":`Awakening ${(inf_combat.FE.fruit / 1e4).toFixed(4)}%`
+    engine_result_fruit_status.innerText = (inf_combat.FE.fruit == -1)?"Not inserted":`Awakening ${(inf_combat.FE.fruit / 1e4).toFixed(4)}%`
     engine_result_temp.innerText = (inf_combat.FE.outer_temp.toFixed(0)) + 'K / '+ ((inf_combat.FE.outer_temp/240)**2*12).toFixed(2) + 'MPa';
     engine_env1.style.display = (character.equipment.realm?.name == "Flame-Sea Frost Sky [Domain Stage 2]" || character.equipment.realm?.name == "Flame-Sea Frost Sky [Domain Stage 3]")?"inline-block":"none";
     engine_env2.style.display = (character.equipment.realm?.name == "Flame-Sea Frost Sky [Domain Stage 2]" || character.equipment.realm?.name == "Flame-Sea Frost Sky [Domain Stage 3]")?"inline-block":"none";

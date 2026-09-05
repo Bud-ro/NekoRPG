@@ -248,6 +248,7 @@ class Combat_zone {
                 newEnemy.stats.attack += character.stats.full.attack_power;//反击
             }
             if(newEnemy.spec.includes(58)){
+                if(!inf_combat.S3) inf_combat.S3 = {live:true,sp:0,b1:8,b2:8,b3:0}; //legacy saves may lack S3 (normally set by the S3-start textline)
                 let M58 = ((8-inf_combat.S3.b2)*3-inf_combat.S3.b3)*0.05 + 1;
                 newEnemy.stats.health *= M58;
                 newEnemy.stats.attack *= M58;
@@ -3662,7 +3663,7 @@ function get_location_type_penalty(type, stage, stat) {
     locations["纯白冰原 - X"] = new Challenge_zone({
         description: "Ahead stands a stone gate flanked by ice and snow. You'll have to get past this resentful monster to touch it.", 
         enemy_count: 1, 
-        enemy_groups_list : [["敌意女巫[BOSS]","Hostile Hunter [BOSS]","Hostile Hunter [BOSS]","Hostile Hunter [BOSS]","Hostile Hunter [BOSS]","Hostile Hunter [BOSS]","Hostile Hunter [BOSS]"]],
+        enemy_groups_list : [["敌意女巫[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]"]],
         enemy_group_size: [7,7],
         types: [],
         enemy_stat_halo:0.24,
@@ -3679,7 +3680,7 @@ function get_location_type_penalty(type, stage, stat) {
     locations["纯白冰原 - XS"] = new Challenge_zone({
         description: "Ahead stands a stone gate flanked by ice and snow. You'll have to get past this resentful monster to touch it.", 
         enemy_count: 1, 
-        enemy_groups_list : [["敌意女巫[BOSS]","Hostile Hunter [BOSS]","Hostile Hunter [BOSS]","Hostile Hunter [BOSS]","Hostile Hunter [BOSS]","Hostile Hunter [BOSS]","Hostile Hunter [BOSS]"]],
+        enemy_groups_list : [["敌意女巫[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]","敌意猎兵[BOSS]"]],
         enemy_group_size: [7,7],
         types: [],
         enemy_stat_halo:0.24,
@@ -3702,16 +3703,16 @@ function get_location_type_penalty(type, stage, stat) {
     locations["纯白冰原"].connected_locations.push({location: locations["纯白冰原 - X"], custom_text: "Challenge the Ice Palace guards [old]"});
     locations["纯白冰原"].connected_locations.push({location: locations["纯白冰原 - XS"], custom_text: "Challenge the Ice Palace guards"});
     
-    locations["极寒冰城"] = new Location({ 
-        connected_locations: [{location: locations["极寒冰宫"], custom_text: "Go to the [Frigid Ice Palace]"}], 
+    locations["极寒冰城"] = new Location({
+        connected_locations: [], //filled in below — 极寒冰宫 is not defined yet at this point
         description: "Sorry, the last character of this place's name has been changed... this location exists to stop any cats from falling into the void!",
-        name: "Frigid Ice City", 
+        name: "Frigid Ice City",
         is_unlocked: true,
         bgm: 17,
     });//3-4(D)
-    
-    locations["极寒冰宫"] = new Location({ 
-        connected_locations: [{location: locations["纯白冰原"], custom_text: "Return to the Pure White Glacial Plain"}], 
+
+    locations["极寒冰宫"] = new Location({
+        connected_locations: [{location: locations["纯白冰原"], custom_text: "Return to the Pure White Arctic Tundra"}],
         description: "A city made entirely of ice blocks, at the heart of the Pure White Glacial Plain. The witches seem to want to keep Neko and Nanami here, unaware that attacker and defender have quietly switched places.",
         name: "Frigid Ice Palace", 
         traders: ["冰宫商人"],
@@ -3720,6 +3721,7 @@ function get_location_type_penalty(type, stage, stat) {
         bgm: 17,
         unlock_text : "[Witch] Little outsiders, I thought you'd know better and turn back. Yet here you are, barging into the ice city.",
     });//3-4
+    locations["极寒冰城"].connected_locations.push({location: locations["极寒冰宫"], custom_text: "Go to the [Frigid Ice Palace]"});
     locations["纯白冰原"].connected_locations.push({location: locations["极寒冰宫"]});
     locations["极寒冰宫 - 1"] = new Combat_zone({
         description: "A hostility-filled city of ice, where witches direct raging Wild Beasts", 
@@ -4723,7 +4725,7 @@ function get_location_type_penalty(type, stage, stat) {
     locations["城门战 - X"] = new Challenge_zone({
         description: "The Barrier Lake BOSS fight returns in force! Still the mage-warrior-tank lineup~", 
         enemy_count: 1, 
-        enemy_groups_list : [["薛奇[BOSS]","Yangang Cavalry Squad [BOSS]","Yangang Cavalry Squad [BOSS]","Yangang Mighty Squad [BOSS]","Yangang Mighty Squad [BOSS]","Yangang Garrison Squad [BOSS]","Yangang Garrison Squad [BOSS]"]],
+        enemy_groups_list : [["薛奇[BOSS]","燕岗骑砍小队[BOSS]","燕岗骑砍小队[BOSS]","燕岗威武小队[BOSS]","燕岗威武小队[BOSS]","燕岗卫戍小队[BOSS]","燕岗卫戍小队[BOSS]"]],
         enemy_group_size: [7,7],
         types: [],
         is_unlocked: false, 
@@ -4870,7 +4872,7 @@ function get_location_type_penalty(type, stage, stat) {
     locations["密林战 - X"] = new Challenge_zone({
         description: "Take them all out fast! They don't look like they have much HP, but every one of them has Time Lock...", 
         enemy_count: 1, 
-        enemy_groups_list : [["燕岗城警戒哨[BOSS]","Yangang City Sentry Post [BOSS]","Yangang City Sentry Post [BOSS]"]],
+        enemy_groups_list : [["燕岗城警戒哨[BOSS]","燕岗城警戒哨[BOSS]","燕岗城警戒哨[BOSS]"]],
         enemy_group_size: [3,3],
         types: [],
         is_unlocked: false, 
@@ -5156,7 +5158,7 @@ function get_location_type_penalty(type, stage, stat) {
     locations["毬毬山谷 - 歧路"] = new Challenge_zone({
         description: "An obelisk made of Black Iron Mother! Paying respects to it might transform your [Starlight Bloom] comprehension. As for these guys... the only effective answer is dodging more [Fire-Blowing Palms].", 
         enemy_count: 1, 
-        enemy_groups_list : [["红邪鬼[BOSS]","Flyfly Fluffy [BOSS]","Flyfly Fluffy [BOSS]","Flyfly Fluffy [BOSS]","Flyfly Fluffy [BOSS]"]],
+        enemy_groups_list : [["红邪鬼[BOSS]","飞飞茸茸[BOSS]","飞飞茸茸[BOSS]","飞飞茸茸[BOSS]","飞飞茸茸[BOSS]"]],
         enemy_group_size: [5,5],
         types: [],
         is_unlocked: false, 

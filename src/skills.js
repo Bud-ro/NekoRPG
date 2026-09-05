@@ -485,7 +485,6 @@ function format_skill_rewards(milestone){
                                                 dexterity: {multiplier: 1.05},
                                             },
                                             xp_multipliers: {
-                                                Evasion: 1.1,
                                                 "Shield blocking": 1.1,
                                             }
                                         }

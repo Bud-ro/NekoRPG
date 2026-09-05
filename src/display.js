@@ -1381,6 +1381,7 @@ function update_displayed_equipment() {
 function update_displayed_book(book_id) {
     const book = item_templates[book_id];
     const book_key = book.getInventoryKey();
+    if(!item_divs[book_key]) return; //book not present in the displayed inventory
     if(book_stats[book.name].is_finished) {
         item_divs[book_key].classList.add("book_finished");
         item_divs[book_key].classList.remove("book_active");
@@ -1495,7 +1496,7 @@ function update_displayed_normal_location(location) {
     ////////////////////////////////////
     //add buttons for starting dialogues
 
-    const available_dialogues = location.dialogues.filter(dialogue => {
+    const available_dialogues = (location.dialogues || []).filter(dialogue => {
         if(!dialogues[dialogue].is_unlocked || dialogues[dialogue].is_finished) {
             return false;
         } else {
@@ -2186,6 +2187,7 @@ function add_crafting_recipe_to_display({category, subcategory, recipe_id}) {
             }
         });
         recipe_max.addEventListener("click", (event)=>{
+            if(event.target.parentNode.classList.contains("recipe_unavailable")) return;
             window.useRecipemax(event.target);
                 //normal items
         });
@@ -3101,9 +3103,9 @@ function start_activity_display(current_activity) {
 
 
     const action_end_text = document.createElement("div");
-    const ActivityNameMap = {"Running":"Running","Swimming":"Swimming","mining":"Excavation","woodcutting":"Woodcutting","fishing":"Fishing","AquaElement":"Water Element Sensing"};
+    const ActivityNameMap = {"Running":"Running","Swimming":"Swimming","mining":"Excavation","woodcutting":"Woodcutting","fishing":"Fishing","AquaElement":"Water Element Sensing","weightlifting":"Weightlifting","meditating":"Meditating","patrolling":"Patrolling","balancing":"Balancing","herbalism":"Herbalism","animal care":"Animal Care","fieldwork":"Fieldwork"};
     const dev_ACNMap = false;
-    action_end_text.innerText = `Stop ${dev_ACNMap?current_activity.activity_name:ActivityNameMap[current_activity.activity_name]}`;
+    action_end_text.innerText = `Stop ${dev_ACNMap?current_activity.activity_name:(ActivityNameMap[current_activity.activity_name] || current_activity.activity_name)}`;
     action_end_text.id = "action_end_text";
 
 

@@ -242,7 +242,7 @@ class Textline {
                 "Ahh, and before I forget, here, take these. They will be helpful for gathering necessary materials.",
                 unlocks: {
                     textlines: [{dialogue: "old craftsman", lines: ["remind1", "remind2", "remind3"]}],
-                    items: ["Old pickaxe" ,"Old axe", "Old sickle"],
+                    items: [{item_name: "Old pickaxe"}, {item_name: "Old axe"}, {item_name: "Old sickle"}],
                     flags: ["is_gathering_unlocked", "is_crafting_unlocked"],
                 },
                 locks_lines: ["learn","leave"],
@@ -3234,22 +3234,6 @@ class Textline {
         }
     });
 
-    dialogues["心之石像"] = new Dialogue({
-        name: "Heart Stone Idol",
-        starting_text: "Crystallize insights accumulated in battle",
-        textlines: {
-            "clumbs": new Textline({ 
-                is_unlocked: true,
-                name: "Wild Beast Forest Insight / Click to receive!! (will be removed in v1.10)",
-                text: "...",
-                unlocks: {
-                    spec:"A1-fusion",
-                },
-                
-                locks_lines: ["clumbs"],
-            }),
-        }
-    });
 })();
 
 export {dialogues};
