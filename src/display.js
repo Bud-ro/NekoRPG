@@ -4211,10 +4211,10 @@ function add_levelary_tooltip(level_name) {
     if(level.enemy_stat_halo != 0)
     {
         let c_halo = level.enemy_stat_halo;
-        if(level.id == "Na Family Secret Realm - ∞"){
+        if(level.id == "纳家秘境 - ∞"){
             c_halo = inf_combat.A6.cur * 0.08;
         }
-        if(level.id?.includes("Hel Swamp")){
+        if(level.id?.includes("赫尔沼泽")){
             inf_combat.B3 = inf_combat.B3 || 0;
             c_halo = inf_combat.B3 * 0.01;
         }

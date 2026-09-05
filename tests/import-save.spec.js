@@ -123,3 +123,19 @@ test('beast voucher exchange consumes vouchers and grants Mithril Ingots', async
   expect(ingotsAfter - ingotsBefore).toBeGreaterThanOrEqual(expectedTrades);
   expect(errors, `errors: ${errors.join('\n')}`).toHaveLength(0);
 });
+
+test('equipped Arcane Method grants skill XP from kills after import', async ({ page }) => {
+  const errors = collectErrors(page);
+  await loadGameAndImport(page);
+
+  const before = decodeSave(readFileSync(FIXTURE, 'utf8').trim());
+  const xpBefore = before.skills.StarDestruction.total_xp; // save has Star-Dissolution Technique equipped
+
+  // the save resumes combat in Hel Swamp - 4; let some kills happen
+  await page.waitForTimeout(8000);
+
+  const after = decodeSave(await page.evaluate(() => window.save_to_file()));
+  expect(after.character.equipment.method.name).toBe('星解之术'); // saved as upstream key
+  expect(after.skills.StarDestruction.total_xp).toBeGreaterThan(xpBefore);
+  expect(errors, `errors: ${errors.join('\n')}`).toHaveLength(0);
+});

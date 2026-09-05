@@ -2496,9 +2496,9 @@ function do_character_combat_action({target, attack_power}, target_num,c_atk_mul
             add_xp_to_skill({skill: skills['Unarmed'], xp_to_add: target.xp_value});
         }//武器技能+空手技能
         if(character.equipment.method != null){
-            if(character.equipment.method.id=="Three-Month Severed Night") add_xp_to_skill({skill: skills['3Moon/Night'], xp_to_add: target.xp_value});
-            if(character.equipment.method.id=="Star-Dissolution Technique") add_xp_to_skill({skill: skills['StarDestruction'], xp_to_add: target.xp_value});
-            if(character.equipment.method.id=="Starlight Violet Radiance") add_xp_to_skill({skill: skills['ReflectStarVioletLight'], xp_to_add: target.xp_value});
+            if(character.equipment.method.id=="三月断宵") add_xp_to_skill({skill: skills['3Moon/Night'], xp_to_add: target.xp_value});
+            if(character.equipment.method.id=="星解之术") add_xp_to_skill({skill: skills['StarDestruction'], xp_to_add: target.xp_value});
+            if(character.equipment.method.id=="映星紫华") add_xp_to_skill({skill: skills['ReflectStarVioletLight'], xp_to_add: target.xp_value});
         }
         if(character.stats.full.crit_rate > Math.random()) {
             vibra_damage *= character.stats.full.crit_multiplier;
