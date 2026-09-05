@@ -5854,8 +5854,10 @@ function update_displayed_engine(){
     engine_result_name.innerText = (inf_combat.FE.SF.num * 999.999 - inf_combat.FE.SF.ice < 0)?"万载冰髓锭":"Arctic Superfluid";
     engine_result_fruit_status.innerText = (inf_combat.FE.fruit == -1)?"Not inserted":`Awakening ${(inf_combat.FE.fruit / 1e4).toFixed(4)}%`
     engine_result_temp.innerText = (inf_combat.FE.outer_temp.toFixed(0)) + 'K / '+ ((inf_combat.FE.outer_temp/240)**2*12).toFixed(2) + 'MPa';
-    engine_env1.style.display = (character.equipment.realm?.name == "Flame-Sea Frost Sky [Domain Stage 2]" || character.equipment.realm?.name == "Flame-Sea Frost Sky [Domain Stage 3]")?"inline-block":"none";
-    engine_env2.style.display = (character.equipment.realm?.name == "Flame-Sea Frost Sky [Domain Stage 2]" || character.equipment.realm?.name == "Flame-Sea Frost Sky [Domain Stage 3]")?"inline-block":"none";
+    //unlocked at [Domain Stage 2]; upstream only matched stages 2-3, hiding the buttons again at [Rising Cloud, Falling Moon] stages 4-6
+    const engine_envs_unlocked = /\[Domain Stage [2-6]\]/.test(character.equipment.realm?.name ?? "");
+    engine_env1.style.display = engine_envs_unlocked?"inline-block":"none";
+    engine_env2.style.display = engine_envs_unlocked?"inline-block":"none";
 
 
     piston_div.style.left = Math.round(120 * (1+Math.cos(3.1415927*(1+inf_combat.FE.piston))) + 64) + 'px';
@@ -6103,7 +6105,7 @@ function engine_e(e_temp){
     if(e_temp != -1) inf_combat.FE.outer_temp = e_temp;
     else{
         
-            if(character.equipment.special?.name == "Vessel Heart")
+            if(character.equipment.special?.name == "Spaceship Heart")
             {
                 character.equipment.special = null;
                 add_to_character_inventory([{item: item_templates["飞船之心·材"], count: 1}]);
@@ -6113,7 +6115,7 @@ function engine_e(e_temp){
                 log_message("Your [Spaceship Heart] has been converted into [Spaceship Heart (Material)],","combat_loot");
                 log_message("which can be upgraded further into the [Glacial Plain Heart].","combat_loot");
             }
-            else log_message("Equip the [Spaceship Heart] and try again!`","combat_looot");
+            else log_message("Equip the [Spaceship Heart] and try again!","combat_loot");
             //借用代码……
     }
 }

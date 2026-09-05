@@ -1412,43 +1412,60 @@ i {
 }
 #engine_div {
 	width: 810px;
-	height: var(--actions_div_height);
+	/* the engine panel needs room for the piston area plus both stat columns
+	   (absolutely positioned at top:256px) — the shared actions-div height
+	   (120px in combat layout) clipped them into the content below */
+	height: 470px;
 	left: 410px;
 	top: var(--actions_div_top);
 	display:none;
+	z-index: 5;
 }
 #engine_piston{
 	position:absolute;
 }
 #piston_change {
 	background-color: rgb(83, 184, 0);
-	width:90px;
+	width:130px;
 	height:24px;
 	font-weight:bold;
 	position:absolute;
 	top:12px;
 	left:280px;
 	border:2px solid lightgreen;
+	white-space:nowrap;
+	overflow:hidden;
 }
 #leave_engine{
 	background-color: rgb(184, 98, 0);
-	width:155px;
+	width:170px;
 	height:24px;
 	font-weight:bold;
 	position:absolute;
 	top:12px;
-	left:400px;
+	left:430px;
 	border:2px solid rgb(238, 194, 144);
+	white-space:nowrap;
+	overflow:hidden;
 }
 #engine_container_stats{
 	position:absolute;
 	top:256px;
-	left:0px;
+	left:6px;
+	width:434px;
 }
 #engine_result_stats{
 	position:absolute;
 	top:256px;
-	left:448px;
+	left:452px;
+	width:352px;
+}
+#engine_container_stats .money_button, #engine_result_stats .money_button{
+	white-space:nowrap;
+	display:inline-block;
+	width:auto;
+	min-width:48px;
+	padding-right:6px;
 }
 #container_circle {
       position: absolute;
@@ -1486,7 +1503,7 @@ i {
 	position:absolute;
 }
 #piston_stats{
-	top:36px;
+	top:40px;
 	left:240px;
 	height:160px;
 	width:264px;
@@ -1496,15 +1513,19 @@ i {
 	top:8px;
 	left:240px;
 	height:40px;
-	width:264px;
+	width:266px;
 	position:absolute;
 }
 #piston_compress,#piston_expand,#piston_fill,#piston_defill{
 	height:22px;
-	width:40px;
+	width:58px;
 	position:absolute;
 	font-weight:bold;
+	font-size:12px;
+	line-height:22px;
 	text-align: center;         /* 可选：文字内部也水平居中 */
+	white-space:nowrap;
+	overflow:hidden;
 }
 #piston_compress{
 	top:0px;
@@ -1514,19 +1535,19 @@ i {
 }
 #piston_expand{
 	top:0px;
-	left:45px;
+	left:64px;
 	background-color: rgb(36, 186, 255);
 	border:2px solid rgb(128, 247, 255);
 }
 #piston_fill{
 	top:0px;
-	left:90px;
+	left:128px;
 	background-color: rgb(255, 36, 36);
 	border:2px solid rgb(255, 128, 128);
 }
 #piston_defill{
 	top:0px;
-	left:135px;
+	left:192px;
 	background-color: rgb(204, 36, 255);
 	border:2px solid rgb(225, 128, 255);
 }
