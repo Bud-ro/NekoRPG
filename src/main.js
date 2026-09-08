@@ -5423,7 +5423,7 @@ window.leave_grass = leave_grass;
 //割草小游戏
 
 let digging_able = true;
-const dig_loots = [[0,60,15,2,"Extreme Ice Marrow"],[0.7,85,3,4,"Spirit Blue Supplies"],[1.0,135,1,8,"Blood-Burning Flower King"],[1.199,360,1,960,"Feng"]]
+const dig_loots = [[0,60,15,2,"极冰骨髓"],[0.7,85,3,4,"灵蓝补给品"],[1.0,135,1,8,"焚血花王"],[1.199,360,1,960,"峰"]]//[4] is the item_templates key (Chinese); display via getName()
 //[0]:RNG需要量,[1]:移动速度，[2]:一次获取量，[3]:回收速度/伸长的速度
 //spec/fishmark_lootX.png，格式统一
 let fish_cd = 1.00;
@@ -5513,7 +5513,7 @@ function start_digging_minigame(){
                     add_xp_to_skill({skill: skills["GroundDigging"], xp_to_add: (dig_loots[claw_fish][3]/2)**2,should_info:true,use_bonus:true});
                     add_to_character_inventory([{ "item": getItem(item_templates[dig_loots[claw_fish][4]]), "count": dig_loots[claw_fish][2] }]);
                     
-                    log_message("Drilled the stratum and unearthed " + dig_loots[claw_fish][2] + " x " + dig_loots[claw_fish][4] + "！","enemy_defeated");
+                    log_message("Drilled the stratum and unearthed " + dig_loots[claw_fish][2] + " x " + item_templates[dig_loots[claw_fish][4]].getName() + "!","enemy_defeated");
                 }
 
                 claw_fish = -1;
